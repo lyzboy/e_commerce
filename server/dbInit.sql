@@ -21,7 +21,8 @@ CREATE TABLE products_categories (
 
 CREATE TABLE states(
     id SERIAL PRIMARY KEY,
-    name varchar(150) NOT NULL
+    name varchar(150) NOT NULL,
+    short_name varchar(2) NOT NULL
 );
 
 CREATE TABLE cities(
