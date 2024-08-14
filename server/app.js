@@ -1,0 +1,146 @@
+const express = require("express");
+const bodyParser = require("body-parser");
+const db = require("./db/queries");
+const session = require("express-session");
+const store = new session.MemoryStore();
+const passport = require("passport");
+const LocalStrategy = require("passport-local").Strategy;
+
+const app = express();
+const port = 3000;
+
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
+
+app.use(
+    session({
+        // TODO: move secrete to env
+        secret: "sfj&D636&^jdu",
+        cookie: { maxAge: 300000000, secure: false },
+        saveUninitialized: false,
+        resave: false,
+        store,
+    })
+);
+
+app.use(passport.initialize());
+app.ust(passport.session());
+
+passport.serializeUser((user, done) => {
+    done(null, user.id);
+});
+
+passport.deserializeUser((id, done) => {
+    // need a function to retrieve user id from database
+    db.users.findByID(id, function (err, user) {
+        if (err) {
+            return done(err);
+        }
+        done(null, user);
+    });
+});
+
+passport.use(
+    new LocalStrategy(function (username, password, cb) {
+        db.users.findByUsername(username, function (err, user) {
+            if (err) {
+                return cb(err);
+            }
+            if (!user) {
+                return cb(null, false);
+            }
+            if (user.password != password) {
+                return cb(null, false);
+            }
+            return cb(null, user);
+        });
+    })
+);
+
+app.get("/", (req, res) => {
+    res.json({ info: "Node.js, Express, and Postgres API" });
+});
+
+// ACCOUNTS
+app.get("/login", (req, res) => {
+    res.render("login");
+});
+app.post("/register", async (req, res) => {
+    const { username, password } = req.body;
+    const newUser = await db.users.createUser({ username, password });
+    if (newUser) {
+        res.status(201).json({
+            msg: "New user created!",
+            newUser,
+        });
+    } else {
+        res.status(500).json({ msg: "Unable to create user" });
+    }
+});
+app.post(
+    "/login",
+    passport.authenticate("local", { failureRedirect: "/login" }),
+    (req, res) => {
+        res.redirect("profile");
+    }
+);
+app.get("/profile", (req, res) => {
+    const email = req.params.email;
+    res.send(`Retrieved use with email of ${email}`);
+});
+app.put("/profile", (req, res) => {
+    res.send("User profile updated");
+});
+app.post("/logout", (req, res) => {
+    res.send("User logged out");
+});
+
+// PRODUCTS
+app.get("/products", (req, res) => {
+    const productDetails = req.query;
+    // return the queries for testing
+    res.json(productDetails);
+});
+app.post("/products", (req, res) => {
+    const newProduct = req.body;
+    res.json(newProduct);
+});
+app.get("/products/:id", (req, res) => {
+    const id = req.params.id;
+    res.send(`Getting product with id ${id}`);
+});
+app.delete("/products/:id", (req, res) => {
+    const id = req.params.id;
+    res.send(`Deleting product with id ${id}`);
+});
+app.put("/products/:id", (req, res) => {
+    const id = req.params.id;
+    res.send(`Updating product with id ${id}`);
+});
+
+//CART
+
+app.get("/cart/:id", (req, res) => {
+    res.send(`Retrieving card with id ${req.params.id}`);
+});
+app.put("/cart/:id", (req, res) => {
+    res.send(`Updating cart ${req.params.id} with request body`);
+});
+app.post("/clear_cart/:id", (req, res) => {
+    res.send(`Clearing cart with id ${req.params.id}`);
+});
+app.post("/cart/:id/checkout", (req, res) => {
+    res.send(`Cart with id ${req.params.id} completed`);
+});
+
+//ORDERS
+app.get("/orders", (req, res) => {
+    res.send("returning all orders");
+});
+app.get("/orders/:orderId", (req, res) => {
+    res.send(`Retrieving order at id ${req.params.orderId}`);
+});
+
+app.listen(port, () => {
+    console.log(`Server started on port ${port}`);
+});
