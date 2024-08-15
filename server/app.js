@@ -24,7 +24,7 @@ app.use(
 );
 
 app.use(passport.initialize());
-app.ust(passport.session());
+app.use(passport.session());
 
 passport.serializeUser((user, done) => {
     done(null, user.id);
@@ -63,7 +63,7 @@ app.get("/", (req, res) => {
 
 // ACCOUNTS
 app.get("/login", (req, res) => {
-    res.render("login");
+    res.send("log in to site");
 });
 app.post("/register", async (req, res) => {
     const { username, password } = req.body;
@@ -81,7 +81,7 @@ app.post(
     "/login",
     passport.authenticate("local", { failureRedirect: "/login" }),
     (req, res) => {
-        res.redirect("profile");
+        res.redirect("/login");
     }
 );
 app.get("/profile", (req, res) => {
