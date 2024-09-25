@@ -1,61 +1,134 @@
 openapi: 3.0.1
 info:
-  title: All Things E-Store
-  version: 1.0.0
-  description: An online store where you can be ALMOST anything you can think of!
+    title: All Things E-Store
+    version: 1.0.0
+    description: An online store where you can be ALMOST anything you can think of!
 paths:
-  /products:
-    summary: Product Management
-    description: >-
-      Endpoints related to retrieving and managing all products within the
-      store's database.
-    get:
-      summary: Get all products
-      description: Retrieves all products for the store's database
-      operationId: get_products
-      # requestBody:
-      #   description: A new order object
-      #   content:
-      #     application/json:
-      #       schema:
-      #         $ref: '#/components/schemas/Order'
-      responses:
-        '200':
-          description: The list of products was successfully retrieved
-          content:
-            application/json:
-              examples:
-                products:
-                  value: '[
-                    {
-                      "id": 1,
-                      "barcode": "123456789012",
-                      "name": "ABC Soap",
-                      "description": "A 32oz box of laundry soap",
-                      "price": 12.99,
-                      "quantity": 27
-                    },
-                                        {
-                      "id": 2,
-                      "barcode": "4567890123456",
-                      "name": "ABC Bread",
-                      "description": "A loaf a bread",
-                      "price": 15.99,
-                      "quantity": 5
-                    }
-                    ]'
-      tags:
-        - Products
+    /products:
+        summary: Product Management
+        description: >-
+            Endpoints related to retrieving and managing all products within the
+            store's database.
+        get:
+            summary: Search and filter products
+            description: Retrieves products from the store's database based on search criteria
+            operationId: search_products
+            parameters:
+                - in: query
+                  name: category
+                  schema:
+                      type: string
+                  description: Filter products by category
+                - in: query
+                  name: name
+                  schema:
+                      type: string
+                  description: Search products by name
+                - in: query
+                  name: min_price
+                  schema:
+                      type: number
+                      format: float
+                  description: Filter products by minimum price
+                - in: query
+                  name: max_price
+                  schema:
+                      type: number
+                      format: float
+                  description: Filter products by maximum price
+                - in: query
+                  name: page
+                  schema:
+                      type: number
+                      format: integer
+                  description: The page number to retrieve
+                - in: query
+                  name: limit
+                  schema:
+                      type: number
+                      format: float
+                  description: The number of products per page
+            responses:
+                "200":
+                    description: The list of products was successfully retrieved
+                    content:
+                        application/json:
+                            schema:
+                                type: array
+                                items:
+                                    $ref: "#/components/schemas/Product"
+                "500":
+                    description: Server error
+            tags:
+                - Products
+        put:
+            summary: Add a product
+            description: Adds a new product to the database
+            operationId: add_product
+            requestBody:
+                description: A new product object
+                content:
+                    application/json:
+                        schema:
+                            $ref: "#/components/schemas/Product"
+            responses:
+                default:
+                    description: Default error sample response
+            tags:
+                - Products
+    /products/{id}:
+        summary: Retrieve a single product by ID
+        description: Retrieves a single product from the database by given ID
+        get:
+            summary: Get a product
+            description: This operation retrieves an object with the matching id
+            operationId: get_product_id
+            responses:
+                "200":
+                    description: The product was successfully retrieved.
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/Product"
+            parameters:
+                - name: id
+                  in: path
+                  description: The id of the product.
+                  required: true
+                  schema:
+                      type: string
+            tags:
+                - Products
 components:
-  schemas:
-    Order:
-      type: object
-      properties:
-        name:
-          type: string
-        id:
-          type: string
-        state:
-          type: string
-      xml:
-        name: Order
+    schemas:
+        Product:
+            type: object
+            properties:
+                id:
+                    type: integer
+                    description: Auto-incrementing primary key
+                barcode:
+                    type: string
+                    maxLength: 20
+                    description: The barcode of the product
+                    nullable: true # Since the database allows null values for barcode
+                name:
+                    type: string
+                    maxLength: 50
+                    description: The name of the product
+                description:
+                    type: string
+                    maxLength: 254
+                    description: A detailed description of the product
+                    nullable: true # Since the database allows null values for description
+                price:
+                    type: number
+                    format: float
+                    description: The price of the product, must be greater than 0
+                quantity:
+                    type: integer
+                    description: The quantity of the product in stock, must be greater than 0
+            required:
+                - name
+                - price
+                - quantity
