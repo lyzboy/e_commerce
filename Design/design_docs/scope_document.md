@@ -35,9 +35,9 @@ The roles of different users will be as follows:
 
 **Admins**: refers administrators of the site. They will be able to view, edit, and delete products and orders.
 
-**Users**: refers to logged in users of the site. They will be able to view products, add products to a cart, and complete a purchase.
+**Users**: refers to logged in users of the site. They will be able to view products, add products to a cart, and complete a purchase. These are end-users.
 
-**Visitors**: refers to users who are not logged in but include the subset of logged in users. Any action a visitor can take, a logged in user can also take. 
+**Visitors**: refers to users who are not logged in but include the subset of logged in users. Any action a visitor can take, a logged in user can also take. These are end-users. 
 
 
 ### Required Features
