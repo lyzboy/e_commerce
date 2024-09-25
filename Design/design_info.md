@@ -10,11 +10,14 @@
 
 ## Table of Contents
 
-[**Database Schema**](#database-schema)  
-[**API Documentation**](#api-documentation)  
-[**Wireframes and Mockups**](#wireframes-and-mockups)
+[**Technology Stack**](#technology-stack)<br>
+[**Database Schema**](#database-schema)<br>
+[**API Documentation**](#api-documentation)<br>
+[**Wireframes and Mockups**](#wireframes-and-mockups)<br>
 
 ---
+
+## Technology Stack
 
 ## Database Schema
 
