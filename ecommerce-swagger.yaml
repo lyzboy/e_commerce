@@ -1,0 +1,61 @@
+openapi: 3.0.1
+info:
+  title: All Things E-Store
+  version: 1.0.0
+  description: An online store where you can be ALMOST anything you can think of!
+paths:
+  /products:
+    summary: Product Management
+    description: >-
+      Endpoints related to retrieving and managing all products within the
+      store's database.
+    get:
+      summary: Get all products
+      description: Retrieves all products for the store's database
+      operationId: get_products
+      # requestBody:
+      #   description: A new order object
+      #   content:
+      #     application/json:
+      #       schema:
+      #         $ref: '#/components/schemas/Order'
+      responses:
+        '200':
+          description: The list of products was successfully retrieved
+          content:
+            application/json:
+              examples:
+                products:
+                  value: '[
+                    {
+                      "id": 1,
+                      "barcode": "123456789012",
+                      "name": "ABC Soap",
+                      "description": "A 32oz box of laundry soap",
+                      "price": 12.99,
+                      "quantity": 27
+                    },
+                                        {
+                      "id": 2,
+                      "barcode": "4567890123456",
+                      "name": "ABC Bread",
+                      "description": "A loaf a bread",
+                      "price": 15.99,
+                      "quantity": 5
+                    }
+                    ]'
+      tags:
+        - Products
+components:
+  schemas:
+    Order:
+      type: object
+      properties:
+        name:
+          type: string
+        id:
+          type: string
+        state:
+          type: string
+      xml:
+        name: Order
