@@ -35,6 +35,7 @@
 ### Hosting
 - Render
 - [Cloudinary](https://cloudinary.com/) (Image hosting)
+- Supabase (PostgreSQL database hosting)
 
 ## Database Schema
 
