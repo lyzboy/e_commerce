@@ -99,6 +99,20 @@ paths:
                       type: string
             tags:
                 - Products
+    /user:
+        summary: Allow the user to login.
+        description: >-
+            Endpoints related to retrieving and managing all products within the
+            store's database.
+        get:
+            summary: Get a product
+            description: This operation retrieves an object with the matching id
+            operationId: get_login
+            responses:
+                "200":
+                    description: The user was successfully retrieved.
+            tags:
+                - User
 components:
     schemas:
         Product:
