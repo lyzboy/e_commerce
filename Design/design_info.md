@@ -19,9 +19,6 @@
 
 ## Technology Stack
 
-- [Cloudinary](https://cloudinary.com/) - Image hosting
-
-
 ### Frontend
 - React
 - Redux
