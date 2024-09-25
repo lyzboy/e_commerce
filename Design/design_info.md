@@ -19,6 +19,26 @@
 
 ## Technology Stack
 
+- [Cloudinary](https://cloudinary.com/) - Image hosting
+
+
+### Frontend
+- React
+- Redux
+
+### Backend
+- Node.js
+- Express
+    - Passport (authentication)
+    - Validator (input validation)
+
+### Databse
+- PostgreSQL
+
+### Hosting
+- Render
+- [Cloudinary](https://cloudinary.com/) (Image hosting)
+
 ## Database Schema
 
 The schema can be found at [dbdiagram.io](https://dbdiagram.io/d/E-Commerce-Codecademy-66b97b108b4bb5230ed3f102)
