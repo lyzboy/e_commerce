@@ -20,24 +20,36 @@
 ## Technology Stack
 
 ### Frontend
-- React
-- Redux
+- React (CRA)
+- Redux (state management)
+- RTL (react testing)
+- Jest (js testing)
 
 ### Backend
 - Node.js
 - Express
     - Passport (authentication)
-    - Validator (input validation)
+    - Bcrypt (password hashing)
+    - Express-Validator (input validation)
+    - Oauth2-server (OAuth2)
+    - Express-session (session management)
+    - Node-postgres (PostgreSQL client)
+    - Express-session (session management)
+- Mocha (testing)
+- Chai (testing)
 
-### Databse
+### Database
 - PostgreSQL
 
 ### Hosting
-- Render
+- Render (Full-stack hosting)
 - [Cloudinary](https://cloudinary.com/) (Image hosting)
 - Supabase (PostgreSQL database hosting)
 
 ## Database Schema
+
+> **Note**:
+> need to add table for admin users
 
 The schema can be found at [dbdiagram.io](https://dbdiagram.io/d/E-Commerce-Codecademy-66b97b108b4bb5230ed3f102)
 
