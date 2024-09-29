@@ -23,7 +23,7 @@
 [**Error page**](#error-page)<br>
 [**Home Page**](#home-page)<br>
 [**Examples**](#examples)<br>
-- [**Home Depot**](#home-depot)<br>
+    - [**Home Depot**](#home-depot)<br>
 
 
 The purpose of this document is to brainstorm the layout of the design for the project. This will include the layout of the components and the overall design of the project. This will include possible sections for each page and what elements should be included in each. This will aid in the creation of wireframes and prototypes for the project.
@@ -53,10 +53,37 @@ The home page will be the first page that the user sees when they visit the site
 - **Footer**
 
 ## Profile Page
+The profile page is where the user will be able to see their profile information. This will include their profile picture, username, email, address, purchase history, current orders, and the ability to change their password.
+
+- *Profile Picture*: <br> The user will be able to upload a profile picture. This will be displayed in a circle.
+    - *Username*: <br> The username of the user will be displayed.
+    - *Email*: <br> The email of the user will be displayed.
+    - *Address*: <br> The address of the user will be displayed.
+    - *Purchase History*: <br> The user will be able to see their purchase history. This will include the date of purchase, the product purchased, the price of the product, and the status of the order.
+    - *Current Orders*: <br> The user will be able to see their current orders. This will include the date of purchase, the product purchased, the price of the product, and the status of the order.
+    - *Change Password*: <br> The user will be able to change their password.
+
+## Change Password
+This page will include a form that will allow the user to change their password. This will include the following fields:
+- *Old Password*: <br> The user will be able to enter their old password.
+    - *New Password*: <br> The user will be able to enter their new password.
+    - *Confirm Password*: <br> The user will be able to confirm their new password.
+    - *Submit*: <br> The user will be able to submit the form to change their password.
 
 ## Category Page
+This page will list categories that the user can click on to see products in that category. This will include the name of the category, the image of the category, and the number of products in the category.
+
+- *Category List*: <br> The user will be able to see a list of products in the category. This will include the name of the product, the price of the product, and the image of the product.
 
 ## Product Page
+- *Product Image*: <br> The user will be able to see an image of the product.
+    - *Product Name*: <br> The user will be able to see the name of the product.
+    - *Product Price*: <br> The user will be able to see the price of the product.
+    - *Product Description*: <br> The user will be able to see the description of the product.
+    - *Add to Cart*: <br> The user will be able to add the product to their cart.
+    - *Quantity*: <br> The user will be able to select the quantity of the product they would like to purchase.
+    - *Modifiers*: <br> The user will be able to select any modifiers for the product.
+    - *Similar Products*: <br> The user will be able to see similar products to the product they are viewing.
 
 ## Admin page
 
