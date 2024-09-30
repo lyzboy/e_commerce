@@ -2,6 +2,8 @@
 
 # Design Layout Brainstorm
 
+The purpose of this document is to brainstorm the layout of the design for the project. This will include the layout of the components and the overall design of the project. This will include possible sections for each page and what elements should be included in each. This will aid in the creation of wire frames and prototypes for the project.
+
 ## Table of Contents
 
 [**Site Intent**](#site-intent)<br>
@@ -26,8 +28,6 @@
 [**Examples**](#examples)<br>
     - [**Home Depot**](#home-depot)<br>
 
-
-The purpose of this document is to brainstorm the layout of the design for the project. This will include the layout of the components and the overall design of the project. This will include possible sections for each page and what elements should be included in each. This will aid in the creation of wireframes and prototypes for the project.
 
 ## Site Intent
 
