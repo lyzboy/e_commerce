@@ -45,6 +45,8 @@
 - Render (Full-stack hosting)
 - [Cloudinary](https://cloudinary.com/) (Image hosting)
 - Supabase (PostgreSQL database hosting)
+- Stripe (payment processing - test mode)
+- SendGrid (email service - free tier)
 
 ## Database Schema
 
