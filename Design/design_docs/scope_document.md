@@ -53,6 +53,10 @@ The roles of different users will be as follows:
     - [ ] Visitors will be able to log in using a 3rd party service (Google, Facebook, etc.)
     - [ ] Visitors will be able to reset their password.
     - [ ] Visitors will be able to update their account information including address and payment information.
+    - [ ] Visitors will be able to view past orders.
+    - [ ] Visitors will be able to log out.
+    - [ ] Visitors will be able to view their cart.
+    - [ ] Visitors will be able to change their password.
 -  **Product Browsing**
     - [ ] Visitors will be able to view a list of products.
     - [ ] Visitors will be able to view a single product.
