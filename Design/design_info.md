@@ -2,11 +2,12 @@
 
 ## Quick Links
 
-[**Style Guide**](design_docs/style_guide.md)  
-[**Scope Document**](design_docs/scope_document.md)  
-[**Component Planning**](design_docs/component_planning.md)  
-[**Redux Store Documentation**](design_docs/redux_store_documentation.md)  
-[**Testing Documentation**](design_docs/testing_documentation.md)
+[**Style Guide**](design_docs/style_guide.md) <br>
+[**Scope Document**](design_docs/scope_document.md) X<br>
+[**Component Planning**](design_docs/component_planning.md)  <br>
+[**Redux Store Documentation**](design_docs/redux_store_documentation.md)  <br>
+[**Testing Documentation**](design_docs/testing_documentation.md)<br>
+[**Design Layout Brainstorm**](design_docs/design_layout_brainstorm.md) X<br>
 
 ## Table of Contents
 
@@ -51,7 +52,7 @@
 ## Database Schema
 
 > **Note**:
-> need to add table for admin users
+> need to add table for admin users and roles. Also for password reset tokens, payment tokens, as others. ***OUT OF DATE***
 
 The schema can be found at [dbdiagram.io](https://dbdiagram.io/d/E-Commerce-Codecademy-66b97b108b4bb5230ed3f102)
 
