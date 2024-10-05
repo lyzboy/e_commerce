@@ -51,8 +51,16 @@
 
 ## Database Schema
 
-> **Note**:
-> need to add table for admin users and roles. Also for password reset tokens, payment tokens, as others. ***OUT OF DATE***
+> **Note**:<br>
+> ***OUT OF DATE***
+> - need to add table for admin users and roles.
+> - add table to database for reset password auth code.
+> - add element to user table for OAuth2 provider id.
+> - add table for payment tokens.
+> - add table for hero products/speacials.
+> - add table for poduct discounts.
+> <br><br>
+> ***OUT OF DATE***
 
 The schema can be found at [dbdiagram.io](https://dbdiagram.io/d/E-Commerce-Codecademy-66b97b108b4bb5230ed3f102)
 
@@ -63,5 +71,10 @@ The current schema is pictured below:
 ## API Documentation
 
 The API documentation has been created using Swagger Editor. The file [ecommerce-swagger.yaml](ecommerce-swagger.yaml) can be uploaded to the Swagger editor either [online](https://editor.swagger.io/) or desktop to view the documentation.
+
+> **Note**:<br>
+> new endpoints need to be added for:
+> - user registration
+> - password reset
 
 ## Wireframes and Mockups
