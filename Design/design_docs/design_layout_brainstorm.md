@@ -136,8 +136,15 @@ The register page will allow users to create an account on the site. The user wi
 ## Forgot Password Page
 The forgot password page will allow users to reset their password. The user will be able to enter their email to submit to the server, the server will send a code to the user to use for password reset. The code will need to be store in the database for verification along with an expiration time for the code.
  - *Email*: <br> The user will be able to enter their email.
-    - *Reset Password*: <br> The user will be able to reset their password.
- - *Reset Code*: <br> the user will be able to enter the reset code that was sent to their email and it will be accepted as long as the expiration time has not been exceeded.
+### Forgot Password Code page
+This page will be displayed after the user has submitted their email. This page will notify the user that a code has been sent to their email. The user will need to retieve the code from their email and enter it on this page.
+ - *Code*: <br> The user will be able to enter the code that was sent to their email.
+    - *Submit*: <br> The user will be able to submit the code to reset their password.
+### Forgot Password Reset page
+This page will show if the user has entered the correct code for reset. The user will need to enter their password twice to confirm the change.
+ - *New Password*: <br> The user will be able to enter their new password.
+    - *Confirm Password*: <br> The user will be able to confirm their new password.
+    - *Submit*: <br> The user will be able to submit the form to reset their password.
 
 ## Reset Password Page
 The reset password page will allow users to reset their password if they have forgotten it. After entering the code that was send to their email, the user will be directed to this page. The user will have to enter their new password and confirm it.
