@@ -51,22 +51,11 @@
 
 ## Database Schema
 
-> **Note**:<br>
-> ***OUT OF DATE***
-> - need to add table for admin users and roles.
-> - add table to database for reset password auth code.
-> - add element to user table for OAuth2 provider id.
-> - add table for payment tokens.
-> - add table for hero products/speacials.
-> - add table for poduct discounts.
-> <br><br>
-> ***OUT OF DATE***
-
 The schema can be found at [dbdiagram.io](https://dbdiagram.io/d/E-Commerce-Codecademy-66b97b108b4bb5230ed3f102)
 
 The current schema is pictured below:
 
-![database schema](DB_Schema.png)
+![database schema](/Design/design_docs/imgs/DB_Schema.png)
 
 ## API Documentation
 
