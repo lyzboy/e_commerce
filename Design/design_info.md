@@ -50,6 +50,14 @@
 - Stripe (payment processing - test mode)
 - SendGrid (email service - free tier)
 
+## Legal Documents
+
+This website should include documents. It may be beneficial to include an editor for amdin to edit these documents. The documents should include:
+
+- Privacy Policy (with cookie policy)
+- Terms of Service
+- Refund Policy
+
 ## Security
 
 For authentication for endpoints that require an elevated level of access (HTTP Methods: delete, put, etc.), the API will use JWT tokens. The token will be passed in the header of the request. The token will be verified using the `passport-jwt` strategy. The token will be signed using the `jsonwebtoken` package. This will ensure that the user is who they say they are and prevent against CSRF attacks. There will be two levels of access: user and admin. The admin level will have access to all endpoints, while the user level will have access to only certain endpoints. The server will check the token against the database to ensure the all HTTP Methods come from an admin account when the bearer token is present.
