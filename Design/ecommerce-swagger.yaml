@@ -2,8 +2,91 @@ openapi: 3.0.1
 info:
     title: All Things E-Store
     version: 1.0.0
-    description: An online store where you can be ALMOST anything you can think of!
+    description: An online store where you can buy ALMOST anything you can think of!
 paths:
+    /categories:
+        summary: Category Management
+        description: >-
+            Endpoints related to retrieving and managing all categories
+            withing the store's database.
+        get:
+            summary: Search and filter categories.
+            description: Retrieves categories from the store's database based on search criteria
+            operationId: search_categories
+            responses:
+                "200":
+                    description: The list of categories was successfully retrieved.
+                    content:
+                        application/json:
+                            schema:
+                                type: array
+                                items:
+                                    $ref: "#/components/schemas/Category"
+                "500":
+                    description: Server error
+            tags:
+                - Category
+        put:
+            summary: Add a category
+            description: Adds a new category to the database
+            operationId: add_category
+            security:
+                - bearerAuth: []
+            requestBody:
+                description: A new category object
+                content:
+                    application/json:
+                        schema:
+                            $ref: "#/components/schemas/Category"
+            responses:
+                default:
+                    description: Default error sample response
+            tags:
+                - Category
+    /categories/{id}:
+        summary: Retrieve a single category by ID
+        description: Retrieves a single category from the database by given ID
+        get:
+            summary: Get a category
+            description: This operation retrieves an object with the matching id
+            operationId: get_category_id
+            responses:
+                "200":
+                    description: The category was successfully retrieved.
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/Category"
+            parameters:
+                - name: id
+                  in: path
+                  description: The id of the category.
+                  required: true
+                  schema:
+                      type: string
+            tags:
+                - Category
+        delete:
+            summary: Delete a category.
+            description: This operation deletes an object with the matching id.
+            operationId: delete_category_id
+            security:
+                - bearerAuth: []
+            responses:
+                "200":
+                    description: The category was deleted successfully
+                "403":
+                    description: User does not have elevated role to complete this operation.
+                "500":
+                    description: Server error
+            parameters:
+                - name: id
+                  in: path
+                  schema:
+                      type: string
+                  required: true
+            tags:
+                - Category
     /products:
         summary: Product Management
         description: >-
@@ -65,6 +148,8 @@ paths:
             summary: Add a product
             description: Adds a new product to the database
             operationId: add_product
+            security:
+                - bearerAuth: []
             requestBody:
                 description: A new product object
                 content:
@@ -99,6 +184,27 @@ paths:
                       type: string
             tags:
                 - Products
+        delete:
+            summary: Delete a product.
+            description: This product deletes an object with the matching id.
+            operationId: delete_product_id
+            security:
+                - bearerAuth: []
+            responses:
+                "200":
+                    description: The product was deleted successfully
+                "403":
+                    description: User does not have elevated role to complete this operation.
+                "500":
+                    description: Server error
+            parameters:
+                - name: id
+                  in: path
+                  schema:
+                      type: string
+                  required: true
+            tags:
+                - Products
     /user:
         summary: Allow the user to login.
         description: >-
@@ -114,7 +220,30 @@ paths:
             tags:
                 - User
 components:
+    securitySchemes:
+        bearerAuth:
+            type: http
+            scheme: bearer
+            bearerFormat: JWT
+
     schemas:
+        Category:
+            type: object
+            properties:
+                id:
+                    type: integer
+                    description: Auto-incrementing primary key
+                name:
+                    type: string
+                    description: The name of the category
+                description:
+                    type: string
+                    description: The description for the category
+            required:
+                - id
+                - name
+                - description
+
         Product:
             type: object
             properties:
@@ -125,7 +254,7 @@ components:
                     type: string
                     maxLength: 20
                     description: The barcode of the product
-                    nullable: true # Since the database allows null values for barcode
+                    nullable: true
                 name:
                     type: string
                     maxLength: 50
@@ -134,7 +263,7 @@ components:
                     type: string
                     maxLength: 254
                     description: A detailed description of the product
-                    nullable: true # Since the database allows null values for description
+                    nullable: true
                 price:
                     type: number
                     format: float
@@ -143,6 +272,7 @@ components:
                     type: integer
                     description: The quantity of the product in stock, must be greater than 0
             required:
+                - id
                 - name
                 - price
                 - quantity
