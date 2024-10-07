@@ -93,6 +93,26 @@ The admin page will only be available to users with admin privileges. This page 
  - View Orders: The admin will be able to view all orders. This will include the date of purchase, the product purchased, the price of the product, the status of the order, and the user who purchased the product.
     - *Edit Order*: <br> The admin will be able to edit an order. This will include the date of purchase, the product purchased, the price of the product, the status of the order, and the user who purchased the product.
     - *Delete Order*: <br> The admin will be able to delete an order. This will include the date of purchase, the product purchased, the price of the product, the status of the order, and the user who purchased the product.
+    - *Add Hero*: <br> The admin will be able to add hero content that will be shown on the home page. This will include:
+        - *Image*: <br> The hero image that will be shown on the home page.
+        - *Link*: <br> The link that the image will take the user to when clicked.
+        - *Title*: <br> The title of the hero.
+        - *Description*: <br> The description of the hero.
+    - *Edit Hero*: <br> The admin will be able to edit hero content that will be shown on the home page. This will include:
+    - *Delete Hero*: <br> The admin will be able to delete hero content that will be shown on the home page. This will include:
+    - *Add Category*: <br> The admin will be able to add a category. This will include the name of the category, the image of the category, and the number of products in the category.
+    - *Edit Category*: <br> The admin will be able to edit a category. This will include the name of the category, the image of the category, and the number of products in the category.
+    - *Delete Category*: <br> The admin will be able to delete a category. This will include the name of the category, the image of the category, and the number of products in the category.
+## Product Management Page
+  - Used to edit a single product.
+
+## Order management page
+
+## Category Management Page
+
+## Edit Hero
+
+## Edit Order page
 
 ## Cart Page
 The cart page will display items in the user's cart. The user wil be able to see each products information including name, price, quantity, and modifiers. The user will be able to change the quantity of the product and remove the product from the cart. The user will also be able to see the total price of the cart and proceed to checkout.
