@@ -62,10 +62,6 @@ app.get("/", (req, res) => {
 });
 
 // ACCOUNTS
-
-app.get("/state", (req, res) => {
-    db.getStates(req, res);
-});
 app.get("/login", (req, res) => {
     res.send("log in to site");
 });
@@ -88,61 +84,16 @@ app.post(
         res.redirect("/login");
     }
 );
-app.get("/profile", (req, res) => {
-    const email = req.params.email;
-    res.send(`Retrieved use with email of ${email}`);
-});
-app.put("/profile", (req, res) => {
-    res.send("User profile updated");
-});
-app.post("/logout", (req, res) => {
-    res.send("User logged out");
-});
 
-// PRODUCTS
-app.get("/products", (req, res) => {
-    const productDetails = req.query;
-    // return the queries for testing
-    res.json(productDetails);
-});
-app.post("/products", (req, res) => {
-    const newProduct = req.body;
-    res.json(newProduct);
-});
-app.get("/products/:id", (req, res) => {
-    const id = req.params.id;
-    res.send(`Getting product with id ${id}`);
-});
-app.delete("/products/:id", (req, res) => {
-    const id = req.params.id;
-    res.send(`Deleting product with id ${id}`);
-});
-app.put("/products/:id", (req, res) => {
-    const id = req.params.id;
-    res.send(`Updating product with id ${id}`);
-});
-
-//CART
-
-app.get("/cart/:id", (req, res) => {
-    res.send(`Retrieving card with id ${req.params.id}`);
-});
-app.put("/cart/:id", (req, res) => {
-    res.send(`Updating cart ${req.params.id} with request body`);
-});
-app.post("/clear_cart/:id", (req, res) => {
-    res.send(`Clearing cart with id ${req.params.id}`);
-});
-app.post("/cart/:id/checkout", (req, res) => {
-    res.send(`Cart with id ${req.params.id} completed`);
-});
-
-//ORDERS
-app.get("/orders", (req, res) => {
-    res.send("returning all orders");
-});
-app.get("/orders/:orderId", (req, res) => {
-    res.send(`Retrieving order at id ${req.params.orderId}`);
+//Categories
+app.get("/api/v1/categories", async (req, res) => {
+    try {
+        const results = await db.getCategories(req, res);
+        res.status(200).json(results);
+    } catch (err) {
+        console.log(err);
+        res.status(500).json({ error: err.message });
+    }
 });
 
 app.listen(port, () => {

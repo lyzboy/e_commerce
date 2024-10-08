@@ -9,8 +9,13 @@ const pool = new Pool({
     port: process.env.POOL_PORT,
 });
 
-const query = (text, params, callback) => {
-    return pool.query(text, params, callback);
+const query = async (text, params, callback) => {
+    try {
+        const result = await pool.query(text, params, callback);
+        return result;
+    } catch (err) {
+        console.log(err);
+    }
 };
 
 module.exports = {
