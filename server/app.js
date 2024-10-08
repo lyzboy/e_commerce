@@ -62,6 +62,10 @@ app.get("/", (req, res) => {
 });
 
 // ACCOUNTS
+
+app.get("/state", (req, res) => {
+    db.getStates(req, res);
+});
 app.get("/login", (req, res) => {
     res.send("log in to site");
 });
