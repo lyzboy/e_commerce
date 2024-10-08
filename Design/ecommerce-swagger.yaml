@@ -4,14 +4,14 @@ info:
     version: 1.0.0
     description: An online store where you can buy ALMOST anything you can think of!
 paths:
-    /categories:
+    /api/v1/categories:
         summary: Category Management
         description: >-
-            Endpoints related to retrieving and managing all categories
+            Enpoints related to retrieving and managing all categories
             withing the store's database.
         get:
             summary: Search and filter categories.
-            description: Retrieves categories from the store's database based on search criteria
+            description: Retieves categories from the store's database based on search criteria
             operationId: search_categories
             responses:
                 "200":
@@ -26,7 +26,7 @@ paths:
                     description: Server error
             tags:
                 - Category
-        put:
+        post:
             summary: Add a category
             description: Adds a new category to the database
             operationId: add_category
@@ -43,7 +43,7 @@ paths:
                     description: Default error sample response
             tags:
                 - Category
-    /categories/{id}:
+    /api/v1/categories/{id}:
         summary: Retrieve a single category by ID
         description: Retrieves a single category from the database by given ID
         get:
@@ -64,6 +64,27 @@ paths:
                   required: true
                   schema:
                       type: string
+            tags:
+                - Category
+        put:
+            summary: Update a Category.
+            description: This operation updates an object with the matching id.
+            security:
+                - bearerAuth: []
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: "#/components/schemas/Category"
+            responses:
+                "200":
+                    description: The category was successfully updated.
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/Product"
+                "404":
+                    description: No category found
             tags:
                 - Category
         delete:
@@ -87,7 +108,7 @@ paths:
                   required: true
             tags:
                 - Category
-    /products:
+    /api/v1/products:
         summary: Product Management
         description: >-
             Endpoints related to retrieving and managing all products within the
@@ -144,7 +165,7 @@ paths:
                     description: Server error
             tags:
                 - Products
-        put:
+        post:
             summary: Add a product
             description: Adds a new product to the database
             operationId: add_product
@@ -161,7 +182,7 @@ paths:
                     description: Default error sample response
             tags:
                 - Products
-    /products/{id}:
+    /api/v1/products/{id}:
         summary: Retrieve a single product by ID
         description: Retrieves a single product from the database by given ID
         get:
@@ -205,26 +226,34 @@ paths:
                   required: true
             tags:
                 - Products
-    /user:
+    /api/v1/user/{id}:
         summary: Allow the user to login.
-        description: >-
-            Endpoints related to retrieving and managing all products within the
-            store's database.
+        description: Enpoints relating to all user info.
         get:
-            summary: Get a product
+            summary: Get a user
             description: This operation retrieves an object with the matching id
-            operationId: get_login
+            operationId: get_user
+            parameters:
+                - in: path
+                  name: id
+                  schema:
+                      type: string
+                  description: The user's id.
+                  required: true
+            security:
+                - bearerAuth: []
             responses:
                 "200":
                     description: The user was successfully retrieved.
             tags:
                 - User
+
 components:
     securitySchemes:
-        bearerAuth:
-            type: http
+        bearerAuth: # Name for the security scheme
+            type: http # HTTP-based authentication
             scheme: bearer
-            bearerFormat: JWT
+            bearerFormat: JWT # Indicates that the token format is JWT
 
     schemas:
         Category:
