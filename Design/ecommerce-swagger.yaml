@@ -7,11 +7,11 @@ paths:
     /api/v1/categories:
         summary: Category Management
         description: >-
-            Enpoints related to retrieving and managing all categories
+            Endpoints related to retrieving and managing all categories
             withing the store's database.
         get:
             summary: Search and filter categories.
-            description: Retieves categories from the store's database based on search criteria
+            description: Retrieves categories from the store's database based on search criteria
             operationId: search_categories
             responses:
                 "200":
