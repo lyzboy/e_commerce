@@ -226,9 +226,35 @@ paths:
                   required: true
             tags:
                 - Products
+    /api/v1/user:
+        summary: Endpoints for all user related requests
+
+        post:
+            summary: Add a user.
+            description: This operation creates a new user.
+            operationId: add_user
+            security:
+                - bearerAuth: []
+            requestBody:
+                description: A new user object
+                content:
+                    application/json:
+                        schema:
+                            $ref: "#/components/schemas/User"
+            responses:
+                "200":
+                    description: The user has been created
+                    content:
+                        application/json:
+                            schema:
+                                type: array
+                                items:
+                                    $ref: "#/components/schemas/Product"
+            tags:
+                - User
     /api/v1/user/{id}:
         summary: Allow the user to login.
-        description: Enpoints relating to all user info.
+        description: Endpoints relating to all user info.
         get:
             summary: Get a user
             description: This operation retrieves an object with the matching id
@@ -250,10 +276,10 @@ paths:
 
 components:
     securitySchemes:
-        bearerAuth: # Name for the security scheme
-            type: http # HTTP-based authentication
+        bearerAuth:
+            type: http
             scheme: bearer
-            bearerFormat: JWT # Indicates that the token format is JWT
+            bearerFormat: JWT
 
     schemas:
         Category:
@@ -272,7 +298,16 @@ components:
                 - id
                 - name
                 - description
-
+        User:
+            type: object
+            properties:
+                email:
+                    type: string
+                    description: The email for the user (PK)
+                username:
+                    type: string
+                    maxLength: 50
+                    description: The user's username.
         Product:
             type: object
             properties:
