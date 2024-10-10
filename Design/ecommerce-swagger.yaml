@@ -205,6 +205,31 @@ paths:
                       type: string
             tags:
                 - Products
+        put:
+            summary: Update a product.
+            description: This operation updates an object with the matching id
+            operationId: update_product_id
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: "#/components/schemas/Product"
+            responses:
+                "200":
+                    description: The product was successfully retrieved.
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/Product"
+            parameters:
+                - name: id
+                  in: path
+                  description: The id of the product.
+                  required: true
+                  schema:
+                      type: string
+            tags:
+                - Products
         delete:
             summary: Delete a product.
             description: This product deletes an object with the matching id.
@@ -275,16 +300,113 @@ paths:
                                 $ref: "#/components/schemas/User"
             tags:
                 - User
+        delete:
+            summary: Delete a user
+            security:
+                - bearerAuth: []
+            parameters:
+                - in: path
+                  name: id
+                  schema:
+                    type: string
+                  required: true
+                  description: The user's id
+            responses:
+                "200":
+                    description: The user has been deleted
+            tags:
+                - User
+        put:
+            summary: Update a user
+            description: This operation updates the user at the provided with the object within the request body.
+            security:
+                - bearerAuth: []
+            parameters:
+                - in: path
+                  name: id
+                  schema:
+                    type: string
+                  required: true
+                  description: The user's id
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: "#components/schemas/User"
+            responses:
+                "200":
+                    description: The user has been updated.
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/User"
+            tags:
+                - User
     /api/v1/orders:
         description: Endpoints for retrieving orders.
+        get:
+            tags:
+                - Orders
+        post:
+            tags:
+                - Orders
+    /api/v1/orders/{id}:
+        put:
+            tags:
+                - Orders
     /api/v1/heros:
         description: Endpoints relating to site heros (banners)
-    /api/v1/roles:
+        get:
+            tags:
+                - Heros
+        post:
+            tags:
+                - Heros
+    /api/v1/heros/{id}:
+        put:
+            tags:
+                - Heros
+        delete:
+            tags:
+                - Heros
+    /api/v1/roles/{id}:
         description: Endpoints relating to user roles.
+        get:
+            tags:
+                - Roles
+        put:
+            tags:
+                - Roles
     /api/v1/discounts:
         description: Endpoints relating to product discounts
+        get:
+            tags:
+                - Discounts
+        post:
+            tags:
+                - Discounts
+    /api/v1/discounts/{id}:
+        put:
+            tags:
+                - Discounts
+        delete:
+            tags:
+                - Discounts
     /api/v1/carts:
         description: Endpoints relating to user carts.
+        post:
+            tags:
+                - Carts
+    /api/v1/carts{id}:
+        put:
+            tags:
+                - Carts
+        get:
+            tags:
+                - Carts
+        delete:
+            tags:
+                - Carts
 
 components:
     securitySchemes:
