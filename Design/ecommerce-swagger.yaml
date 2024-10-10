@@ -247,9 +247,7 @@ paths:
                     content:
                         application/json:
                             schema:
-                                type: array
-                                items:
-                                    $ref: "#/components/schemas/Product"
+                                $ref: "#/components/schemas/User"
             tags:
                 - User
     /api/v1/user/{id}:
@@ -271,8 +269,22 @@ paths:
             responses:
                 "200":
                     description: The user was successfully retrieved.
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/User"
             tags:
                 - User
+    /api/v1/orders:
+        description: Endpoints for retrieving orders.
+    /api/v1/heros:
+        description: Endpoints relating to site heros (banners)
+    /api/v1/roles:
+        description: Endpoints relating to user roles.
+    /api/v1/discounts:
+        description: Endpoints relating to product discounts
+    /api/v1/carts:
+        description: Endpoints relating to user carts.
 
 components:
     securitySchemes:
@@ -308,6 +320,25 @@ components:
                     type: string
                     maxLength: 50
                     description: The user's username.
+                name:
+                    type: string
+                    maxLength: 254
+                    description: The user's name
+                streetName: 
+                    type: string
+                    maxLength: 75
+                    description: The name of the street the user ships to.
+                streetNumber:
+                    type: string
+                city:
+                    type: string
+                state:
+                    type: string
+                zipCode:
+                    type: string
+                phoneNumber:
+                    type: string
+
         Product:
             type: object
             properties:
