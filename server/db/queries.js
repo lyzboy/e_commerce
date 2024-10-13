@@ -20,7 +20,21 @@ const getCategories = async (req, res) => {
     }
 };
 
+const createCategory = async (categoryData) => {
+    try {
+        const { name, description } = categoryData;
+        const results = await query(
+            "INSERT INTO categories (name, description) VALUES ($1, $2) RETURNING *",
+            [name, description]
+        );
+        return results.rows[0]; // Returning the newly created category
+    } catch (err) {
+        throw err;
+    }
+};
+
 module.exports = {
     getStates,
     getCategories,
+    createCategory, // Exporting createCategory function
 };

@@ -14,8 +14,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 app.use(
     session({
-        // TODO: move secrete to env
-        secret: "sfj&D636&^jdu",
+        secret: "sfj&D636&^jdu", // Move secret to env in production
         cookie: { maxAge: 300000000, secure: false },
         saveUninitialized: false,
         resave: false,
@@ -31,7 +30,6 @@ passport.serializeUser((user, done) => {
 });
 
 passport.deserializeUser((id, done) => {
-    // need a function to retrieve user id from database
     db.users.findByID(id, function (err, user) {
         if (err) {
             return done(err);
@@ -85,17 +83,30 @@ app.post(
     }
 );
 
-//Categories
+// Categories
 app.get("/api/v1/categories", async (req, res) => {
     try {
         const results = await db.getCategories(req, res);
         res.status(200).json(results);
     } catch (err) {
-        console.log(err);
-        res.status(500).json({ error: err.message });
+        res.status(500).json({ message: "Server error:" + err.message });
     }
 });
 
-app.listen(port, () => {
-    console.log(`Server started on port ${port}`);
+app.post("/api/v1/categories", async (req, res) => {
+    try {
+        const results = await db.createCategory(req.body);
+        res.status(200).json(results);
+    } catch (err) {
+        res.status(500).json({ message: "Server Error:" + err.message });
+    }
 });
+
+module.exports = app; // Export app for testing
+
+// Create a separate file for starting the server
+if (require.main === module) {
+    app.listen(port, () => {
+        console.log(`Server started on port ${port}`);
+    });
+}
