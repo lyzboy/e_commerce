@@ -62,6 +62,8 @@ This website should include documents. It may be beneficial to include an editor
 
 For authentication for endpoints that require an elevated level of access (HTTP Methods: delete, put, etc.), the API will use JWT tokens. The token will be passed in the header of the request. The token will be verified using the `passport-jwt` strategy. The token will be signed using the `jsonwebtoken` package. This will ensure that the user is who they say they are and prevent against CSRF attacks. There will be two levels of access: user and admin. The admin level will have access to all endpoints, while the user level will have access to only certain endpoints. The server will check the token against the database to ensure the all HTTP Methods come from an admin account when the bearer token is present.
 
+
+
 ## Database Schema
 
 The schema can be found at [dbdiagram.io](https://dbdiagram.io/d/E-Commerce-Codecademy-66b97b108b4bb5230ed3f102)
@@ -74,9 +76,28 @@ The current schema is pictured below:
 
 The API documentation has been created using Swagger Editor. The file [ecommerce-swagger.yaml](ecommerce-swagger.yaml) can be uploaded to the Swagger editor either [online](https://editor.swagger.io/) or desktop to view the documentation.
 
-> **Note**:<br>
-> new endpoints need to be added for:
-> - user registration
-> - password reset
+### Needed Functions
+- Get user profile
+    - username
+    - email
+    - address
+    - phone number
+- Update user profile
+- Delete user
+- Get all products
+- Get product by id
+- Update product
+- Delete product
+- Create product
+- Get all orders
+- Get order by id
+- Update order
+- Delete order
+- Create order
+- Get all categories
+- Get category by id
+- Update category
+- Delete category
+- Create category
 
 ## Wireframes and Mockups
