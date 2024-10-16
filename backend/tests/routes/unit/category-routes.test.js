@@ -1,99 +1,106 @@
-const request = require('supertest'); // Import supertest for making HTTP requests to the Express app
-const app = require('../../../app'); // Import the Express app (which you will test)
-const queries = require('../../../models/category-model'); // Import the model (queries) for mocking
+// UNIT TEST
 
-jest.mock('../../../models/category-model'); // Mock the entire category model to control its behavior in tests
+const httpMocks = require("node-mocks-http"); // Library for mocking req and res
+const categoryRoutes = require("../../../routes/category-routes"); // Import the routes
+const queries = require("../../../models/category-model"); // Import the model to mock
 
-// Describe the entire test suite for the Category Routes
-describe('Category Routes', () => {
+jest.mock("../../../models/category-model"); // Mock the category-model
 
-  // Testing the GET /api/v1/categories route
-  describe('GET /api/v1/categories', () => {
+describe("Category Routes - Unit Tests", () => {
+    // Test the GET / route
+    describe("GET /api/v1/categories", () => {
+        it("should return a list of categories with status 200", async () => {
+            // *** Arrange ***
+            const mockCategories = [
+                { id: 1, name: "Name1", description: "Description1" },
+                { id: 2, name: "Name2", description: "Description2" },
+            ];
+            queries.getCategories.mockResolvedValue(mockCategories); // Mock the model function to return mock categories
+            const req = httpMocks.createRequest({ method: "GET" }); // Create a mock request object
+            const res = httpMocks.createResponse(); // Create a mock response object
 
-    // Test case: Should return a list of categories successfully (status 200)
-    it('should return a list of categories', async () => {
-      // Mock data that will be returned when querying the database
-      const mockCategories = [{ id: 1, name: 'Electronics' }, { id: 2, name: 'Books' }];
+            // *** Act ***
+            await categoryRoutes.handle(req, res); // Call the route handler directly
 
-      // Mock the getCategories function from the category-model to return mockCategories
-      queries.getCategories.mockResolvedValue(mockCategories); 
+            // *** Assert ***
+            expect(res.statusCode).toBe(200); // Assert the status code
+            expect(res._getJSONData()).toEqual(mockCategories); // Assert the response body (use _getJSONData for json response)
+        });
 
-      // Send a GET request to the /api/v1/categories route
-      const response = await request(app).get('/api/v1/categories');
+        it("should handle errors with status 500", async () => {
+            // *** Arrange ***
+            queries.getCategories.mockRejectedValue(
+                new Error("Database error")
+            ); // Mock the model to throw an error
+            const req = httpMocks.createRequest({ method: "GET" });
+            const res = httpMocks.createResponse();
 
-      // Expect that the response status is 200 (OK)
-      expect(response.status).toBe(200);
+            // *** Act ***
+            await categoryRoutes.handle(req, res);
 
-      // Expect that the body of the response matches the mock data we defined earlier
-      expect(response.body).toEqual(mockCategories);
+            // *** Assert ***
+            expect(res.statusCode).toBe(500); // Assert the status code
+            expect(res._getJSONData()).toEqual({
+                message: "Server error: Database error",
+            }); // Assert the error message
+        });
     });
 
-    // Test case: Should handle server errors by returning a 500 status
-    it('should handle server errors', async () => {
-      // Mock the getCategories function to throw an error, simulating a server/database issue
-      queries.getCategories.mockRejectedValue(new Error('Database error'));
+    // Test the POST / route
+    describe("POST /api/v1/categories", () => {
+        it("should create a category and return it with status 200", async () => {
+            // *** Arrange ***
+            const newCategory = {
+                name: "Clothing",
+                description: "Items relating to clothing",
+            };
+            const createdCategory = { id: 3, ...newCategory };
+            queries.createCategory.mockResolvedValue(createdCategory); // Mock the model function
+            const req = httpMocks.createRequest({
+                method: "POST",
+                body: newCategory,
+            }); // Mock request with body
+            const res = httpMocks.createResponse();
 
-      // Send a GET request to the /api/v1/categories route
-      const response = await request(app).get('/api/v1/categories');
+            // *** Act ***
+            await categoryRoutes.handle(req, res);
 
-      // Expect that the response status is 500 (Internal Server Error)
-      expect(response.status).toBe(500);
+            // *** Assert ***
+            expect(res.statusCode).toBe(200);
+            expect(res._getJSONData()).toEqual(createdCategory);
+        });
 
-      // Expect that the response body contains the correct error message
-      expect(response.body).toEqual({ message: 'Server error: Database error' });
-    });
-  });
+        it("should handle errors with status 500", async () => {
+            // *** Arrange ***
+            queries.createCategory.mockRejectedValue(
+                new Error("Database error")
+            ); // Mock the model to throw an error
+            const req = httpMocks.createRequest({
+                method: "POST",
+                body: { name: "Clothing" },
+            });
+            const res = httpMocks.createResponse();
 
-  // Testing the POST /api/v1/categories route
-  describe('POST /api/v1/categories', () => {
+            // *** Act ***
+            await categoryRoutes.handle(req, res);
 
-    // Test case: Should create a new category successfully (status 200)
-    it('should create a new category', async () => {
-      // Mock data for the new category that will be sent to the route
-      const newCategory = { name: 'Clothing', description: "Items relating to clothing" };
-
-      // Mock data for the created category, returned after inserting it into the database
-      const createdCategory = { id: 3, ...newCategory };
-
-      // Mock the createCategory function from the category-model to return the created category
-      queries.createCategory.mockResolvedValue(createdCategory);
-
-      // Send a POST request to the /api/v1/categories route, with the new category data
-      const response = await request(app).post('/api/v1/categories').send(newCategory);
-
-      // Expect that the response status is 200 (OK)
-      expect(response.status).toBe(200);
-
-      // Expect that the body of the response matches the created category data
-      expect(response.body).toEqual(createdCategory);
-    });
-
-    // Test case: Should handle server errors by returning a 500 status
-    it('should handle server errors', async () => {
-      // Mock the createCategory function to throw an error, simulating a server/database issue
-      queries.createCategory.mockRejectedValue(new Error('Database error'));
-
-      // Send a POST request to the /api/v1/categories route, with some data
-      const response = await request(app).post('/api/v1/categories').send({ name: 'Clothing' });
-
-      // Expect that the response status is 500 (Internal Server Error)
-      expect(response.status).toBe(500);
-
-      // Expect that the body of the response contains the correct error message
-      expect(response.body).toEqual({ message: 'Server Error: Database error' });
-    });
-  });
-
-  describe('DELETE /api/v1/categories/:id', () => {
-    it('should delete a category and return a 200 success status', async () => {
-      queries.deleteCategory.mockResolvedValue(1);
-      const response = await request(app).delete('/api/v1/categories/1');
-
-      expect(response.status).toBe(200);
-      expect(response.body).toEqual({message: "Category deleted successfully"});
+            // *** Assert ***
+            expect(res.statusCode).toBe(500);
+            expect(res._getJSONData()).toEqual({
+                message: "Server Error: Database error",
+            });
+        });
     });
 
+    describe("DELETE /api/v1/categories/:id", () => {
+        it("should delete a category and return a 200 success status", async () => {
+            queries.deleteCategory.mockResolvedValue(1);
+            const response = await request(app).delete("/api/v1/categories/1");
 
-
-  })
+            expect(response.status).toBe(200);
+            expect(response.body).toEqual({
+                message: "Category deleted successfully",
+            });
+        });
+    });
 });
