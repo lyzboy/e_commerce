@@ -24,7 +24,7 @@ describe('Category Routes', () => {
       const response = await request(app).get('/api/v1/categories'); // Make a GET request to the endpoint
 
       expect(response.status).toBe(500); // Expect the status code to be 500
-      expect(response.body).toEqual({ message: 'Server error:Database error' }); // Expect the response body to contain the error message
+      expect(response.body).toEqual({ message: 'Server error: Database error' }); // Expect the response body to contain the error message
     });
   });
 
@@ -47,7 +47,7 @@ describe('Category Routes', () => {
       const response = await request(app).post('/api/v1/categories').send({ name: 'Clothing' }); // Make a POST request to the endpoint with some data
 
       expect(response.status).toBe(500); // Expect the status code to be 500
-      expect(response.body).toEqual({ message: 'Server Error:Database error' }); // Expect the response body to contain the error message
+      expect(response.body).toEqual({ message: 'Server Error: Database error' }); // Expect the response body to contain the error message
     });
   });
 });

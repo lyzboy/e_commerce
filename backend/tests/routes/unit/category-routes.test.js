@@ -40,7 +40,7 @@ describe('Category Routes', () => {
       expect(response.status).toBe(500);
 
       // Expect that the response body contains the correct error message
-      expect(response.body).toEqual({ message: 'Server error:Database error' });
+      expect(response.body).toEqual({ message: 'Server error: Database error' });
     });
   });
 
@@ -50,10 +50,10 @@ describe('Category Routes', () => {
     // Test case: Should create a new category successfully (status 200)
     it('should create a new category', async () => {
       // Mock data for the new category that will be sent to the route
-      const newCategory = { name: 'Clothing' };
+      const newCategory = { name: 'Clothing', description: "Items relating to clothing" };
 
       // Mock data for the created category, returned after inserting it into the database
-      const createdCategory = { id: 3, name: 'Clothing' };
+      const createdCategory = { id: 3, ...newCategory };
 
       // Mock the createCategory function from the category-model to return the created category
       queries.createCategory.mockResolvedValue(createdCategory);
@@ -80,7 +80,20 @@ describe('Category Routes', () => {
       expect(response.status).toBe(500);
 
       // Expect that the body of the response contains the correct error message
-      expect(response.body).toEqual({ message: 'Server Error:Database error' });
+      expect(response.body).toEqual({ message: 'Server Error: Database error' });
     });
   });
+
+  describe('DELETE /api/v1/categories/:id', () => {
+    it('should delete a category and return a 200 success status', async () => {
+      queries.deleteCategory.mockResolvedValue(1);
+      const response = await request(app).delete('/api/v1/categories/1');
+
+      expect(response.status).toBe(200);
+      expect(response.body).toEqual({message: "Category deleted successfully"});
+    });
+
+
+
+  })
 });
