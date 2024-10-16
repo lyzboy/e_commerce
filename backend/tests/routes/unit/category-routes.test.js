@@ -15,7 +15,9 @@ describe("Category Routes - Unit Tests", () => {
                 { id: 1, name: "Name1", description: "Description1" },
                 { id: 2, name: "Name2", description: "Description2" },
             ];
-            queries.getCategories.mockResolvedValue(mockCategories); // Mock the model function to return mock categories
+            // Mock the model function to return mock categories, this will be what is
+            // returned from the _getJSONData() function
+            queries.getCategories.mockResolvedValue(mockCategories);
             const req = httpMocks.createRequest({ method: "GET" }); // Create a mock request object
             const res = httpMocks.createResponse(); // Create a mock response object
 
