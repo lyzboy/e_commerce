@@ -84,6 +84,7 @@ describe("Category Routes - Unit Tests", () => {
             const res = httpMocks.createResponse();
 
             // *** Act ***
+            //TODO: issue in test
             await categoryRoutes.handle(req, res);
 
             // *** Assert ***
