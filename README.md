@@ -140,8 +140,8 @@ Distributed under the **MIT License**. See [LICENSE](LICENSE) for more informati
 
 ## Contact
 
-**Josh Sanford**
-Project Link: [https://github.com/username/repository](https://github.com/lyzboy/e_commerce)
+**Josh Sanford**<br>
+Project Link: [E-commerce](https://github.com/lyzboy/e_commerce)
 
 ---
 
