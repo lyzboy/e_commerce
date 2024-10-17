@@ -13,7 +13,7 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use(
     session({
-        secret: "sfj&D636&^jdu", // Move secret to env in production
+        secret: "sfj&D636&^jdu", // **TEST VALUE** Move secret to env in production
         cookie: { maxAge: 300000000, secure: false },
         saveUninitialized: false,
         resave: false,
@@ -54,44 +54,11 @@ passport.use(
     })
 );
 
-app.use('/api/v1/categories', categoryRoutes);
+app.use("/api/v1/categories", categoryRoutes);
 
 app.get("/", (req, res) => {
     res.json({ info: "Node.js, Express, and Postgres API" });
 });
-
-// // ACCOUNTS
-// app.get("/login", (req, res) => {
-//     res.send("log in to site");
-// });
-// app.post("/register", async (req, res) => {
-//     const { username, password } = req.body;
-//     const newUser = await db.users.createUser({ username, password });
-//     if (newUser) {
-//         res.status(201).json({
-//             msg: "New user created!",
-//             newUser,
-//         });
-//     } else {
-//         res.status(500).json({ msg: "Unable to create user" });
-//     }
-// });
-// app.post(
-//     "/login",
-//     passport.authenticate("local", { failureRedirect: "/login" }),
-//     (req, res) => {
-//         res.redirect("/login");
-//     }
-// );
-
-// const getStates = (req, res) => {
-//     query("SELECT * FROM states ORDER BY id ASC", (err, results) => {
-//         if (err) {
-//             throw err;
-//         }
-//         res.status(200).json(results.rows);
-//     });
-// };
 
 module.exports = app; // Export app for testing
 
