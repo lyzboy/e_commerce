@@ -22,11 +22,21 @@ exports.createCategory = async (name, description) => {
     return results.rows[0];
 };
 
+/**
+ * Gets a single ID from the database
+ * @param {string} id - the ID of the category
+ * @returns
+ */
 exports.getCategory = async (id) => {
     const results = await query("SELECT * FROM categories WHERE id = $1", [id]);
-    results.rows[0];
+    return results.rows[0];
 };
 
+/**
+ *
+ * @param {object} categoryObject - the category object to update
+ * @returns
+ */
 exports.updateCategory = async (categoryObject) => {
     const results = await query(
         "UPDATE categories SET name = $1, description = $2 WHERE id = $3 RETURNING *",
@@ -35,6 +45,11 @@ exports.updateCategory = async (categoryObject) => {
     return results.rows[0];
 };
 
+/**
+ * Deletes a category object from the database with the given ID.
+ * @param {string} id - the ID of the object to delete
+ * @returns
+ */
 exports.deleteCategory = async (id) => {
     const results = await query("DELETE FROM categories WHERE id = $1", [id]);
 
