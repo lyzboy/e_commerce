@@ -22,7 +22,7 @@ describe("Category Routes - Unit Tests", () => {
             const res = httpMocks.createResponse(); // Create a mock response object
 
             // *** Act ***
-            await categoryRoutes.handle(req, res); // Call the route handler directly
+            await categoryRoutes.getCategories(req, res); // Call the route handler directly
 
             // *** Assert ***
             expect(res.statusCode).toBe(200); // Assert the status code
