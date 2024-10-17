@@ -351,6 +351,29 @@ paths:
     /api/v1/orders:
         description: Endpoints for retrieving orders.
         get:
+            summary: Get all orders
+            description: This operation retrieves all orders with the matching id
+            operationId: get_orders
+            parameters:
+                - 
+                    in: query
+                    name: limit
+                    schema:
+                        type: integer
+                        minimum: 1
+                        maximum: 100
+                        default: 25
+                    description: The number of orders to return
+                    example: 25
+            security:
+                - bearerAuth: []
+            responses:
+                "200":
+                    description: The user was successfully retrieved.
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/Order"
             tags:
                 - Orders
         post:
@@ -496,7 +519,38 @@ components:
                     type: string
                 phoneNumber:
                     type: string
+        Order:
+            type: object
+            properties:
+                id:
+                    type: integer
+                    description: Auto-incrementing primary key
+                userId:
+                    type: string
+                    description: The user's id
+                products:
+                    type: array
+                    items: 
+                        type: string
+                    description: The products in the order
+                purchaseDate:
+                    type: string
+                    format: date
+                    description: The date the order was purchased
+                status:
+                    type: string
+                    description: The status of the order
+                discounts:
+                    type: array
+                    items:
+                        type: string
+                    description: The discounts applied to the order
+                orderTotal:
+                    type: number
+                    format: float
+                    description: The total cost of the order
 
+                
         Product:
             type: object
             properties:
