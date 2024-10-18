@@ -52,7 +52,7 @@ exports.authenticateToken = (req, res, next) => {
 };
 
 exports.checkAdminRole = (req, res, next) => {
-    if (req.user.rol !== "admin") {
+    if (req.user.role !== "admin") {
         return res.status(403).json({ message: "Access denied" });
     }
 
