@@ -2,7 +2,7 @@ const dotenv = require("dotenv");
 const jwt = require("jsonwebtoken");
 
 //get config vars
-dotenv.config();
+dotenv.config({ path: "../../.env" });
 
 // access config var for the token secret
 const tokenSecret = process.env.TOKEN_SECRET;
