@@ -37,6 +37,7 @@ The web app includes an admin dashboard where store owners can manage products, 
 ### Prerequisites
 
 - Node.js
+- PostgreSQL
 
 ### Steps
 
