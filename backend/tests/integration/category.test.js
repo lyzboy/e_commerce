@@ -10,6 +10,21 @@ const jwt = require("jsonwebtoken");
 // mock the category model to simulate access to the database
 jest.mock("../../models/category-model");
 
+describe("GET /api/v1/categories - Get Categories", () => {
+    // mock the jwt
+    const token = jwt.sign({ id: 1, role: "user" }, process.env.TOKEN_SECRET, {
+        expiresIn: "1800s",
+    });
+
+    it("should return a max of 25 category objects", () => {});
+    it("should return only 10 category objects when provide the correct limit parameter", () => {});
+    it("should return the default of 25 category objects when an incorrect limit parameter is given", () => {});
+    it("should return status 500 when a server error", () => {});
+    it("should return status 400 when required params are not included", () => {});
+    it("should return status 401 when no auth token provided", () => {});
+    it("should return status 403 when auth token is invalid", () => {});
+});
+
 describe("PUT /api/v1/categories/:id - Update Category", () => {
     // mock the jwt token
     const token = jwt.sign({ id: 1, role: "admin" }, process.env.TOKEN_SECRET, {
@@ -56,4 +71,5 @@ describe("PUT /api/v1/categories/:id - Update Category", () => {
             ...updateData,
         });
     });
+    //TODO: test the rest of result cases including edge cases
 });

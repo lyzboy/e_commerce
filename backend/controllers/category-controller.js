@@ -48,6 +48,7 @@ exports.createCategory = async (req, res) => {
  */
 exports.getCategory = async (req, res) => {
     try {
+        // TODO: introduce pagination and limit returns.
         const results = await categoryModel.getCategory(req.params.id);
         res.status(200).json(results);
     } catch (error) {
