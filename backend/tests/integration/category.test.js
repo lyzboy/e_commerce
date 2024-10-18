@@ -1,3 +1,4 @@
+require("dotenv").config({ path: "../.env" });
 // use supertest to mock the HTTP requests
 const request = require("supertest");
 // import the app for testing category-routes and category-controller without having to run the server
@@ -5,10 +6,15 @@ const app = require("../../app");
 // import the category model so jest can mock the database functionality.
 const categoryModel = require("../../models/category-model");
 
+const jwt = require("jsonwebtoken");
 // mock the category model to simulate access to the database
 jest.mock("../../models/category-model");
 
 describe("PUT /api/v1/categories/:id - Update Category", () => {
+    // mock the jwt token
+    const token = jwt.sign({ id: 1, role: "admin" }, process.env.TOKEN_SECRET, {
+        expiresIn: "1800s",
+    });
     // make test use async since category model is async
     it("should update a category and return the updated category", async () => {
         // Arrange
@@ -36,7 +42,8 @@ describe("PUT /api/v1/categories/:id - Update Category", () => {
             // call the endpoint with the id as a template literal
             .put(`/api/v1/categories/${categoryId}`)
             // pass the update data in the request body to the server. This is the data that would be asked the original to be changed to.
-            .send(updateData);
+            .send(updateData)
+            .set("Authorization", `Bearer ${token}`);
 
         // Assert
         // should have correct status
