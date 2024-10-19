@@ -63,8 +63,13 @@ The web app includes an admin dashboard where store owners can manage products, 
    ```bash
    cp .env.example .env
    ```
-   - `DATABASE_URL`
-   - `API_KEY`
+   - `TOKEN_SECRET`
+      - Use `/backend/util/secretGenerator.js` if you would like to generate a random secret. Using:
+      ```bash
+      node backend/util/secretGenerator.js
+      ```
+      It will output a random string in the console that you can copy and paste in the `TOKEN_SECRET` field within .env
+   - `POOL_USER_NAME`
    - etc.
 
 4. **Run the project**:
