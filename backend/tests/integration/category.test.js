@@ -11,18 +11,99 @@ const jwt = require("jsonwebtoken");
 jest.mock("../../models/category-model");
 
 describe("GET /api/v1/categories - Get Categories", () => {
-    // mock the jwt
-    const token = jwt.sign({ id: 1, role: "user" }, process.env.TOKEN_SECRET, {
-        expiresIn: "1800s",
+    let req, res, next;
+    // set jest beforeEach hook for pre test setup
+    beforeEach(() => {
+        req = { headers: {} }; //mock request object
+        // mock response object
+        res = { status: jest.fn().mockReturnThis(), json: jest.fn() };
+        // mock next middleware function
+        next = jest.fn();
     });
 
-    it("should return a max of 25 category objects", () => {});
+    it("should return status 401 when no auth token provided", async () => {
+        const categories = [
+            {
+                id: "1",
+                name: "Updated Category 1",
+                description: "Updated description 1",
+            },
+            {
+                id: "2",
+                name: "Updated Category 2",
+                description: "Updated description 2",
+            },
+        ];
+
+        categoryModel.getCategories.mockResolvedValue(categories);
+
+        const response = await request(app)
+        .get(`/api/v1/categories`)
+
+        expect(response.status).toBe(401);
+        expect(response.body.message).toBe("No auth token");
+    });
+    it("should return status 403 when auth token is invalid", async () => {
+
+        //ARRANGE
+        const invalidToken = `Bearer ${jwt.sign({ id: 1, role: 'admin' }, 'wrong-secret', { expiresIn: '1800s' })}`;
+        const categories = [
+            {
+                id: "1",
+                name: "Updated Category 1",
+                description: "Updated description 1",
+            },
+            {
+                id: "2",
+                name: "Updated Category 2",
+                description: "Updated description 2",
+            },
+        ];
+        categoryModel.getCategories.mockResolvedValue(categories);
+
+        //ACT
+        const response = await request(app)
+        .get(`/api/v1/categories`)
+        .set('Authorization', invalidToken);
+
+        //ASSERT
+        expect(response.status).toBe(403);
+        expect(response.body.message).toBe("Authentication error: invalid signature")
+    });
+
+
+    it("should return a max of 25 category objects", async () => {
+            // mock the jwt
+        const token = jwt.sign({ id: 1, role: "user" }, process.env.TOKEN_SECRET, {
+            expiresIn: "1800s",
+        });
+        const categories = [
+            {
+                id: "1",
+                name: "Updated Category 1",
+                description: "Updated description 1",
+            },
+            {
+                id: "2",
+                name: "Updated Category 2",
+                description: "Updated description 2",
+            },
+        ];
+        categoryModel.getCategories.mockResolvedValue(categories);
+
+        //ACT
+        const response = await request(app)
+        .get(`/api/v1/categories`)
+        .set('Authorization', `Bearer ${token}`);
+
+        //ASSERT
+        expect(response.status).toBe(200);
+        expect(response.body).toEqual(categories);
+    });
     it("should return only 10 category objects when provide the correct limit parameter", () => {});
     it("should return the default of 25 category objects when an incorrect limit parameter is given", () => {});
     it("should return status 500 when a server error", () => {});
     it("should return status 400 when required params are not included", () => {});
-    it("should return status 401 when no auth token provided", () => {});
-    it("should return status 403 when auth token is invalid", () => {});
 });
 
 describe("PUT /api/v1/categories/:id - Update Category", () => {
