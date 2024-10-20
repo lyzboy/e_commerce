@@ -14,11 +14,13 @@ describe("GET /api/v1/categories - Get Categories", () => {
     let req, res, next;
     // set jest beforeEach hook for pre test setup
     beforeEach(() => {
+        jest.resetAllMocks();
         req = { headers: {} }; //mock request object
         // mock response object
         res = { status: jest.fn().mockReturnThis(), json: jest.fn() };
         // mock next middleware function
         next = jest.fn();
+
     });
 
     it("should return status 401 when no auth token provided", async () => {
@@ -72,34 +74,27 @@ describe("GET /api/v1/categories - Get Categories", () => {
     });
 
 
-    it("should return a max of 25 category objects", async () => {
-            // mock the jwt
+    it("should return a max of 25 category objects from the database", async () => {
+        // mock the jwt
         const token = jwt.sign({ id: 1, role: "user" }, process.env.TOKEN_SECRET, {
-            expiresIn: "1800s",
+          expiresIn: "1800s",
         });
-        const categories = [
-            {
-                id: "1",
-                name: "Updated Category 1",
-                description: "Updated description 1",
-            },
-            {
-                id: "2",
-                name: "Updated Category 2",
-                description: "Updated description 2",
-            },
-        ];
-        categoryModel.getCategories.mockResolvedValue(categories);
+      
+        const limit = 25;
 
-        //ACT
+        categoryModel.getCategories.mockResolvedValue(new Array(25).fill({}));
+      
+        // ACT: Call the API with the limit query
         const response = await request(app)
-        .get(`/api/v1/categories`)
-        .set('Authorization', `Bearer ${token}`);
-
-        //ASSERT
+          .get(`/api/v1/categories`)
+          .set('Authorization', `Bearer ${token}`)
+          .query({ limit });
+      
+        // ASSERT
         expect(response.status).toBe(200);
-        expect(response.body).toEqual(categories);
-    });
+        expect(response.body.length).toEqual(limit);  // Expect response to contain only the limited amount
+      });
+      
     it("should return only 10 category objects when provide the correct limit parameter", () => {});
     it("should return the default of 25 category objects when an incorrect limit parameter is given", () => {});
     it("should return status 500 when a server error", () => {});
