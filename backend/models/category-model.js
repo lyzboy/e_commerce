@@ -3,7 +3,7 @@ const { query } = require("../config/db");
 /**
  * Queries the database to retrieve all categories.
  */
-exports.getCategories = async ({ limit = "25", name } = {}) => {
+exports.getCategories = async ({ limit = 25, offset = 0, name } = {}) => {
     // Start with the base query
     let queryText = `SELECT * FROM categories`;
     const queryParams = [];
@@ -11,12 +11,15 @@ exports.getCategories = async ({ limit = "25", name } = {}) => {
     // Add filters based on query parameters
     if (name) {
         queryParams.push(`%${name}%`); // Add name filter
-        queryText += ` WHERE name ILIKE $${queryParams.length}`; // ILIKE for case-insensitive matching
+        queryText += ` WHERE name ILIKE $${queryParams.length}`;
     }
 
-    // Add ordering and limit
-    queryText += ` ORDER BY name ASC LIMIT $${queryParams.length + 1}`;
+    // Add ordering, limit, and offset for pagination
+    queryText += ` ORDER BY name ASC LIMIT $${queryParams.length + 1} OFFSET $${
+        queryParams.length + 2
+    }`;
     queryParams.push(limit);
+    queryParams.push(offset);
 
     // Execute the query
     const results = await query(queryText, queryParams);

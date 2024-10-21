@@ -10,10 +10,13 @@ const categoryModel = require("../models/category-model");
  */
 exports.getCategories = async (req, res) => {
     try {
-        // Extract query parameters (could be more in the future)
-        const { limit, name } = req.query; // Example for additional query parameters
-
-        const results = await categoryModel.getCategories({ limit, name }); // Pass an object to the model
+        // Extract query parameters for pagination
+        const { limit = 25, offset = 0, name } = req.query;
+        const results = await categoryModel.getCategories({
+            limit,
+            offset,
+            name,
+        });
 
         if (!results.length) {
             throw new Error("No results returned.");
@@ -23,7 +26,6 @@ exports.getCategories = async (req, res) => {
         res.status(500).json({ message: "Server error: " + error.message });
     }
 };
-
 /**
  * Controller function to create a category.
  * Sends a JSON response with the created category or an error message.
