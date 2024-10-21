@@ -10,7 +10,17 @@ const categoryModel = require("../models/category-model");
  */
 exports.getCategories = async (req, res) => {
     try {
-        const results = await categoryModel.getCategories();
+        const limit = req.query.limit;
+        console.log(`controller limit = ${limit}`);
+        let results = [];
+        if (limit) {
+            results = await categoryModel.getCategories(limit.toString());
+        } else {
+            results = await categoryModel.getCategories();
+        }
+        if (results.length < 1) {
+            throw new Error("No results returned.");
+        }
         res.status(200).json(results);
     } catch (error) {
         res.status(500).json({ message: "Server error: " + error.message });

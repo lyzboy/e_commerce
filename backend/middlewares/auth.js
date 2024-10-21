@@ -1,11 +1,13 @@
 const dotenv = require("dotenv");
 const jwt = require("jsonwebtoken");
+const path = require("path");
 
 //get config vars
-dotenv.config({ path: "../../.env" });
+dotenv.config({ path: path.resolve(__dirname, "../../.env") });
 
 // access config var for the token secret
 const tokenSecret = process.env.TOKEN_SECRET;
+const isDevMode = process.env.DEV_MODE;
 
 /*
 app.post('/api/createNewUser', (req, res) => {
@@ -31,8 +33,14 @@ exports.generateAccessToken = (payload) => {
 };
 
 exports.authenticateToken = (req, res, next) => {
+    if (isDevMode && req.body.dev === "true") {
+        console.log("Development mode: bypassing authentication");
+        req.user = { username: "dev", role: "admin" };
+        return next();
+    }
     // get the authorization header
     const authHeader = req.headers["authorization"];
+
     //
     const token = authHeader && authHeader.split(" ")[1];
 

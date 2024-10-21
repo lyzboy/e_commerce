@@ -3,8 +3,12 @@ const { query } = require("../config/db");
 /**
  * Queries the database to retrieve all categories.
  */
-exports.getCategories = async (limit = 25) => {
-    const results = await query(`SELECT * FROM categories ORDER BY name ASC LIMIT $1`, [limit]);
+exports.getCategories = async (limit = "25") => {
+    console.log(`limit = ${limit}`);
+    const results = await query(
+        `SELECT * FROM categories ORDER BY name ASC LIMIT $1`,
+        [limit]
+    );
     return results.rows;
 };
 

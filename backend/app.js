@@ -4,6 +4,7 @@ const passport = require("passport");
 const LocalStrategy = require("passport-local").Strategy;
 
 const categoryRoutes = require("./routes/category-routes");
+const authRoutes = require("./routes/auth-routes");
 
 const app = express();
 const port = 3000;
@@ -55,6 +56,7 @@ passport.use(
 );
 
 app.use("/api/v1/categories", categoryRoutes);
+app.use("/api/v1/user", authRoutes);
 
 app.get("/", (req, res) => {
     res.json({ info: "Node.js, Express, and Postgres API" });
