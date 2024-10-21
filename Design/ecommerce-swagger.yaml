@@ -13,6 +13,30 @@ paths:
             summary: Search and filter categories.
             description: Retrieves categories from the store's database based on search criteria
             operationId: search_categories
+            parameters:
+                - in: query
+                  name: name
+                  schema:
+                      type: string
+                  description: Filter categories by name. Can be partial to return names that would be close.
+                  example: hats
+                - 
+                    in: query
+                    name: limit
+                    schema:
+                        type: number
+                        format: integer
+                    description: The number of items to return.
+                    example: 25
+                -
+                    in: query
+                    name: offset
+                    schema:
+                        type: number
+                        format: integer
+                    description: The number to offset for return items. Creates pagination.
+
+                
             responses:
                 "200":
                     description: The list of categories was successfully retrieved.
@@ -33,11 +57,20 @@ paths:
             security:
                 - bearerAuth: []
             requestBody:
-                description: A new category object
+                description: The category to be created
+                required: true
                 content:
                     application/json:
                         schema:
-                            $ref: "#/components/schemas/Category"
+                            type: object
+                            required:
+                                - name
+                                - description
+                            properties:
+                                name:
+                                    type: string
+                                description:
+                                    type: string
             responses:
                 "200":
                     description: Category created
@@ -147,11 +180,11 @@ paths:
                       format: float
                   description: Filter products by maximum price
                 - in: query
-                  name: page
+                  name: offset
                   schema:
                       type: number
                       format: integer
-                  description: The page number to retrieve
+                  description: The offset of the number of items to retrieve. Creates pagination.
                 - in: query
                   name: limit
                   schema:
