@@ -10,15 +10,12 @@ const categoryModel = require("../models/category-model");
  */
 exports.getCategories = async (req, res) => {
     try {
-        const limit = req.query.limit;
-        console.log(`controller limit = ${limit}`);
-        let results = [];
-        if (limit) {
-            results = await categoryModel.getCategories(limit.toString());
-        } else {
-            results = await categoryModel.getCategories();
-        }
-        if (results.length < 1) {
+        // Extract query parameters (could be more in the future)
+        const { limit, name } = req.query; // Example for additional query parameters
+
+        const results = await categoryModel.getCategories({ limit, name }); // Pass an object to the model
+
+        if (!results.length) {
             throw new Error("No results returned.");
         }
         res.status(200).json(results);
