@@ -6,7 +6,7 @@ CREATE DATABASE ecommerce;
 
 -- Tables
 
-CREATE TABLE "product" (
+CREATE TABLE "products" (
   "id" SERIAL PRIMARY KEY,
   "barcode" varchar(20),
   "name" varchar(100),
@@ -15,13 +15,13 @@ CREATE TABLE "product" (
   "quantity" integer
 );
 
-CREATE TABLE "category" (
+CREATE TABLE "categories" (
   "id" SERIAL PRIMARY KEY,
   "name" varchar(25),
   "description" varchar(150)
 );
 
-CREATE TABLE "account" (
+CREATE TABLE "accounts" (
   "email" varchar PRIMARY KEY,
   "username" varchar(50) NOT NULL,
   "name" varchar(254) NOT NULL,
@@ -33,7 +33,7 @@ CREATE TABLE "account" (
 
 CREATE TABLE "admins" (
   "id" SERIAL PRIMARY KEY,
-  "account_id" varchar NOT NULL
+  "account_email" varchar NOT NULL
 );
 
 CREATE TABLE "reset_password_codes" (
@@ -43,25 +43,25 @@ CREATE TABLE "reset_password_codes" (
   "email" varchar
 );
 
-CREATE TABLE "address" (
+CREATE TABLE "addresses" (
   "id" SERIAL PRIMARY KEY,
   "street_name" varchar(75),
   "street_number" varchar(25),
   "city_id" integer
 );
 
-CREATE TABLE "city" (
+CREATE TABLE "cities" (
   "id" SERIAL PRIMARY KEY,
   "name" varchar(150),
   "state_id" integer
 );
 
-CREATE TABLE "state" (
+CREATE TABLE "states" (
   "id" SERIAL PRIMARY KEY,
   "name" varchar(150)
 );
 
-CREATE TABLE "order" (
+CREATE TABLE "orders" (
   "id" SERIAL PRIMARY KEY,
   "status" varchar(25),
   "discount_id" integer,
@@ -84,11 +84,11 @@ CREATE TABLE "discounts" (
 );
 
 CREATE TABLE "accounts_orders" (
-  "account_id" varchar,
+  "account_email" varchar,
   "order_id" integer
 );
 
-CREATE TABLE "cart" (
+CREATE TABLE "carts" (
   "id" SERIAL PRIMARY KEY,
   "account_email" varchar
 );
@@ -99,7 +99,7 @@ CREATE TABLE "carts_products" (
   "quantity" integer
 );
 
-CREATE TABLE "phone" (
+CREATE TABLE "phones" (
   "id" SERIAL PRIMARY KEY,
   "number" varchar(10)
 );
@@ -128,31 +128,31 @@ CREATE TABLE "heros" (
 );
 
 -- Indices
-CREATE INDEX ON "orders_products" ("product_id", "order_id");
-CREATE INDEX ON "accounts_orders" ("account_id", "order_id");
-CREATE INDEX ON "carts_products" ("product_id", "cart_id");
-CREATE INDEX ON "products_categories" ("product_id", "category_id");
+CREATE INDEX IF NOT EXISTS ON "orders_products" ("product_id", "order_id");
+CREATE INDEX IF NOT EXISTS ON "accounts_orders" ("account_email", "order_id");
+CREATE INDEX IF NOT EXISTS ON "carts_products" ("product_id", "cart_id");
+CREATE INDEX IF NOT EXISTS ON "products_categories" ("product_id", "category_id");
 
 -- Foreign keys
-ALTER TABLE "city" ADD FOREIGN KEY ("state_id") REFERENCES "state" ("id");
-ALTER TABLE "address" ADD FOREIGN KEY ("city_id") REFERENCES "city" ("id");
-ALTER TABLE "account" ADD FOREIGN KEY ("address_id") REFERENCES "address" ("id");
-ALTER TABLE "accounts_orders" ADD FOREIGN KEY ("account_id") REFERENCES "account" ("email");
-ALTER TABLE "accounts_orders" ADD FOREIGN KEY ("order_id") REFERENCES "order" ("id");
-ALTER TABLE "cart" ADD FOREIGN KEY ("account_email") REFERENCES "account" ("email");
-ALTER TABLE "order" ADD FOREIGN KEY ("discount_id") REFERENCES "discounts" ("id");
-ALTER TABLE "orders_products" ADD FOREIGN KEY ("order_id") REFERENCES "order" ("id");
-ALTER TABLE "orders_products" ADD FOREIGN KEY ("product_id") REFERENCES "product" ("id");
-ALTER TABLE "account" ADD FOREIGN KEY ("phone_id") REFERENCES "phone" ("id");
-ALTER TABLE "carts_products" ADD FOREIGN KEY ("product_id") REFERENCES "product" ("id");
-ALTER TABLE "carts_products" ADD FOREIGN KEY ("cart_id") REFERENCES "cart" ("id");
-ALTER TABLE "products_categories" ADD FOREIGN KEY ("category_id") REFERENCES "category" ("id");
-ALTER TABLE "products_categories" ADD FOREIGN KEY ("product_id") REFERENCES "product" ("id");
-ALTER TABLE "admins" ADD FOREIGN KEY ("account_id") REFERENCES "account" ("email");
-ALTER TABLE "reset_password_codes" ADD FOREIGN KEY ("email") REFERENCES "account" ("email");
-ALTER TABLE "payment_token" ADD FOREIGN KEY ("email") REFERENCES "account" ("email");
-ALTER TABLE "heros" ADD FOREIGN KEY ("product_id") REFERENCES "product" ("id");
-ALTER TABLE "heros" ADD FOREIGN KEY ("category_id") REFERENCES "category" ("id");
+ALTER TABLE "cities" ADD FOREIGN KEY ("state_id") REFERENCES "states" ("id");
+ALTER TABLE "addresses" ADD FOREIGN KEY ("city_id") REFERENCES "cities" ("id");
+ALTER TABLE "accounts" ADD FOREIGN KEY ("address_id") REFERENCES "addresses" ("id");
+ALTER TABLE "accounts_orders" ADD FOREIGN KEY ("account_email") REFERENCES "accounts" ("email");
+ALTER TABLE "accounts_orders" ADD FOREIGN KEY ("order_id") REFERENCES "orders" ("id");
+ALTER TABLE "carts" ADD FOREIGN KEY ("account_email") REFERENCES "accounts" ("email");
+ALTER TABLE "orders" ADD FOREIGN KEY ("discount_id") REFERENCES "discounts" ("id");
+ALTER TABLE "orders_products" ADD FOREIGN KEY ("order_id") REFERENCES "orders" ("id");
+ALTER TABLE "orders_products" ADD FOREIGN KEY ("product_id") REFERENCES "products" ("id");
+ALTER TABLE "accounts" ADD FOREIGN KEY ("phone_id") REFERENCES "phones" ("id");
+ALTER TABLE "carts_products" ADD FOREIGN KEY ("product_id") REFERENCES "products" ("id");
+ALTER TABLE "carts_products" ADD FOREIGN KEY ("cart_id") REFERENCES "carts" ("id");
+ALTER TABLE "products_categories" ADD FOREIGN KEY ("category_id") REFERENCES "categories" ("id");
+ALTER TABLE "products_categories" ADD FOREIGN KEY ("product_id") REFERENCES "products" ("id");
+ALTER TABLE "admins" ADD FOREIGN KEY ("account_email") REFERENCES "accounts" ("email");
+ALTER TABLE "reset_password_codes" ADD FOREIGN KEY ("email") REFERENCES "accounts" ("email");
+ALTER TABLE "payment_token" ADD FOREIGN KEY ("email") REFERENCES "accounts" ("email");
+ALTER TABLE "heros" ADD FOREIGN KEY ("product_id") REFERENCES "products" ("id");
+ALTER TABLE "heros" ADD FOREIGN KEY ("category_id") REFERENCES "categories" ("id");
 
 -- ROLES AND PRIVILEGES
 
@@ -164,7 +164,7 @@ GRANT CONNECT ON DATABASE ecommerce TO standard_user;
 GRANT SELECT ON ALL TABLES IN SCHEMA public TO standard_user;
 
 -- If standard users need to insert or modify data, grant the relevant privileges
-GRANT INSERT, UPDATE ON TABLE account, cart, orders_products, carts_products TO standard_user;
+GRANT INSERT, UPDATE ON TABLE accounts, carts, orders_products, carts_products TO standard_user;
 
 -- Create an admin role
 CREATE ROLE admin_user;
