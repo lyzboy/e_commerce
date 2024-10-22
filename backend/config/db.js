@@ -37,7 +37,7 @@ const standardPool = new Pool({
 const query = async (queryText, queryParams, isAdmin = false) => {
     try {
         const pool = isAdmin ? adminPool : standardPool;
-        const result = await pool.query(text, params);
+        const result = await pool.query(queryText, queryParams);
         return result;
     } catch (err) {
         console.log(err);
