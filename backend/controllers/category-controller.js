@@ -57,8 +57,18 @@ exports.createCategory = async (req, res) => {
  */
 exports.getCategory = async (req, res) => {
     try {
-        // TODO: introduce pagination and limit returns.
-        const results = await categoryModel.getCategory(req.params.id);
+        // Extract query parameters for pagination
+        const { limit = 25, offset = 0, name } = req.query;
+        const results = await categoryModel.getCategory({
+            //TODO: insert correct queries.
+            limit,
+            offset,
+            name,
+        });
+
+        if (!results.length) {
+            throw new Error("No results returned.");
+        }
         res.status(200).json(results);
     } catch (error) {
         res.status(500).json({ message: "Server Error: " + error.message });
