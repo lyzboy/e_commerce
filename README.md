@@ -71,8 +71,12 @@ The web app includes an admin dashboard where store owners can manage products, 
       It will output a random string in the console that you can copy and paste in the `TOKEN_SECRET` field within .env
    - `POOL_USER_NAME`
    - etc.
-
-4. **Run the project**:
+4. **Set up the database**:
+   Create a new database in PostgreSQL and run the SQL script create_ecommerceDB.sql. This will create the database with the necessary tables and roles.
+   ```bash
+   psql -U postgres -f create_ecommerceDB.sql
+   ```
+5. **Run the project**:
 You will need to run the backend and frontend separately.
 a.) Backend
 ```bash
@@ -97,6 +101,22 @@ npm run dev
 
 You can access the app by visiting `http://localhost:3000` in your browser.
 
+### Calling the API
+
+If you would like to make calls to the API from a client like Postman, ensure that your environment variable `DEV_MODE` is set to true. You will then need to ensure that in the request body for your calls, that you include the field `"dev"` with the value `"true"`.
+
+```js
+{
+  "dev": "true",
+}
+```
+By doing so, your token payload will use the following properties:
+```js
+{
+  "username": "dev",
+  "role": "admin"
+}
+```
 ---
 
 ## Features
