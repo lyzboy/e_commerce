@@ -61,7 +61,7 @@ exports.getCategory = async (req, res) => {
         const { id } = req.params;
         const results = await categoryModel.getCategory(id);
 
-        if (!results.length) {
+        if (!results) {
             throw new Error("No results returned.");
         }
         res.status(200).json(results);
@@ -81,7 +81,8 @@ exports.getCategory = async (req, res) => {
 exports.updateCategory = async (req, res) => {
     try {
         const { name, description } = req.body;
-        if (!name || !description) {
+        // Check if both are missing, meaning neither exists
+        if (!name && !description) {
             return res.status(400).json({ message: "Invalid request object." });
         }
         const results = await categoryModel.updateCategory({

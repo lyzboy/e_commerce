@@ -49,7 +49,15 @@ exports.createCategory = async (name, description) => {
  * @returns
  */
 exports.getCategory = async (id) => {
-    const results = await query("SELECT * FROM categories WHERE id = $1", [id]);
+    let queryText = `SELECT * FROM categories`;
+    const queryParams = [];
+    if (id) {
+        queryParams.push(id); // Add name filter
+        queryText += ` WHERE id = $${queryParams.length}`;
+    }
+    console.log(`params in model= ${queryParams}`);
+
+    const results = await query(queryText, queryParams);
     return results.rows[0];
 };
 
@@ -60,18 +68,35 @@ exports.getCategory = async (id) => {
  */
 exports.updateCategory = async (categoryObject) => {
     const { name, description, id } = categoryObject;
-    const results = await query(
-        "UPDATE categories SET name = $1, description = $2 WHERE id = $3 RETURNING *",
-        [name, description, id],
-        true
-    );
+    let queryText = `UPDATE categories SET `;
+    const queryParams = [];
+    // used to add comma for multiple params
+    let setClauses = [];
+
+    if (name) {
+        queryParams.push(name);
+        setClauses.push(`name = $${queryParams.length}`);
+    }
+
+    if (description) {
+        queryParams.push(description);
+        setClauses.push(`description = $${queryParams.length}`);
+    }
+
+    // Join the clauses with a comma
+    queryText += setClauses.join(", ");
+
+    queryParams.push(id);
+    queryText += ` WHERE id = $${queryParams.length} RETURNING *`;
+
+    const results = await query(queryText, queryParams, true);
     return results.rows[0];
 };
 
 /**
  * Deletes a category object from the database with the given ID.
  * @param {string} id - the ID of the object to delete
- * @returns
+ * @returns {integer} number of items deleted
  */
 exports.deleteCategory = async (id) => {
     const results = await query(
