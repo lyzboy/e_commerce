@@ -35,7 +35,8 @@ exports.getCategories = async ({ limit = 25, offset = 0, name } = {}) => {
 exports.createCategory = async (name, description) => {
     const results = await query(
         "INSERT INTO categories (name, description) VALUES ($1, $2) RETURNING *",
-        [name, description]
+        [name, description],
+        true
     );
     return results.rows[0];
 };
@@ -58,7 +59,8 @@ exports.getCategory = async (id) => {
 exports.updateCategory = async (categoryObject) => {
     const results = await query(
         "UPDATE categories SET name = $1, description = $2 WHERE id = $3 RETURNING *",
-        [categoryObject.name, categoryObject.description, categoryObject.id]
+        [categoryObject.name, categoryObject.description, categoryObject.id],
+        true
     );
     return results.rows[0];
 };
@@ -69,7 +71,11 @@ exports.updateCategory = async (categoryObject) => {
  * @returns
  */
 exports.deleteCategory = async (id) => {
-    const results = await query("DELETE FROM categories WHERE id = $1", [id]);
+    const results = await query(
+        "DELETE FROM categories WHERE id = $1",
+        [id],
+        true
+    );
 
     return results.rowCount;
 };
