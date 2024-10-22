@@ -2,6 +2,8 @@ const { query } = require("../config/db");
 
 /**
  * Queries the database to retrieve all categories.
+ * @param {object} object - and object containing the optional query parameters
+ * @returns array
  */
 exports.getCategories = async ({ limit = 25, offset = 0, name } = {}) => {
     // Start with the base query
