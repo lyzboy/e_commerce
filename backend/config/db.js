@@ -1,18 +1,31 @@
 const dotenv = require("dotenv");
 const path = require("path");
 dotenv.config({ path: path.resolve(__dirname, "../../.env") });
-const Pool = require("pg").Pool;
-const pool = new Pool({
-    user: process.env.POOL_USER_NAME,
+const { Pool } = require("pg");
+
+// Admin pool
+const adminPool = new Pool({
+    user: process.env.ADMIN_USER_NAME,
     host: process.env.POOL_HOST_NAME,
     database: process.env.POOL_DATABASE_NAME,
-    password: process.env.POOL_PASSWORD.toString(),
+    password: process.env.ADMIN_PASSWORD,
     port: process.env.POOL_PORT,
 });
 
-const query = async (text, params, callback) => {
+// Standard user pool
+const standardPool = new Pool({
+    user: process.env.STANDARD_USER_NAME,
+    host: process.env.POOL_HOST_NAME,
+    database: process.env.POOL_DATABASE_NAME,
+    password: process.env.STANDARD_PASSWORD,
+    port: process.env.POOL_PORT,
+});
+
+// Function to query with the appropriate pool
+const query = async (text, params, isAdmin = false) => {
     try {
-        const result = await pool.query(text, params, callback);
+        const pool = isAdmin ? adminPool : standardPool;
+        const result = await pool.query(text, params);
         return result;
     } catch (err) {
         console.log(err);
