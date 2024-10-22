@@ -59,9 +59,10 @@ exports.getCategory = async (id) => {
  * @returns
  */
 exports.updateCategory = async (categoryObject) => {
+    const { name, description, id } = categoryObject;
     const results = await query(
         "UPDATE categories SET name = $1, description = $2 WHERE id = $3 RETURNING *",
-        [categoryObject.name, categoryObject.description, categoryObject.id],
+        [name, description, id],
         true
     );
     return results.rows[0];
