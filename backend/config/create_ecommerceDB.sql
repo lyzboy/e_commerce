@@ -183,6 +183,18 @@ GRANT standard_user TO user1;
 CREATE USER admin1;
 GRANT admin_user TO admin1;
 
+-- Grant sequence usage and select privileges to admin user
+DO $$
+DECLARE r RECORD;
+BEGIN
+   FOR r IN SELECT sequence_schema, sequence_name
+            FROM information_schema.sequences
+            WHERE sequence_schema = 'public'
+   LOOP
+      EXECUTE 'GRANT USAGE, SELECT ON SEQUENCE ' || r.sequence_schema || '.' || r.sequence_name || ' TO admin_user';
+   END LOOP;
+END $$;
+
 -- Be sure to set passwords after creation
 -- ALTER USER user1 WITH PASSWORD 'your_strong_password';
 -- ALTER USER admin1 WITH PASSWORD 'your_strong_admin_password';
