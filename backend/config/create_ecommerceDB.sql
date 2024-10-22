@@ -128,10 +128,10 @@ CREATE TABLE "heros" (
 );
 
 -- Indices
-CREATE INDEX IF NOT EXISTS ON "orders_products" ("product_id", "order_id");
-CREATE INDEX IF NOT EXISTS ON "accounts_orders" ("account_email", "order_id");
-CREATE INDEX IF NOT EXISTS ON "carts_products" ("product_id", "cart_id");
-CREATE INDEX IF NOT EXISTS ON "products_categories" ("product_id", "category_id");
+CREATE INDEX IF NOT EXISTS idx_orders_products ON "orders_products" ("product_id", "order_id");
+CREATE INDEX IF NOT EXISTS idx_accounts_orders ON "accounts_orders" ("account_email", "order_id");
+CREATE INDEX IF NOT EXISTS idx_carts_products ON "carts_products" ("product_id", "cart_id");
+CREATE INDEX IF NOT EXISTS idx_products_categories ON "products_categories" ("product_id", "category_id");
 
 -- Foreign keys
 ALTER TABLE "cities" ADD FOREIGN KEY ("state_id") REFERENCES "states" ("id");
@@ -198,3 +198,17 @@ END $$;
 -- Be sure to set passwords after creation
 -- ALTER USER user1 WITH PASSWORD 'your_strong_password';
 -- ALTER USER admin1 WITH PASSWORD 'your_strong_admin_password';
+
+
+
+-- DATA INSERTION
+
+INSERT INTO categories (name, description) VALUES
+('Shirts', 'Shirts descriptions'),
+('Pants', 'Pants descriptions'),
+('Dresses', 'Dresses descriptions'),
+('Cooking', 'Cooking descriptions'),
+('Camping', 'Camping descriptions'),
+('Cars', 'Cars descriptions'),
+('Games', 'Games descriptions'),
+('Board Games', 'Board Games descriptions')
