@@ -12,6 +12,8 @@ CREATE TABLE "products" (
   "barcode" varchar(20),
   "name" varchar(100),
   "description" varchar(254)
+  "stock_quantity" integer
+  "price" numeric(10,2)
 );
 
 -- Categories table (for product categories like "Shirts", "Electronics")
