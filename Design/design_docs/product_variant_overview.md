@@ -4,6 +4,12 @@ This document explains the updated **variant storage** system, outlining the rol
 
 ## Overview of the System
 
+> If your product doesn't have variants, you can store it directly in
+> the `products` table without creating entries in the `attributes`,
+> `attribute_values`, `product_variants`, and 
+> `variant_attribute_values` tables. Use `stock_quantity` and `price`
+> from the `products` table to manage stock and pricing for such.
+
 We are using a **key-value pair approach** to represent product variants (like size, color, etc.), which allows us to flexibly add new attributes as needed (e.g., different dimensions, material types, etc.). Here’s a breakdown of the tables involved and how they relate:
 
 ## 1. Products Table
