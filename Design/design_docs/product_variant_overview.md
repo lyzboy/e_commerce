@@ -1,6 +1,6 @@
 # Product Variants Storage System: Explanation
 
-This document explains how the **variant storage** system works, outlining the role of each table and how they work together to represent products with various attributes (like size, color, etc.) and their specific details like price and stock.
+This document explains the updated **variant storage** system, outlining the role of each table and how they work together to represent products with various attributes (like size, color, etc.) and their specific details like price and stock.
 
 ## Overview of the System
 
@@ -53,12 +53,22 @@ We are using a **key-value pair approach** to represent product variants (like s
 |------------------|------------|--------------------------------------------------|
 | id               | SERIAL     | Unique identifier for the product variant (Primary Key). |
 | product_id       | integer    | Foreign key to the `products` table, identifying the product (e.g., Cotton T-Shirt). |
-| attribute_value_id | integer   | Foreign key to the `attribute_values` table, identifying the specific attribute value (e.g., "S", "Red"). |
 | price            | decimal    | The price for this specific variant (e.g., price for "S", "Red" t-shirt). |
 | stock_quantity   | integer    | The stock quantity available for this variant.   |
 
 - Each row represents a **unique combination of attributes** for a product.
-- Example: A "Small, Red Cotton T-Shirt" would have a separate entry from a "Medium, Blue Cotton T-Shirt", with each having its own price and stock.
+
+## 5. Variant Attribute Values Table
+
+**Purpose:** The `variant_attribute_values` table links each variant to its specific attribute values (e.g., Size, Color). This allows a variant to have multiple attributes.
+
+| Column               | Type       | Description                                      |
+|----------------------|------------|--------------------------------------------------|
+| id                   | SERIAL     | Unique identifier for the variant-attribute-value link (Primary Key). |
+| product_variant_id    | integer    | Foreign key to the `product_variants` table, identifying the variant. |
+| attribute_value_id    | integer    | Foreign key to the `attribute_values` table, identifying the specific value (e.g., "S", "Red"). |
+
+- Each row links a **variant** to an **attribute value**, allowing products to have multiple variants.
 
 ## How These Tables Work Together
 
@@ -103,38 +113,49 @@ The `product_variants` table stores each possible combination of attributes for 
 4. **Insert the product variants (combinations of size and color) into the `product_variants` table**:
 
     ```sql
-    INSERT INTO product_variants (product_id, attribute_value_id, price, stock_quantity)
+    INSERT INTO product_variants (product_id, price, stock_quantity)
     VALUES 
-      (5, (SELECT id FROM attribute_values WHERE value = 'S'), 19.99, 100),
-      (5, (SELECT id FROM attribute_values WHERE value = 'Red'), 19.99, 100),
-      (5, (SELECT id FROM attribute_values WHERE value = 'M'), 21.99, 80),
-      (5, (SELECT id FROM attribute_values WHERE value = 'Blue'), 21.99, 80),
-      (5, (SELECT id FROM attribute_values WHERE value = 'L'), 23.99, 60),
-      (5, (SELECT id FROM attribute_values WHERE value = 'Red'), 23.99, 60);
+      (5, 19.99, 100),
+      (5, 21.99, 80),
+      (5, 23.99, 60);
     ```
 
-5. **Query the product and its variants**:
+5. **Link product variants to their attribute values**:
+
+    ```sql
+    INSERT INTO variant_attribute_values (product_variant_id, attribute_value_id)
+    VALUES 
+      (1, (SELECT id FROM attribute_values WHERE value = 'S')),
+      (1, (SELECT id FROM attribute_values WHERE value = 'Red')),
+      (2, (SELECT id FROM attribute_values WHERE value = 'M')),
+      (2, (SELECT id FROM attribute_values WHERE value = 'Blue')),
+      (3, (SELECT id FROM attribute_values WHERE value = 'L')),
+      (3, (SELECT id FROM attribute_values WHERE value = 'Red'));
+    ```
+
+6. **Query the product and its variants**:
 
     ```sql
     SELECT 
         p.name AS product_name,
-        av.value AS attribute_value,
-        a.attribute_name AS attribute_type,
         pv.price,
-        pv.stock_quantity
+        pv.stock_quantity,
+        STRING_AGG(av.value, ' ') AS variant_attributes
     FROM 
         products p
     JOIN 
         product_variants pv ON p.id = pv.product_id
     JOIN 
-        attribute_values av ON pv.attribute_value_id = av.id
+        variant_attribute_values vav ON pv.id = vav.product_variant_id
     JOIN 
-        attributes a ON av.attribute_id = a.id
+        attribute_values av ON vav.attribute_value_id = av.id
     WHERE 
-        p.id = 5;
+        p.id = 5
+    GROUP BY 
+        pv.id, p.name, pv.price, pv.stock_quantity;
     ```
 
-This query will return all the variants for the "Cotton T-Shirt," displaying their attributes (size, color), prices, and stock quantities.
+This query will return all the variants for the "Cotton T-Shirt," displaying their combined attributes (like "S Red") along with prices and stock quantities.
 
 ## Key Benefits of This System:
 
