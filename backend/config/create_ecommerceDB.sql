@@ -10,15 +10,37 @@ CREATE TABLE "products" (
   "id" SERIAL PRIMARY KEY,
   "barcode" varchar(20),
   "name" varchar(100),
-  "description" varchar(254),
-  "price" decimal(10,2),
-  "quantity" integer
+  "description" varchar(254)
+  -- Removed quantity and price since they will be handled by product_variants
 );
 
 CREATE TABLE "categories" (
   "id" SERIAL PRIMARY KEY,
   "name" varchar(25),
   "description" varchar(150)
+);
+
+-- Table for dynamic attributes like size, color, material, etc.
+CREATE TABLE "attributes" (
+  "id" SERIAL PRIMARY KEY,
+  "attribute_name" varchar(100) NOT NULL
+);
+
+-- Table for attribute values (e.g., 'Red', 'Large', etc.)
+CREATE TABLE "attribute_values" (
+  "id" SERIAL PRIMARY KEY,
+  "attribute_id" integer REFERENCES attributes(id) ON DELETE CASCADE,
+  "value" varchar(100) NOT NULL
+);
+
+-- Table for product-attribute-value combinations
+-- This is where price and quantity now live
+CREATE TABLE "product_variants" (
+  "id" SERIAL PRIMARY KEY,
+  "product_id" integer REFERENCES products(id) ON DELETE CASCADE,
+  "attribute_value_id" integer REFERENCES attribute_values(id) ON DELETE CASCADE,
+  "price" decimal(10,2) NOT NULL,  -- Price specific to the variant
+  "quantity" integer NOT NULL  -- Stock specific to the variant
 );
 
 CREATE TABLE "accounts" (
@@ -199,8 +221,6 @@ END $$;
 -- ALTER USER user1 WITH PASSWORD 'your_strong_password';
 -- ALTER USER admin1 WITH PASSWORD 'your_strong_admin_password';
 
-
-
 -- DATA INSERTION
 
 INSERT INTO categories (name, description) VALUES
@@ -211,4 +231,4 @@ INSERT INTO categories (name, description) VALUES
 ('Camping', 'Camping descriptions'),
 ('Cars', 'Cars descriptions'),
 ('Games', 'Games descriptions'),
-('Board Games', 'Board Games descriptions')
+('Board Games', 'Board Games descriptions');
