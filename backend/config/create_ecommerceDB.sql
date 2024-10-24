@@ -273,12 +273,12 @@ VALUES ('12345', 'Cotton T-Shirt', 'A basic cotton t-shirt');
 -- Insert product variants for Cotton T-Shirt
 INSERT INTO product_variants (product_id, price, stock_quantity)
 VALUES 
-(5, 19.99, 100),  -- Small Red T-shirt
-(5, 19.99, 100),  -- Small Blue T-shirt
-(5, 21.99, 80),   -- Medium Red T-shirt
-(5, 21.99, 80),   -- Medium Blue T-shirt
-(5, 23.99, 60),   -- Large Red T-shirt
-(5, 23.99, 60);   -- Large Blue T-shirt
+(1, 19.99, 100),  -- Small Red T-shirt
+(1, 19.99, 100),  -- Small Blue T-shirt
+(1, 21.99, 80),   -- Medium Red T-shirt
+(1, 21.99, 80),   -- Medium Blue T-shirt
+(1, 23.99, 60),   -- Large Red T-shirt
+(1, 23.99, 60);   -- Large Blue T-shirt
 
 -- Link product variants to their attribute values
 INSERT INTO variant_attribute_values (product_variant_id, attribute_value_id)
@@ -311,6 +311,6 @@ JOIN
 JOIN 
     attribute_values av ON vav.attribute_value_id = av.id
 WHERE 
-    p.id = 5  -- Product ID for Cotton T-Shirt
+    p.id = 1  -- Product ID for Cotton T-Shirt
 GROUP BY 
     pv.id, p.name, pv.price, pv.stock_quantity;
