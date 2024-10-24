@@ -323,6 +323,29 @@ paths:
                   required: true
             tags:
                 - Products
+    /api/v1/products/{productId}/variants:
+        post:
+            summary: create a variant for a product
+            responses: 
+                "200":
+                    description: Variant created
+            tags:
+                - Products
+    /api/v1/products/{productId}/variants/{variantId}:
+        put:
+            summary: update a variant.
+            responses:
+                "200":
+                    description: Variant updated.
+            tags:
+                - Products
+        delete:
+            summary: delete a variant.
+            responses:
+                "200":
+                    description: Variant deleted
+            tags:
+                - Products
     /api/v1/user:
         summary: Endpoints for all user related requests
 
