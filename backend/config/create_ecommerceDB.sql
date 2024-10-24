@@ -281,6 +281,7 @@ VALUES
 (1, 23.99, 60);   -- Large Blue T-shirt
 
 -- Link product variants to their attribute values
+-- product_variant_id may be different
 INSERT INTO variant_attribute_values (product_variant_id, attribute_value_id)
 VALUES 
 (1, (SELECT id FROM attribute_values WHERE value = 'S')), -- Small
