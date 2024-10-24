@@ -11,8 +11,8 @@ CREATE TABLE "products" (
   "id" SERIAL PRIMARY KEY,
   "barcode" varchar(20),
   "name" varchar(100),
-  "description" varchar(254)
-  "stock_quantity" integer
+  "description" varchar(254),
+  "stock_quantity" integer,
   "price" numeric(10,2)
 );
 
