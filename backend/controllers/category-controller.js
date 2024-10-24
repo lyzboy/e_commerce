@@ -12,14 +12,19 @@ exports.getCategories = async (req, res) => {
     try {
         // Extract query parameters for pagination
         const { limit = 25, offset = 0, name } = req.query;
+        if (limit <= 1) {
+            return res.status(400).json({
+                message:
+                    "Bad Request. Invalid limit number. Limit must be greater than 1",
+            });
+        }
         const results = await categoryModel.getCategories({
             limit,
             offset,
             name,
         });
-
         if (!results.length) {
-            throw new Error("No results returned.");
+            return res.status(404).json({ message: "No results returned." });
         }
         res.status(200).json(results);
     } catch (error) {
