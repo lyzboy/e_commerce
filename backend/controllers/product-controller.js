@@ -1,3 +1,5 @@
+const productModel = require("../models/product-model");
+
 exports.getProducts = async (req, res) => {
     try {
         const { id, maxPrice, minPrice } = req.body;
