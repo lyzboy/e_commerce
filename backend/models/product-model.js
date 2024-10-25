@@ -1,24 +1,39 @@
 const { query } = require("../config/db");
 
-exports.getProducts = async (paramsObject) => {
-    const { categoryId, minPrice, maxPrice } = paramsObject;
-    const queryText = "SELECT * FROM products";
+exports.getProducts = async ({ categoryId, minPrice, maxPrice }) => {
+    let queryText = "SELECT * FROM products";
     const queryParams = [];
+    const conditions = [];
 
-    const exampleQuery = `SELECT * FROM products 
-    JOIN products_categories 
-    ON products.id = products_categories.product_id
-    JOIN categories
-    ON categories.id = products_categories.category_id
-    WHERE categories.id = ${categoryId} AND products.price BETWEEN ${minPrice} AND ${maxPrice}`;
-
-    if (categoryID) {
-        queryParams.push(categoryID);
-        // join table category products
+    // Add JOINs and filter by category if categoryId is provided
+    if (categoryId) {
+        queryText += ` JOIN products_categories 
+                       ON products.id = products_categories.product_id
+                       JOIN categories
+                       ON categories.id = products_categories.category_id`;
+        conditions.push(`categories.id = $${queryParams.length + 1}`);
+        queryParams.push(categoryId);
     }
-    const results = query(queryText, queryParams);
+
+    // Add price conditions if specified
+    if (minPrice) {
+        conditions.push(`products.price >= $${queryParams.length + 1}`);
+        queryParams.push(minPrice);
+    }
+    if (maxPrice) {
+        conditions.push(`products.price <= $${queryParams.length + 1}`);
+        queryParams.push(maxPrice);
+    }
+
+    // Combine all conditions with WHERE/AND logic
+    if (conditions.length > 0) {
+        queryText += ` WHERE ` + conditions.join(" AND ");
+    }
+
+    const results = await query(queryText, queryParams);
     return results.rows;
 };
+
 exports.createProduct = async () => {};
 exports.getProduct = async () => {};
 exports.updateProduct = async () => {};

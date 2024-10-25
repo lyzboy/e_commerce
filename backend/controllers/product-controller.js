@@ -2,8 +2,7 @@ const productModel = require("../models/product-model");
 
 exports.getProducts = async (req, res) => {
     try {
-        const { id, maxPrice, minPrice } = req.body;
-
+        const { categoryId, maxPrice, minPrice } = req.body;
         // Create a params object with only defined values
         const params = {};
         if (categoryId) params.categoryId = categoryId;
@@ -11,14 +10,22 @@ exports.getProducts = async (req, res) => {
         if (minPrice) params.minPrice = minPrice;
 
         // Pass params object to the model function
-        const results = await productModel.getCategories(params);
+        const results = await productModel.getProducts(params);
 
         res.status(200).json(results);
     } catch (error) {
         res.status(500).json({ message: "Server Error: " + error.message });
     }
 };
-exports.createProduct = async (req, res) => {};
-exports.getProduct = async (req, res) => {};
-exports.updateProduct = async (req, res) => {};
-exports.deleteProduct = async (req, res) => {};
+exports.createProduct = async (req, res) => {
+    res.status(500).json({ message: "Not implemented" });
+};
+exports.getProduct = async (req, res) => {
+    res.status(500).json({ message: "Not implemented" });
+};
+exports.updateProduct = async (req, res) => {
+    res.status(500).json({ message: "Not implemented" });
+};
+exports.deleteProduct = async (req, res) => {
+    res.status(500).json({ message: "Not implemented" });
+};
