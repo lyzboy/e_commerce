@@ -1,3 +1,4 @@
+const { query } = require("../config/db");
 const productModel = require("../models/product-model");
 
 exports.getProducts = async (req, res) => {
@@ -19,7 +20,8 @@ exports.getProducts = async (req, res) => {
 };
 exports.createProduct = async (req, res) => {
     try {
-        const { barcode, name, description, price, stock_quantity } = req.body;
+        const { barcode, name, description, price, stock_quantity, variants } =
+            req.body;
 
         if (!name) {
             return res
@@ -34,6 +36,7 @@ exports.createProduct = async (req, res) => {
         if (description) params.description = description;
         if (price) params.price = price;
         if (stock_quantity) params.stock_quantity = stock_quantity;
+        if (variants) params.variants = variants;
         const results = await productModel.createProduct(params);
         res.status(200).json(results);
     } catch (error) {
@@ -54,8 +57,38 @@ exports.getProduct = async (req, res) => {
     }
 };
 exports.updateProduct = async (req, res) => {
-    res.status(500).json({ message: "Not implemented" });
+    try {
+        const { id } = req.params;
+        if (!id)
+            return res
+                .status(400)
+                .json({ message: "Bad Request: Missing Product ID" });
+        const { barcode, name, description, price, stock_quantity, variants } =
+            req.body;
+
+        const params = { id };
+        if (barcode) params.barcode = barcode;
+        if (name) params.name = name;
+        if (description) params.description = description;
+        if (price) params.price = price;
+        if (stock_quantity) params.stock_quantity = stock_quantity;
+        if (variants) params.variants = variants;
+        const results = await productModel.updateProduct(params);
+        res.status(200).json(results);
+    } catch (error) {
+        res.status(500).json({ message: error });
+    }
 };
 exports.deleteProduct = async (req, res) => {
-    res.status(500).json({ message: "Not implemented" });
+    try {
+        const { id } = req.params;
+        if (!id)
+            return res
+                .status(400)
+                .json({ message: "Bad Request. Missing Product ID" });
+        const results = productModel.deleteProduct(id);
+        res.status(200).json(results);
+    } catch (error) {
+        res.status(500).json({ message: error });
+    }
 };
