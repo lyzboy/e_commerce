@@ -41,7 +41,17 @@ exports.createProduct = async (req, res) => {
     }
 };
 exports.getProduct = async (req, res) => {
-    res.status(500).json({ message: "Not implemented" });
+    try {
+        const { id } = req.params;
+        if (!id)
+            return res
+                .status(400)
+                .json({ message: "Bad Request: Missing Product ID." });
+        const results = await productModel.getProduct(productId);
+        res.status(200).json(results);
+    } catch (error) {
+        res.status(500).json({ message: error });
+    }
 };
 exports.updateProduct = async (req, res) => {
     res.status(500).json({ message: "Not implemented" });
