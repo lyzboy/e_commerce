@@ -2,6 +2,72 @@
 
 This document explains the updated **variant storage** system, outlining the role of each table and how they work together to represent products with various attributes (like size, color, etc.) and their specific details like price and stock.
 
+## Request Body Object Structure
+
+```js
+{
+    "id": 35,
+    "barcode": "12345678901234",
+    "name": "Running Shoes",
+    "description": "Comfortable running shoes.",
+    "price": null,
+    "stock_quantity": null,
+    "variants": [
+        {
+            "price": 9.99,
+            "stock_quantity": 20,
+            "attributes": [
+                {
+                    "attribute_name": null,
+                    "value": null
+                }
+            ]
+        },
+        {
+            "price": 79.99,
+            "stock_quantity": 20,
+            "attributes": [
+                {
+                    "attribute_name": null,
+                    "value": null
+                }
+            ]
+        },
+        {
+            "price": 79.99,
+            "stock_quantity": 15,
+            "attributes": [
+                {
+                    "attribute_name": null,
+                    "value": null
+                }
+            ]
+        },
+        {
+            "price": 79.99,
+            "stock_quantity": 25,
+            "attributes": [
+                {
+                    "attribute_name": null,
+                    "value": null
+                }
+            ]
+        },
+        {
+            "price": 79.99,
+            "stock_quantity": 15,
+            "attributes": [
+                {
+                    "attribute_name": null,
+                    "value": null
+                }
+            ]
+        }
+    ]
+
+}
+```
+
 ## Overview of the System
 
 > If your product doesn't have variants, you can store it directly in
