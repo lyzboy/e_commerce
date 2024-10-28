@@ -15,7 +15,6 @@ exports.getProducts = async ({ categoryId, minPrice, maxPrice }) => {
         const queryParams = [];
         const conditions = [];
 
-        // Add JOINs and filter by category if categoryId is provided
         if (categoryId) {
             queryText += `
                 JOIN products_categories 
@@ -27,7 +26,6 @@ exports.getProducts = async ({ categoryId, minPrice, maxPrice }) => {
             queryParams.push(categoryId);
         }
 
-        // Add price conditions if specified
         if (minPrice) {
             conditions.push(
                 `COALESCE(product_variants.price, products.price) >= $${
@@ -45,12 +43,10 @@ exports.getProducts = async ({ categoryId, minPrice, maxPrice }) => {
             queryParams.push(maxPrice);
         }
 
-        // Combine all conditions with WHERE/AND logic
         if (conditions.length > 0) {
             queryText += ` WHERE ` + conditions.join(" AND ");
         }
 
-        // Group by products.id to ensure one row per product
         queryText += ` GROUP BY products.id`;
 
         const results = await query(queryText, queryParams);
@@ -65,7 +61,6 @@ exports.createProduct = async (productObject) => {
         const { barcode, name, description, price, stock_quantity, variants } =
             productObject;
 
-        // Prepare the query for product insertion
         let queryText = "INSERT INTO products ";
         let fieldsArray = [];
         let queryParams = [];
@@ -101,17 +96,13 @@ exports.createProduct = async (productObject) => {
         queryText += `VALUES (${valuesArray.join(", ")}) `;
         queryText += `RETURNING *`;
 
-        // Execute product insertion
         const productResult = await query(queryText, queryParams, true);
         const newProduct = productResult.rows[0];
 
-        // Handle variants if provided
         if (variants && variants.length > 0) {
-            // Pass the new product ID and the variants array to the createVariants function
             await createVariants(newProduct.id, variants);
         }
 
-        // Fetch the product along with its variants
         const fullProductData = await this.getProductWithVariants(
             newProduct.id
         );
@@ -147,7 +138,6 @@ exports.updateProduct = async (productObject) => {
         const queryParams = [];
         const setClauses = [];
 
-        // Build dynamic set clause based on provided fields
         if (barcode) {
             queryParams.push(barcode);
             setClauses.push(`barcode = $${queryParams.length}`);
@@ -169,22 +159,18 @@ exports.updateProduct = async (productObject) => {
             setClauses.push(`stock_quantity = $${queryParams.length}`);
         }
 
-        // Complete the product update query
         queryParams.push(id);
         queryText +=
             setClauses.join(", ") +
             ` WHERE id = $${queryParams.length} RETURNING *`;
 
-        // Execute product update
         const productResult = await query(queryText, queryParams, true);
         const updatedProduct = productResult.rows[0];
 
-        // Handle variants if provided
         if (variants && variants.length > 0) {
-            await updateVariants(id, variants); // Call a separate function to handle variant updates
+            await updateVariants(id, variants);
         }
 
-        // Fetch the updated product with all variants to return a complete response
         const fullProductData = await this.getProductWithVariants(id);
         return fullProductData;
     } catch (error) {

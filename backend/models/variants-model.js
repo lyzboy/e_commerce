@@ -14,7 +14,6 @@ exports.createVariants = async (productId, variants) => {
             );
         });
 
-        // Run all queries asynchronously
         await Promise.all(variantQueries);
     } catch (error) {
         throw new Error(`Failed to create variants: ${error.message}`);
@@ -23,32 +22,26 @@ exports.createVariants = async (productId, variants) => {
 
 exports.updateVariants = async (productId, variants) => {
     try {
-        // Retrieve current variants from the database for comparison
         const currentVariantsResult = await query(
             `SELECT * FROM product_variants WHERE product_id = $1`,
             [productId]
         );
         const currentVariants = currentVariantsResult.rows;
 
-        // Separate variants into updates, inserts, and deletions
         const variantsToUpdate = [];
         const variantsToInsert = [];
         const variantsToDelete = currentVariants.filter(
             (cv) => !variants.some((v) => v.id === cv.id)
         );
 
-        // Process each variant in the provided variants array
         variants.forEach((variant) => {
             if (variant.id) {
-                // Variant exists, so we should update it
                 variantsToUpdate.push(variant);
             } else {
-                // New variant, so we should insert it
                 variantsToInsert.push(variant);
             }
         });
 
-        // Execute updates
         for (let variant of variantsToUpdate) {
             await query(
                 `UPDATE product_variants 
@@ -59,7 +52,6 @@ exports.updateVariants = async (productId, variants) => {
             );
         }
 
-        // Execute inserts
         for (let variant of variantsToInsert) {
             await query(
                 `INSERT INTO product_variants (product_id, attribute_value_id, price, stock_quantity) 
@@ -74,7 +66,6 @@ exports.updateVariants = async (productId, variants) => {
             );
         }
 
-        // Execute deletions
         for (let variant of variantsToDelete) {
             await query(
                 `DELETE FROM product_variants WHERE id = $1`,
