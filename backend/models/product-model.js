@@ -122,9 +122,9 @@ exports.createProduct = async (productObject) => {
 };
 exports.getProduct = async (productId) => {
     try {
-        let queryText = "Select * FROM products WHERE id = $1";
+        let queryText = "SELECT * FROM products WHERE id = $1";
         let queryParams = [productId];
-        const results = await query(queryText, queryParams, true);
+        const results = await query(queryText, queryParams);
         return results.rows[0];
     } catch (error) {
         throw new Error(error);
@@ -196,7 +196,7 @@ exports.deleteProduct = async (productId) => {
     try {
         const queryText = "DELETE FROM products WHERE id = $1";
         const queryParams = [productId];
-        const results = query(queryText, queryParams, true);
+        const results = await query(queryText, queryParams, true);
         return results.rowCount;
     } catch (error) {
         throw new Error(error);

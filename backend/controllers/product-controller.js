@@ -50,10 +50,10 @@ exports.getProduct = async (req, res) => {
             return res
                 .status(400)
                 .json({ message: "Bad Request: Missing Product ID." });
-        const results = await productModel.getProduct(productId);
+        const results = await productModel.getProductWithVariants(id);
         res.status(200).json(results);
     } catch (error) {
-        res.status(500).json({ message: error });
+        res.status(500).json({ message: "There was a server error: " + error });
     }
 };
 exports.updateProduct = async (req, res) => {
@@ -86,8 +86,8 @@ exports.deleteProduct = async (req, res) => {
             return res
                 .status(400)
                 .json({ message: "Bad Request. Missing Product ID" });
-        const results = productModel.deleteProduct(id);
-        res.status(200).json(results);
+        const results = await productModel.deleteProduct(id);
+        res.status(200).json({ message: `Deleted ${results} row(s)` });
     } catch (error) {
         res.status(500).json({ message: error });
     }
