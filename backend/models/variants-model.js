@@ -1,3 +1,5 @@
+const { query } = require("../config/db");
+
 exports.createVariants = async (productId, variants) => {
     try {
         const variantQueries = variants.map((variant) => {
@@ -7,7 +9,8 @@ exports.createVariants = async (productId, variants) => {
                 `INSERT INTO product_variants (product_id, attribute_value_id, price, stock_quantity)
                  VALUES ($1, $2, $3, $4)
                  RETURNING *`,
-                [productId, attributeValueIds, price, stock_quantity]
+                [productId, attributeValueIds, price, stock_quantity],
+                true
             );
         });
 
@@ -51,7 +54,8 @@ exports.updateVariants = async (productId, variants) => {
                 `UPDATE product_variants 
                  SET price = $1, stock_quantity = $2 
                  WHERE id = $3`,
-                [variant.price, variant.stock_quantity, variant.id]
+                [variant.price, variant.stock_quantity, variant.id],
+                true
             );
         }
 
@@ -65,15 +69,18 @@ exports.updateVariants = async (productId, variants) => {
                     variant.attribute_value_id,
                     variant.price,
                     variant.stock_quantity,
-                ]
+                ],
+                true
             );
         }
 
         // Execute deletions
         for (let variant of variantsToDelete) {
-            await query(`DELETE FROM product_variants WHERE id = $1`, [
-                variant.id,
-            ]);
+            await query(
+                `DELETE FROM product_variants WHERE id = $1`,
+                [variant.id],
+                true
+            );
         }
     } catch (error) {
         throw new Error(`Failed to update variants: ${error.message}`);

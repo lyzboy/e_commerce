@@ -6,7 +6,7 @@ exports.getProducts = async ({ categoryId, minPrice, maxPrice }) => {
         let queryText = `
             SELECT 
                 products.*,
-                COALESCE(product_variants.price, products.price) AS effective_price
+                COALESCE(MIN(product_variants.price), products.price) AS effective_price
             FROM 
                 products
             LEFT JOIN 
@@ -50,7 +50,7 @@ exports.getProducts = async ({ categoryId, minPrice, maxPrice }) => {
             queryText += ` WHERE ` + conditions.join(" AND ");
         }
 
-        // Optional: Group by product to avoid duplicate rows when a product has multiple variants
+        // Group by products.id to ensure one row per product
         queryText += ` GROUP BY products.id`;
 
         const results = await query(queryText, queryParams);
@@ -102,7 +102,7 @@ exports.createProduct = async (productObject) => {
         queryText += `RETURNING *`;
 
         // Execute product insertion
-        const productResult = await query(queryText, queryParams);
+        const productResult = await query(queryText, queryParams, true);
         const newProduct = productResult.rows[0];
 
         // Handle variants if provided
@@ -124,7 +124,7 @@ exports.getProduct = async (productId) => {
     try {
         let queryText = "Select * FROM products WHERE id = $1";
         let queryParams = [productId];
-        const results = await query(queryText, queryParams);
+        const results = await query(queryText, queryParams, true);
         return results.rows[0];
     } catch (error) {
         throw new Error(error);
@@ -176,7 +176,7 @@ exports.updateProduct = async (productObject) => {
             ` WHERE id = $${queryParams.length} RETURNING *`;
 
         // Execute product update
-        const productResult = await query(queryText, queryParams);
+        const productResult = await query(queryText, queryParams, true);
         const updatedProduct = productResult.rows[0];
 
         // Handle variants if provided
@@ -207,29 +207,42 @@ exports.getProductWithVariants = async (productId) => {
     try {
         const queryText = `
             SELECT 
-                products.*,
-                json_agg(
-                    json_build_object(
-                        'price', product_variants.price,
-                        'stock_quantity', product_variants.stock_quantity,
-                        'attributes', json_agg(
-                            json_build_object(
-                                'attribute_name', attributes.attribute_name,
-                                'value', attribute_values.value
-                            )
-                        )
-                    )
-                ) AS variants
-            FROM products
-            LEFT JOIN product_variants ON products.id = product_variants.product_id
-            LEFT JOIN variant_attribute_values vav ON product_variants.id = vav.product_variant_id
-            LEFT JOIN attribute_values ON vav.attribute_value_id = attribute_values.id
-            LEFT JOIN attributes ON attribute_values.attribute_id = attributes.id
-            WHERE products.id = $1
-            GROUP BY products.id
+    products.*,
+    COALESCE(json_agg(product_variants_with_attributes), '[]') AS variants
+FROM 
+    products
+LEFT JOIN (
+    SELECT 
+        pv.product_id,
+        json_build_object(
+            'price', pv.price,
+            'stock_quantity', pv.stock_quantity,
+            'attributes', json_agg(
+                json_build_object(
+                    'attribute_name', a.attribute_name,
+                    'value', av.value
+                )
+            )
+        ) AS product_variants_with_attributes
+    FROM 
+        product_variants pv
+    LEFT JOIN 
+        variant_attribute_values vav ON pv.id = vav.product_variant_id
+    LEFT JOIN 
+        attribute_values av ON vav.attribute_value_id = av.id
+    LEFT JOIN 
+        attributes a ON av.attribute_id = a.id
+    GROUP BY 
+        pv.id
+) product_variants_aggregated ON products.id = product_variants_aggregated.product_id
+WHERE 
+    products.id = $1
+GROUP BY 
+    products.id;
+
         `;
 
-        const result = await query(queryText, [productId]);
+        const result = await query(queryText, [productId], true);
         return result.rows[0];
     } catch (error) {
         throw new Error(error);
