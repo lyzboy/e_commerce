@@ -14,12 +14,13 @@ paths:
             description: Retrieves categories from the store's database based on search criteria
             operationId: search_categories
             parameters:
-                - in: query
-                  name: name
-                  schema:
+                - 
+                    in: query
+                    name: name
+                    schema:
                       type: string
-                  description: Filter categories by name. Can be partial to return names that would be close.
-                  example: hats
+                    description: Filter categories by name. Can be partial to return names that would be close.
+                    example: hats
                 - 
                     in: query
                     name: limit
@@ -46,8 +47,40 @@ paths:
                                 type: array
                                 items:
                                     $ref: "#/components/schemas/Category"
+                "400":
+                    description: The limit number must be greater than 1
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    message:
+                                        type: string
+                                        description: error message
+                                        example: Bad Request. Invalid limit number. Limit must be greater than 1
+                "404":
+                    description: No results were found.
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    message:
+                                        type: string
+                                        description: error message
+                                        example: 'No results returned'
                 "500":
                     description: Server error
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    message:
+                                        type: string
+                                        description: error message
+                                        example: 'Server error: '
+                
             tags:
                 - Category
         post:
@@ -288,6 +321,29 @@ paths:
                   schema:
                       type: string
                   required: true
+            tags:
+                - Products
+    /api/v1/products/{productId}/variants:
+        post:
+            summary: create a variant for a product
+            responses: 
+                "200":
+                    description: Variant created
+            tags:
+                - Products
+    /api/v1/products/{productId}/variants/{variantId}:
+        put:
+            summary: update a variant.
+            responses:
+                "200":
+                    description: Variant updated.
+            tags:
+                - Products
+        delete:
+            summary: delete a variant.
+            responses:
+                "200":
+                    description: Variant deleted
             tags:
                 - Products
     /api/v1/user:
