@@ -1,6 +1,6 @@
 const dotenv = require("dotenv");
 const path = require("path");
-dotenv.config({ path: path.resolve(__dirname, "../../.env") });
+dotenv.config(); //{ path: path.resolve(__dirname, "../../.env") });
 const { Pool } = require("pg");
 
 /**
@@ -8,11 +8,11 @@ const { Pool } = require("pg");
  * to HTTP and database statements.
  */
 const adminPool = new Pool({
-    user: process.env.ADMIN_USER_NAME,
-    host: process.env.POOL_HOST_NAME,
-    database: process.env.POOL_DATABASE_NAME,
-    password: process.env.ADMIN_PASSWORD,
-    port: process.env.POOL_PORT,
+  user: process.env.ADMIN_USER_NAME,
+  host: process.env.POOL_HOST_NAME,
+  database: process.env.POOL_DATABASE_NAME,
+  password: process.env.ADMIN_PASSWORD,
+  port: process.env.POOL_PORT,
 });
 
 /**
@@ -20,11 +20,11 @@ const adminPool = new Pool({
  * to the HTTP and database statements that can be used.
  */
 const standardPool = new Pool({
-    user: process.env.STANDARD_USER_NAME,
-    host: process.env.POOL_HOST_NAME,
-    database: process.env.POOL_DATABASE_NAME,
-    password: process.env.STANDARD_PASSWORD,
-    port: process.env.POOL_PORT,
+  user: process.env.STANDARD_USER_NAME,
+  host: process.env.POOL_HOST_NAME,
+  database: process.env.POOL_DATABASE_NAME,
+  password: process.env.STANDARD_PASSWORD,
+  port: process.env.POOL_PORT,
 });
 
 /**
@@ -35,15 +35,15 @@ const standardPool = new Pool({
  * @returns
  */
 const query = async (queryText, queryParams, isAdmin = false) => {
-    try {
-        const pool = isAdmin ? adminPool : standardPool;
-        const result = await pool.query(queryText, queryParams);
-        return result;
-    } catch (err) {
-        console.log(err);
-    }
+  try {
+    const pool = isAdmin ? adminPool : standardPool;
+    const result = await pool.query(queryText, queryParams);
+    return result;
+  } catch (err) {
+    console.log(err);
+  }
 };
 
 module.exports = {
-    query,
+  query,
 };

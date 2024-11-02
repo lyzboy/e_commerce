@@ -348,28 +348,6 @@ paths:
                 - Products
     /api/v1/user:
         summary: Endpoints for all user related requests
-
-        post:
-            summary: Add a user.
-            description: This operation creates a new user.
-            operationId: add_user
-            security:
-                - bearerAuth: []
-            requestBody:
-                description: A new user object
-                content:
-                    application/json:
-                        schema:
-                            $ref: "#/components/schemas/User"
-            responses:
-                "200":
-                    description: The user has been created
-                    content:
-                        application/json:
-                            schema:
-                                $ref: "#/components/schemas/User"
-            tags:
-                - User
     /api/v1/user/{id}:
         summary: Allow the user to login.
         description: Endpoints relating to all user info.
@@ -540,8 +518,37 @@ paths:
                 - Auth
     /api/auth/register:
         post:
+            summary: create user
+            description: used to create a user account
+            operationId: register_user
+            requestBody:
+                description: the user to be created
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            required:
+                                - email
+                                - name
+                                - password
+                                - address
+                            properties:
+                                email:
+                                    type: string
+                                username:
+                                    type: string
+                                name:
+                                    type: string
+                                password:
+                                    type: string
+                                phone_id:
+                                    type: number
+                                address_id:
+                                    type: number
             responses:
                 "200":
+                    description: Create user successful
                     content:
                         application/json:
                             schema:
