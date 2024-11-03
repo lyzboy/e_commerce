@@ -2,6 +2,8 @@ const express = require("express");
 const session = require("express-session");
 const passport = require("passport");
 const LocalStrategy = require("passport-local").Strategy;
+const {config} = require("dotenv");
+config();
 
 const authRoutes = require("./routes/auth-routes");
 const categoryRoutes = require("./routes/category-routes");
@@ -15,7 +17,7 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use(
     session({
-        secret: "sfj&D636&^jdu", // **TEST VALUE** Move secret to env in production
+        secret: process.env.TOKEN_SECRET, // **TEST VALUE** Move secret to env in production
         cookie: { maxAge: 300000000, secure: false },
         saveUninitialized: false,
         resave: false,
@@ -69,6 +71,6 @@ module.exports = app; // Export app for testing
 // Create a separate file for starting the server
 if (require.main === module) {
     app.listen(port, () => {
-        console.log(`Server started on port ${port}`);
+        console.log(`Server started at: http://localhost:${port}`);
     });
 }

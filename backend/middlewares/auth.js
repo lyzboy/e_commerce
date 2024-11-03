@@ -33,6 +33,7 @@ exports.generateAccessToken = (payload) => {
 };
 
 exports.authenticateToken = (req, res, next) => {
+  // TODO: disable for production
   if (isDevMode && req.body.dev === "true") {
     console.log("Development mode: bypassing authentication");
     req.user = { username: "dev", role: "admin" };

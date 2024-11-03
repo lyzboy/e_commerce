@@ -1,5 +1,5 @@
 const authMiddleware = require("../middlewares/auth");
-const validator = require(validator);
+const validator = require("validator");
 
 exports.createUser = async (req, res) => {
   console.log(req.body);
