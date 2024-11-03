@@ -39,6 +39,7 @@ exports.authenticateToken = (req, res, next) => {
     req.user = { username: "dev", role: "admin" };
     return next();
   }
+  // ***
   // get the authorization header
   const authHeader = req.headers["authorization"];
 
