@@ -5,7 +5,7 @@
 * **What changes does this PR introduce?** (Be clear and concise. Include specific details about the features, bug fixes, or improvements you've made.)
 * **Why are these changes necessary?** (Explain the motivation behind your changes. What problem do they solve? How do they improve the project?)
 * **How were these changes implemented?** (Provide a high-level overview of your approach. Mention any key design decisions or technical challenges you encountered.)
-* **Related Issue:** (If applicable, link to the related issue in your issue tracker. For example, "Fixes #123". You can bring up a list of suggested issues and pull requests within the repository by typing #.)
+* **Related Issue:** (If applicable, link to the related issue in your issue tracker. For example, "Fixes #123". You can bring up a list of suggested issues and pull requests within the repository by typing [#].)
 
 **Screenshots/ GIFs:** (If applicable, include visuals to demonstrate the changes, especially for UI updates.)
 
