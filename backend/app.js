@@ -4,6 +4,7 @@ const passport = require("passport");
 const LocalStrategy = require("passport-local").Strategy;
 const { config } = require("dotenv");
 config();
+require("./config/passport-config");
 
 const authRoutes = require("./routes/auth-routes");
 const categoryRoutes = require("./routes/category-routes");
