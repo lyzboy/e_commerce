@@ -1,7 +1,5 @@
 const express = require("express");
 const session = require("express-session");
-const passport = require("passport");
-const LocalStrategy = require("passport-local").Strategy;
 const { config } = require("dotenv");
 config();
 require("./config/passport-config");
@@ -28,23 +26,6 @@ app.use(
 
 app.use(passport.initialize());
 
-passport.use(
-  new LocalStrategy(function (username, password, done) {
-    userModel.getUserByEmail(email, (err, user) => {
-      if (err) {
-        return done(err);
-      }
-      if (!user) {
-        return done(null, false, { message: "Incorrect username." });
-      }
-      if (!user.validPassword(password)) {
-        return done(null, false, { message: "Incorrect password." });
-      }
-      return done(null, user);
-    });
-  })
-);
-
 passport.serializeUser((user, done) => {
   done(null, user.id);
 });
@@ -57,23 +38,6 @@ passport.deserializeUser((id, done) => {
     done(null, user);
   });
 });
-
-passport.use(
-  new LocalStrategy(function (username, password, cb) {
-    db.users.findByUsername(username, function (err, user) {
-      if (err) {
-        return cb(err);
-      }
-      if (!user) {
-        return cb(null, false);
-      }
-      if (user.password != password) {
-        return cb(null, false);
-      }
-      return cb(null, user);
-    });
-  })
-);
 
 app.use("/api/v1/user", authRoutes);
 app.use("/api/v1/categories", categoryRoutes);
