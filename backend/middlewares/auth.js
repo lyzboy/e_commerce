@@ -8,23 +8,26 @@ dotenv.config();
 const tokenSecret = process.env.TOKEN_SECRET;
 const isDevMode = process.env.DEV_MODE;
 
-exports.authenticateToken = (req, res, next) => {
+exports.authenticate = (req, res, next) => {
   // TODO: disable for production
-  if (isDevMode && req.body.dev === "true") {
-    console.log("Development mode: bypassing authentication");
-    req.user = { username: "dev", role: "admin" };
-    return next();
-  }
 
-  passport.authenticate("jwt", { session: false }, (err, user, info) => {
-    if (err) {
-      return next(err); // Pass the error to the error handling middleware
+  passport.authenticate("local", { failureRedirect: "/login" }, (err, user) => {
+    if (isDevMode && req.body.dev === "true") {
+      console.log("Development mode: bypassing authentication");
+      req.user = { username: "dev", role: "admin" };
+      next();
+    } else {
+      if (err) {
+        console.log("there was an error" + err);
+        return next(err); // Pass the error to the error handling middleware
+      }
+      if (!user) {
+        return res.status(401).json({ message: "Authentication failed" });
+      }
+      req.user = user;
+      console.log("user authenticated");
+      next();
     }
-    if (!user) {
-      return res.status(401).json({ message: "Authentication failed" });
-    }
-    req.user = user;
-    next();
   })(req, res, next); // This invokes the middleware
 };
 

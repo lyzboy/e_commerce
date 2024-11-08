@@ -2,6 +2,7 @@ const express = require("express");
 const session = require("express-session");
 const { config } = require("dotenv");
 config();
+const passport = require("passport");
 require("./config/passport-config");
 
 const authRoutes = require("./routes/auth-routes");
@@ -25,6 +26,7 @@ app.use(
 );
 
 app.use(passport.initialize());
+app.use(passport.session());
 
 passport.serializeUser((user, done) => {
   done(null, user.id);

@@ -1,4 +1,3 @@
-const { get } = require("../app");
 const { query } = require("../config/db");
 
 exports.findUserById = async (id) => {

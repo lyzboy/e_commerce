@@ -1,10 +1,9 @@
 const authMiddleware = require("../middlewares/auth");
 const validator = require("validator");
-const bcrypt = require("bcrypt");
+
+const { passwordHash } = require("../util/helpers");
 
 const userModel = require("../models/user-model");
-
-const saltRounds = 15;
 
 exports.createUser = async (req, res) => {
   try {
@@ -38,19 +37,7 @@ exports.createUser = async (req, res) => {
   }
 };
 
-/**
- * Create a hashed password from a plain text password
- * @param {string} password - the plain text password to hash
- * @returns
- */
-const passwordHash = async (password) => {
-  try {
-    const salt = await bcrypt.genSalt(saltRounds);
-    return await bcrypt.hash(password, salt);
-  } catch (error) {
-    throw new CustomError(500, "Unable to hash password");
-  }
-};
+exports.login = async (req, res) => {};
 
 /**
  * Validate the user object

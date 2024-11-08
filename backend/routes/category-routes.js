@@ -3,37 +3,29 @@ const router = express.Router();
 const categoryController = require("../controllers/category-controller");
 const authMiddleware = require("../middlewares/auth");
 
-router.get(
-    "/",
-    authMiddleware.authenticateToken,
-    categoryController.getCategories
-);
+router.get("/", authMiddleware.authenticate, categoryController.getCategories);
 
 router.post(
-    "/",
-    authMiddleware.authenticateToken,
-    authMiddleware.checkAdminRole,
-    categoryController.createCategory
+  "/",
+  authMiddleware.authenticate,
+  authMiddleware.checkAdminRole,
+  categoryController.createCategory
 );
 
-router.get(
-    "/:id",
-    authMiddleware.authenticateToken,
-    categoryController.getCategory
-);
+router.get("/:id", authMiddleware.authenticate, categoryController.getCategory);
 
 router.put(
-    "/:id",
-    authMiddleware.authenticateToken,
-    authMiddleware.checkAdminRole,
-    categoryController.updateCategory
+  "/:id",
+  authMiddleware.authenticate,
+  authMiddleware.checkAdminRole,
+  categoryController.updateCategory
 );
 
 router.delete(
-    "/:id",
-    authMiddleware.authenticateToken,
-    authMiddleware.checkAdminRole,
-    categoryController.deleteCategory
+  "/:id",
+  authMiddleware.authenticate,
+  authMiddleware.checkAdminRole,
+  categoryController.deleteCategory
 );
 
 module.exports = router;
