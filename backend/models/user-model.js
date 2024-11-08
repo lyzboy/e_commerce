@@ -1,3 +1,4 @@
+const { get } = require("../app");
 const { query } = require("../config/db");
 
 exports.findUserById = async (id) => {
@@ -39,12 +40,30 @@ exports.createUser = async (userObject) => {
 
 exports.createCity = async (city, state) => {
   try {
-    //TODO: check if city already exists
-    const stateId = getState(state);
+    const results = await this.getCityByName(city);
+    if (results) {
+      return results;
+    }
+
+    const stateId = this.getState(state);
     const queryText = "INSERT INTO cities VALUES ($1, $2) RETURNING *";
     const queryParams = [city, stateId];
-    const results = await query(queryText, queryParams);
+    results = await query(queryText, queryParams);
     return results.rows[0].id;
+  } catch (error) {
+    throw new Error(error);
+  }
+};
+
+exports.getCityByName = async (city) => {
+  try {
+    const queryText = "SELECT id FROM cities WHERE name = $1";
+    const queryParams = [city];
+    const results = await query(queryText, queryParams);
+    if (results.rows.length === 0) {
+      return null;
+    }
+    return results.rows[0];
   } catch (error) {
     throw new Error(error);
   }
@@ -52,7 +71,8 @@ exports.createCity = async (city, state) => {
 
 exports.getStateId = async (state) => {
   try {
-    const queryText = "SELECT id FROM states WHERE state = $1";
+    const queryText =
+      "SELECT id FROM states WHERE name = $1 OR short_name = $1";
     const queryParams = [state];
     const results = await query(queryText, queryParams);
     return results.rows[0].id;
