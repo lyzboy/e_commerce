@@ -13,6 +13,7 @@ exports.findUserById = async (id) => {
 
 exports.createUser = async (userObject) => {
   try {
+    //TODO: finish implementing the rest of the user fields
     const {
       email,
       username,
@@ -31,7 +32,74 @@ exports.createUser = async (userObject) => {
       phoneId = await this.createPhoneNumber(phoneNumber);
     }
     const valuesArray = [];
-    const queryText = "INSERT";
+    let queryText = "INSERT INTO accounts (";
+    const fieldsArray = [];
+    const valuesIndexes = [];
+    if(email) {
+      valuesArray.push(email);
+      fieldsArray.push("email");
+      valuesIndexes.push(`$${valuesArray.length}`);
+    }
+    if(username) {
+      valuesArray.push(username);
+      fieldsArray.push("username");
+      valuesIndexes.push(`$${valuesArray.length}`);
+    }
+    if(name) {
+      valuesArray.push(name);
+      fieldsArray.push("name");
+      valuesIndexes.push(`$${valuesArray.length}`);
+    }
+    if(password) {
+      valuesArray.push(password);
+      fieldsArray.push("password");
+      valuesIndexes.push(`$${valuesArray.length}`);
+    }
+    if(phoneId) {
+      valuesArray.push(phoneId);
+      fieldsArray.push("phone_id");
+      valuesIndexes.push(`$${valuesArray.length}`);
+    }
+    queryText += fieldsArray.join(", ");
+    queryText += ") VALUES (";
+    queryText += valuesIndexes.join(", ");
+    queryText += ") RETURNING *";
+    console.log(queryText);
+    const results = await query(queryText, valuesArray);
+    if (results.rows.length === 0) {
+       throw new Error("Unable to create user");
+     }
+    return results.rows[0];
+
+  } catch (error) {
+    throw new Error(error);
+  }
+};
+
+exports.getUserByEmail = async (email) => {
+  try {
+    
+    const queryText = "SELECT * FROM accounts WHERE email = $1";
+    const queryParams = [email];
+    const results = await query(queryText, queryParams);
+    if(results.rows.length === 0) {
+      return null;
+    }
+    return results.rows[0];
+  } catch (error) {
+    throw new Error(error);  
+  }
+}
+
+exports.getUserByUsername = async (username) => {
+  try {
+    const queryText = "SELECT * FROM accounts WHERE username = $1";
+    const queryParams = [username];
+    const results = await query(queryText, queryParams);
+    if(results.rows.length === 0) {
+      return null;
+    }
+    return results.rows[0];
   } catch (error) {
     throw new Error(error);
   }

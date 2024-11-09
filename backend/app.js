@@ -28,19 +28,6 @@ app.use(
 app.use(passport.initialize());
 app.use(passport.session());
 
-passport.serializeUser((user, done) => {
-  done(null, user.id);
-});
-
-passport.deserializeUser((id, done) => {
-  db.users.findByID(id, function (err, user) {
-    if (err) {
-      return done(err);
-    }
-    done(null, user);
-  });
-});
-
 app.use("/api/v1/user", authRoutes);
 app.use("/api/v1/categories", categoryRoutes);
 app.use("/api/v1/products", productRoutes);

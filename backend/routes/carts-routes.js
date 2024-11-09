@@ -3,15 +3,15 @@ const router = express.Router();
 const cartController = require("../controllers/cart-controller");
 const authMiddleware = require("../middlewares/auth");
 
-router.get("/", authMiddleware.authenticateToken, cartController.getCart);
+router.get("/", authMiddleware.authenticate, cartController.getCart);
 
-router.put("/:id", authMiddleware.authenticateToken, cartController.updateCart);
+router.put("/:id", authMiddleware.authenticate, cartController.updateCart);
 
-router.post("/", authMiddleware.authenticateToken, cartController.createCart);
+router.post("/", authMiddleware.authenticate, cartController.createCart);
 
 router.delete(
   "/:id",
-  authMiddleware.authenticateToken,
+  authMiddleware.authenticate,
   cartController.deleteCart
 );
 

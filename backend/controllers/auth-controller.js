@@ -1,14 +1,13 @@
 const authMiddleware = require("../middlewares/auth");
 const validator = require("validator");
 
-const { passwordHash } = require("../util/helpers");
-
 const userModel = require("../models/user-model");
 
 exports.createUser = async (req, res) => {
   try {
+    console.log("Creating user");
     const user = validateUser(req.body);
-    user.password = await passwordHash(user.password);
+    user.password = await authMiddleware.passwordHash(user.password);
 
     // check if user exists
     const emailCheck = await userModel.getUserByEmail(user.email);
@@ -22,10 +21,8 @@ exports.createUser = async (req, res) => {
     }
     // query the database to create a new user
     const newUser = await userModel.createUser(user);
+    res.status(201).json({ message: "User created", user: newUser });
     // generate a token for the new user
-    const token = authMiddleware.generateAccessToken(newUser);
-    // return the token in the response
-    res.status(200).json(token);
   } catch (error) {
     if (error instanceof CustomError) {
       console.error(error);
@@ -37,7 +34,20 @@ exports.createUser = async (req, res) => {
   }
 };
 
-exports.login = async (req, res) => {};
+exports.login = async (req, res) => {
+  console.log("logged in");
+  res.status(200).json({ message: "logged in" });
+};
+
+exports.logout = async (req, res) => {
+  req.logout((err) => {
+      if (err) {
+          console.error("Error during logout:", err);
+          return res.status(500).json({ message: "Logout failed" });
+      }
+      res.status(200).json({ message: "Logged out" });
+  });
+};
 
 /**
  * Validate the user object
@@ -56,6 +66,7 @@ const validateUser = ({
   zipCode,
   phoneNumber,
 }) => {
+  console.log("Validating user");
   if (!email || !username || !password) {
     throw new CustomError(
       422,
