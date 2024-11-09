@@ -1,67 +1,51 @@
-const dotenv = require("dotenv");
-const jwt = require("jsonwebtoken");
-const path = require("path");
+const passport = require("passport");
 
-//get config vars
-dotenv.config(); //{ path: path.resolve(__dirname, "../../.env") });
+const bcrypt = require("bcrypt");
+const saltRounds = 15;
 
-// access config var for the token secret
-const tokenSecret = process.env.TOKEN_SECRET;
-const isDevMode = process.env.DEV_MODE;
+exports.authenticate = async (req, res, next) => {
+  passport.authenticate("local")(req, res, next);
+  // when google and facebook auth is implemented,
+  // const strategy = req.body.strategy || req.headers['x-auth-strategy'] || 'local'; 
 
-/*
-app.post('/api/createNewUser', (req, res) => {
-    // ...
-  
-    const token = generateAccessToken({ username: req.body.username });
-    res.json(token);
-  
-    // ...
-  });
-
-  cookie storage
-  // get token from fetch request
-    const token = await res.json();
-
-    // set token in cookie
-    document.cookie = `token=${token}`
-*/
-
-exports.generateAccessToken = (payload) => {
-  // expires in 30 mins
-  return jwt.sign(payload, tokenSecret, { expiresIn: "1800s" });
-};
-
-exports.authenticateToken = (req, res, next) => {
-  if (isDevMode && req.body.dev === "true") {
-    console.log("Development mode: bypassing authentication");
-    req.user = { username: "dev", role: "admin" };
-    return next();
-  }
-  // get the authorization header
-  const authHeader = req.headers["authorization"];
-
-  //
-  const token = authHeader && authHeader.split(" ")[1];
-
-  // if no token, return 401 status
-  if (!token) return res.status(401).json({ message: "No auth token" });
-
-  jwt.verify(token, tokenSecret, (err, user) => {
-    if (err) {
-      return res
-        .status(403)
-        .json({ message: "Authentication error: " + err.message });
-    }
-    req.user = user;
-
-    next();
-  });
-};
+  // passport.authenticate(strategy, (err, user, info) => { // Callback is needed here
+  //     if (err) {
+  //         return next(err); 
+  //     }
+  //     if (!user) {
+  //         return res.status(401).json({ message: info.message || "Authentication failed" }); 
+  //     }
+  //     req.logIn(user, (err) => {
+  //         if (err) {
+  //             return next(err); 
+  //         }
+  //         next();
+  //     });
+  // })(req, res, next);
+}
 
 exports.checkAdminRole = (req, res, next) => {
   if (req.user.role !== "admin") {
     return res.status(403).json({ message: "Access denied" });
   }
   next();
+};
+
+exports.comparePasswords = async (password, hash) => {
+	try {
+		const matchFound = await bcrypt.compare(password, hash);
+		return matchFound;
+	} catch (err) {
+		console.log(err);
+	}
+	return false;
+};
+
+exports.passwordHash = async (password) => {
+  try {
+    const salt = await bcrypt.genSalt(saltRounds);
+    return await bcrypt.hash(password, salt);
+  } catch (error) {
+    throw new Error("Unable to hash password");
+  }
 };

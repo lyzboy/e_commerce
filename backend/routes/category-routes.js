@@ -5,33 +5,33 @@ const authMiddleware = require("../middlewares/auth");
 
 router.get(
     "/",
-    authMiddleware.authenticateToken,
+    authMiddleware.authenticate,
     categoryController.getCategories
 );
 
 router.post(
     "/",
-    authMiddleware.authenticateToken,
+    authMiddleware.authenticate,
     authMiddleware.checkAdminRole,
     categoryController.createCategory
 );
 
 router.get(
     "/:id",
-    authMiddleware.authenticateToken,
+    authMiddleware.authenticate,
     categoryController.getCategory
 );
 
 router.put(
     "/:id",
-    authMiddleware.authenticateToken,
+    authMiddleware.authenticate,
     authMiddleware.checkAdminRole,
     categoryController.updateCategory
 );
 
 router.delete(
     "/:id",
-    authMiddleware.authenticateToken,
+    authMiddleware.authenticate,
     authMiddleware.checkAdminRole,
     categoryController.deleteCategory
 );

@@ -6,54 +6,54 @@ const authMiddleware = require("../middlewares/auth");
 
 router.get(
     "/",
-    authMiddleware.authenticateToken,
+    authMiddleware.authenticate,
     productController.getProducts
 );
 
 router.post(
     "/",
-    authMiddleware.authenticateToken,
+    authMiddleware.authenticate,
     authMiddleware.checkAdminRole,
     productController.createProduct
 );
 
 router.get(
     "/:id",
-    authMiddleware.authenticateToken,
+    authMiddleware.authenticate,
     productController.getProduct
 );
 
 router.put(
     "/:id",
-    authMiddleware.authenticateToken,
+    authMiddleware.authenticate,
     authMiddleware.checkAdminRole,
     productController.updateProduct
 );
 
 router.delete(
     "/:id",
-    authMiddleware.authenticateToken,
+    authMiddleware.authenticate,
     authMiddleware.checkAdminRole,
     productController.deleteProduct
 );
 
 router.post(
     "/:productId/variants",
-    authMiddleware.authenticateToken,
+    authMiddleware.authenticate,
     authMiddleware.checkAdminRole,
     variantController.createProductVariant
 );
 
 router.put(
     "/:productId/variants/:variantId",
-    authMiddleware.authenticateToken,
+    authMiddleware.authenticate,
     authMiddleware.checkAdminRole,
     variantController.updateProductVariant
 );
 
 router.delete(
     "/:productId/variants/:variantId",
-    authMiddleware.authenticateToken,
+    authMiddleware.authenticate,
     authMiddleware.checkAdminRole,
     variantController.deleteProductVariant
 );
