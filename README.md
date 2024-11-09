@@ -104,6 +104,7 @@ You can access the app by visiting `http://localhost:3000` in your browser.
 ### Calling the API
 
 If you would like to make calls to the API from a client like Postman, ensure that your environment variable `DEV_MODE` is set to true. By doing so, your token payload will use the following properties:
+
 ```js
 {
   "username": "dev",
@@ -112,6 +113,7 @@ If you would like to make calls to the API from a client like Postman, ensure th
 ```
 
 This will allow you to make calls to the endpoints of the API utilziing a development account. This account will not allow for you to make calls to user specific routes like `/cart` and `/profile`. In order to do so, you will need to create an account using the endpoint `/api/v1/user/register` with the require fields in the request body:
+
 ```json
 {
    "email":"your_email",
@@ -119,7 +121,9 @@ This will allow you to make calls to the endpoints of the API utilziing a develo
    "password":"password_8_long_1_number_1_symbol_minimum"
 }
 ```
+
 Once this user has been created within your database, you will be able to authenticate using, `/api/v1/user/login` and make calls to the endpoints.
+
 ---
 
 ## Features
