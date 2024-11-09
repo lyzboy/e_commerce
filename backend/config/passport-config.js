@@ -11,8 +11,7 @@ const userModel = require("../models/user-model");
 passport.use(
     new LocalStrategy(async function(username, password, done) { // Make LocalStrategy callback async
         try {
-            console.log(username);
-            console.log(password);
+          // TODO: REMOVE THIS LINE IN PRODUCTION
             if (process.env.DEV_MODE) {
                 console.log("Development mode: bypassing authentication");
                 const user = { username: "dev", role: "admin" };
