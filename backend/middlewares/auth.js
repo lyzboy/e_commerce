@@ -3,32 +3,48 @@ const passport = require("passport");
 const bcrypt = require("bcrypt");
 const saltRounds = 15;
 
-exports.authenticate = async (req, res, next) => {
-  passport.authenticate("local")(req, res, next);
+exports.authorizeUserAccess = async (req, res, next) => {
+  //passport.authenticate("local")(req, res, next);
   // when google and facebook auth is implemented,
-  // const strategy = req.body.strategy || req.headers['x-auth-strategy'] || 'local'; 
+  const strategy = req.body.strategy || req.headers['x-auth-strategy'] || 'local'; 
 
-  // passport.authenticate(strategy, (err, user, info) => { // Callback is needed here
-  //     if (err) {
-  //         return next(err); 
-  //     }
-  //     if (!user) {
-  //         return res.status(401).json({ message: info.message || "Authentication failed" }); 
-  //     }
-  //     req.logIn(user, (err) => {
-  //         if (err) {
-  //             return next(err); 
-  //         }
-  //         next();
-  //     });
-  // })(req, res, next);
+  passport.authenticate(strategy, (err, user, info) => {
+      console.log("Auth Strat complete, checking err...");
+      if (err) {
+          console.error("Found an error in passport authenticate for user access, posssible error in passport-config.js");
+          return next(err); 
+      }
+      console.log("No error found, Checking user...");
+      if (!user) {
+          console.error("No user found in passport authenticate for user access.");
+          console.log(`User: ${user}`);
+          return res.status(401).json({ message: info.message || "Authentication failed" }); 
+      }
+      console.log(`User: ${user}`);
+      req.user = user;
+      console.log(`Req.user: ${req.user}`);
+      console.log(`Authentication complete, calling next()...`);
+      next();
+  })(req, res, next);
 }
 
-exports.checkAdminRole = (req, res, next) => {
-  if (req.user.role !== "admin") {
-    return res.status(403).json({ message: "Access denied" });
-  }
-  next();
+exports.authorizeAdminAccess = async (req, res, next) => {
+  const strategy = req.body.strategy || req.headers['x-auth-strategy'] || 'local'; 
+
+  passport.authenticate(strategy, (err, user, info) => { // Callback is needed here
+      if (err) {
+          return next(err); 
+      }
+      if (!user) {
+          return res.status(401).json({ message: info.message || "Authentication failed" }); 
+      }
+      if (user.role !== "admin") {
+        return res.status(403).json({ message: "Access denied" });
+      }
+
+      next();
+
+  })(req, res, next);
 };
 
 exports.comparePasswords = async (password, hash) => {

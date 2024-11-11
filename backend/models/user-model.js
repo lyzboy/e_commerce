@@ -64,7 +64,6 @@ exports.createUser = async (userObject) => {
     queryText += ") VALUES (";
     queryText += valuesIndexes.join(", ");
     queryText += ") RETURNING *";
-    console.log(queryText);
     const results = await query(queryText, valuesArray);
     if (results.rows.length === 0) {
        throw new Error("Unable to create user");
@@ -91,8 +90,14 @@ exports.getUserByEmail = async (email) => {
   }
 }
 
+/**
+ * Gets a user object by the username
+ * @param {string} username - the username to search for in the database 
+ * @returns - the user object with the matching username
+ */
 exports.getUserByUsername = async (username) => {
   try {
+    console.log("Getting user by username from database...");
     const queryText = "SELECT * FROM accounts WHERE username = $1";
     const queryParams = [username];
     const results = await query(queryText, queryParams);
@@ -136,6 +141,7 @@ exports.getCityByName = async (city) => {
   }
 };
 
+
 exports.getStateId = async (state) => {
   try {
     const queryText =
@@ -148,6 +154,11 @@ exports.getStateId = async (state) => {
   }
 };
 
+/**
+ * Creates a new phone number in the database if not already existing
+ * @param {string} phoneNumber - the phone number to insert into the database 
+ * @returns - the created phone number's id
+ */
 exports.createPhoneNumber = async (phoneNumber) => {
   try {
     //TODO: check if phone number already exists
@@ -159,3 +170,18 @@ exports.createPhoneNumber = async (phoneNumber) => {
     throw new Error(error);
   }
 };
+
+/**
+ * Checks if an account is an admin
+ * @param {string} account_email - the accounts email to check if they are an admin
+ * @returns a boolean indicating if the account is an admin
+ */
+exports.getIsUserAdmin = async (account_email) => {
+  const queryText = "SELECT * FROM admins WHERE account_email = $1";
+  const queryParams = [account_email];
+  const results = await query(queryText, queryParams);
+  if (results.rows.length === 0) {
+    return false;
+  }
+  return true;
+}

@@ -6,55 +6,49 @@ const authMiddleware = require("../middlewares/auth");
 
 router.get(
     "/",
-    authMiddleware.authenticate,
+    authMiddleware.authorizeUserAccess,
     productController.getProducts
 );
 
 router.post(
     "/",
-    authMiddleware.authenticate,
-    authMiddleware.checkAdminRole,
+    authMiddleware.authorizeAdminAccess,
     productController.createProduct
 );
 
 router.get(
     "/:id",
-    authMiddleware.authenticate,
+    authMiddleware.authorizeUserAccess,
     productController.getProduct
 );
 
 router.put(
     "/:id",
-    authMiddleware.authenticate,
-    authMiddleware.checkAdminRole,
+    authMiddleware.authorizeAdminAccess,
     productController.updateProduct
 );
 
 router.delete(
     "/:id",
-    authMiddleware.authenticate,
-    authMiddleware.checkAdminRole,
+    authMiddleware.authorizeAdminAccess,
     productController.deleteProduct
 );
 
 router.post(
     "/:productId/variants",
-    authMiddleware.authenticate,
-    authMiddleware.checkAdminRole,
+    authMiddleware.authorizeAdminAccess,
     variantController.createProductVariant
 );
 
 router.put(
     "/:productId/variants/:variantId",
-    authMiddleware.authenticate,
-    authMiddleware.checkAdminRole,
+    authMiddleware.authorizeAdminAccess,
     variantController.updateProductVariant
 );
 
 router.delete(
     "/:productId/variants/:variantId",
-    authMiddleware.authenticate,
-    authMiddleware.checkAdminRole,
+    authMiddleware.authorizeAdminAccess,
     variantController.deleteProductVariant
 );
 

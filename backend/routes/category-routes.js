@@ -5,34 +5,31 @@ const authMiddleware = require("../middlewares/auth");
 
 router.get(
     "/",
-    authMiddleware.authenticate,
+    authMiddleware.authorizeUserAccess,
     categoryController.getCategories
 );
 
 router.post(
     "/",
-    authMiddleware.authenticate,
-    authMiddleware.checkAdminRole,
+    authMiddleware.authorizeAdminAccess,
     categoryController.createCategory
 );
 
 router.get(
     "/:id",
-    authMiddleware.authenticate,
+    authMiddleware.authorizeUserAccess,
     categoryController.getCategory
 );
 
 router.put(
     "/:id",
-    authMiddleware.authenticate,
-    authMiddleware.checkAdminRole,
+    authMiddleware.authorizeAdminAccess,
     categoryController.updateCategory
 );
 
 router.delete(
     "/:id",
-    authMiddleware.authenticate,
-    authMiddleware.checkAdminRole,
+    authMiddleware.authorizeAdminAccess,
     categoryController.deleteCategory
 );
 

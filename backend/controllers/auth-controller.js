@@ -21,7 +21,7 @@ exports.createUser = async (req, res) => {
     }
     // query the database to create a new user
     const newUser = await userModel.createUser(user);
-    res.status(201).json({ message: "User created", user: newUser });
+    res.status(201).json({ message: "User created" });
     // generate a token for the new user
   } catch (error) {
     if (error instanceof CustomError) {
@@ -35,8 +35,22 @@ exports.createUser = async (req, res) => {
 };
 
 exports.login = async (req, res) => {
-  console.log("logged in");
-  res.status(200).json({ message: "logged in" });
+  if(!req.user){
+    return res.status(401).json({ message: "Authentication Failed" });
+  }
+  const isAdmin = await userModel.getIsUserAdmin(req.user.email);
+  if(isAdmin) {
+    req.user.role = "admin";
+  }
+  req.logIn(req.user, (err) => {
+    if (err) {
+      console.error("Error during login:", err);
+      return res.status(500).json({ message: "Login failed" });
+    }
+    console.log("User has been logged in");
+    console.log(`User: ${JSON.stringify(req.user)}`);
+    res.status(200).json({ message: "logged in" });
+  });
 };
 
 exports.logout = async (req, res) => {
