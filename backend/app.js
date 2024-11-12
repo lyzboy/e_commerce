@@ -1,7 +1,6 @@
 const express = require("express");
 const session = require("express-session");
-const { config } = require("dotenv");
-config();
+require("dotenv").config();
 const passport = require("passport");
 require("./config/passport-config");
 

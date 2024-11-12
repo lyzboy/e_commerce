@@ -23,6 +23,15 @@ exports.createUser = async (req, res) => {
     const newUser = await userModel.createUser(user);
     res.status(201).json({ message: "User created" });
     // generate a token for the new user
+    req.logIn(newUser, (err) => {
+      if (err) {
+        console.error("Error during login:", err);
+        return res.status(500).json({ message: "Login failed" });
+      }
+      console.log("User has been logged in");
+      console.log(`User: ${JSON.stringify(req.user)}`);
+      res.status(200).json({ message: "logged in" });
+    });
   } catch (error) {
     if (error instanceof CustomError) {
       console.error(error);
@@ -35,11 +44,11 @@ exports.createUser = async (req, res) => {
 };
 
 exports.login = async (req, res) => {
-  if(!req.user){
+  if (!req.user) {
     return res.status(401).json({ message: "Authentication Failed" });
   }
   const isAdmin = await userModel.getIsUserAdmin(req.user.email);
-  if(isAdmin) {
+  if (isAdmin) {
     req.user.role = "admin";
   }
   req.logIn(req.user, (err) => {
@@ -55,11 +64,11 @@ exports.login = async (req, res) => {
 
 exports.logout = async (req, res) => {
   req.logout((err) => {
-      if (err) {
-          console.error("Error during logout:", err);
-          return res.status(500).json({ message: "Logout failed" });
-      }
-      res.status(200).json({ message: "Logged out" });
+    if (err) {
+      console.error("Error during logout:", err);
+      return res.status(500).json({ message: "Logout failed" });
+    }
+    res.status(200).json({ message: "Logged out" });
   });
 };
 
