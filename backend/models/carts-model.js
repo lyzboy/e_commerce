@@ -1,5 +1,10 @@
 const { query } = require("../config/db");
 
+/**
+ * Gets the cart base on id. Used within the ownership authorization middleware
+ * @param {int} id
+ * @returns
+ */
 exports.getResourceById = async (id) => {
   try {
     const queryText = `SELECT * FROM carts WHERE id = $1`;
