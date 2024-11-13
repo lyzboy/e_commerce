@@ -10,8 +10,9 @@ const BaseModel = {
    * @param {integer} id - the id of the resource
    * @returns The resource object if found, null if not found
    */
-  getResourceById: async (id) => {
+  getResourceById: async function (id) {
     try {
+      console.log(this.tableName);
       const queryText = `SELECT * FROM ${this.tableName} WHERE id = $1`;
       const queryParams = [id];
       const result = await query(queryText, queryParams);
