@@ -55,13 +55,6 @@ exports.authorizeOwnership = (requestedModel) => {
       if (!req.user) {
         return res.status(401).json({ message: "Authentication required" });
       }
-      if (req.user.role === "admin") {
-        const isAdmin = await verifyAdmin(req.user.email);
-        if (isAdmin) {
-          return next();
-        }
-        return res.status(403).json({ message: "Access denied" });
-      }
       const { id } = req.params;
       let resourceModel;
       switch (requestedModel) {
@@ -78,11 +71,22 @@ exports.authorizeOwnership = (requestedModel) => {
       }
       const resource = await resourceModel.getResourceById(id);
       if (!resource) {
+        if (req.user.role === "admin") {
+          return res.status(404).json({ message: "Resource not found" });
+        }
         const createdResource = await resourceModel.createResource(
           req.user.email
         );
         req.resource = createdResource;
         return next();
+      }
+      if (req.user.role === "admin") {
+        const isAdmin = await verifyAdmin(req.user.email);
+        if (isAdmin) {
+          req.resource = resource;
+          return next();
+        }
+        return res.status(403).json({ message: "Access denied" });
       }
       if (resource.account_email !== req.user.email) {
         return res.status(403).json({ message: "Access denied" });
