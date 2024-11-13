@@ -4,7 +4,7 @@ const LocalStrategy = require("passport-local").Strategy;
 //const GoogleStrategy = require("passport-google-oauth20").Strategy;
 //const FacebookTokenStrategy = require("passport-facebook-token");
 
-const authMiddleware = require("../middlewares/auth");
+const authMiddleware = require("../middlewares/authentication");
 
 const userModel = require("../models/user-model");
 

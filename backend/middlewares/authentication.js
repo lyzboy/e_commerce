@@ -1,9 +1,7 @@
-const passport = require("passport");
-
 const bcrypt = require("bcrypt");
 const saltRounds = 15;
 
-exports.authorizeUserAccess = async (req, res, next) => {
+exports.authenticateUser = async (req, res, next) => {
   console.log("Checking if user is standard user...");
   if (!req.user) {
     console.error("No user found. Authentication required.");
@@ -11,25 +9,6 @@ exports.authorizeUserAccess = async (req, res, next) => {
   }
 
   console.log("User:", req.user);
-  next();
-};
-
-exports.authorizeAdminAccess = (req, res, next) => {
-  console.log("Checking if user is an admin...");
-
-  if (!req.user) {
-    console.error("No user found. Authentication required.");
-    return res.status(401).json({ message: "Authentication required" });
-  }
-
-  console.log("User:", req.user);
-
-  if (req.user.role !== "admin") {
-    console.error("User is not an admin");
-    return res.status(403).json({ message: "Access denied" });
-  }
-
-  console.log("User is an admin");
   next();
 };
 

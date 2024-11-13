@@ -2,54 +2,50 @@ const express = require("express");
 const router = express.Router();
 const productController = require("../controllers/product-controller");
 const variantController = require("../controllers/variant-controller");
-const authMiddleware = require("../middlewares/auth");
-const passport = require("passport");
+const authentication = require("../middlewares/authentication");
+const authorization = require("../middlewares/authorization");
 
-router.get(
-  "/",
-  authMiddleware.authorizeUserAccess,
-  productController.getProducts
-);
+router.get("/", authentication.authenticateUser, productController.getProducts);
 
 router.post(
   "/",
-  authMiddleware.authorizeAdminAccess,
+  authorization.authorizeRole("admin"),
   productController.createProduct
 );
 
 router.get(
   "/:id",
-  authMiddleware.authorizeUserAccess,
+  authentication.authenticateUser,
   productController.getProduct
 );
 
 router.put(
   "/:id",
-  authMiddleware.authorizeAdminAccess,
+  authorization.authorizeRole("admin"),
   productController.updateProduct
 );
 
 router.delete(
   "/:id",
-  authMiddleware.authorizeAdminAccess,
+  authorization.authorizeRole("admin"),
   productController.deleteProduct
 );
 
 router.post(
   "/:productId/variants",
-  authMiddleware.authorizeAdminAccess,
+  authorization.authorizeRole("admin"),
   variantController.createProductVariant
 );
 
 router.put(
   "/:productId/variants/:variantId",
-  authMiddleware.authorizeAdminAccess,
+  authorization.authorizeRole("admin"),
   variantController.updateProductVariant
 );
 
 router.delete(
   "/:productId/variants/:variantId",
-  authMiddleware.authorizeAdminAccess,
+  authorization.authorizeRole("admin"),
   variantController.deleteProductVariant
 );
 

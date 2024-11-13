@@ -1,4 +1,4 @@
-const authMiddleware = require("../middlewares/auth");
+const authMiddleware = require("../middlewares/authentication");
 const validator = require("validator");
 
 const userModel = require("../models/user-model");
