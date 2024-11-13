@@ -18,8 +18,6 @@ router.put(
   cartController.updateCart
 );
 
-router.post("/", authentication.authenticateUser, cartController.createCart);
-
 router.delete(
   "/:id",
   authentication.authenticateUser,
