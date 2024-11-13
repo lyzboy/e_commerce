@@ -1,17 +1,29 @@
 const express = require("express");
 const router = express.Router();
-const cartController = require("../controllers/cart-controller");
+const cartController = require("../controllers/carts-controller");
 const authentication = require("../middlewares/authentication");
+const authorization = require("../middlewares/authorization");
 
-router.get("/", authentication.authenticateUser, cartController.getCart);
+router.get(
+  "/:id",
+  authentication.authenticateUser,
+  authorization.authorizeOwnership("cart"),
+  cartController.getCart
+);
 
-router.put("/:id", authentication.authenticateUser, cartController.updateCart);
+router.put(
+  "/:id",
+  authentication.authenticateUser,
+  authorization.authorizeOwnership("cart"),
+  cartController.updateCart
+);
 
 router.post("/", authentication.authenticateUser, cartController.createCart);
 
 router.delete(
   "/:id",
   authentication.authenticateUser,
+  authorization.authorizeOwnership("cart"),
   cartController.deleteCart
 );
 

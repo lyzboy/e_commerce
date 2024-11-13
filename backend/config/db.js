@@ -34,7 +34,7 @@ const standardPool = new Pool({
  * @param {*} isAdmin - Determines where to use the adminPool or standardPool
  * @returns
  */
-const query = async (queryText, queryParams, isAdmin = false) => {
+exports.query = async (queryText, queryParams, isAdmin = false) => {
   try {
     const pool = isAdmin ? adminPool : standardPool;
     const result = await pool.query(queryText, queryParams);
@@ -42,8 +42,4 @@ const query = async (queryText, queryParams, isAdmin = false) => {
   } catch (err) {
     console.log(err);
   }
-};
-
-module.exports = {
-  query,
 };
