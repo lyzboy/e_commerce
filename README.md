@@ -105,34 +105,7 @@ You can access the app by visiting `http://localhost:3000` in your browser.
 
 ### Calling the API
 
-If you would like to make calls to the API from a client like Postman and do so in a development mode, ensure that your environment variable `DEV_MODE` is set to true. By doing so, your token payload will use the following properties:
-
-```js
-{
-  "username": "dev",
-  "role": "admin"
-}
-```
-
-In order to authenticate, you will need to use the endpoint `/api/v1/user/login` with the following request body:
-
-```json
-{
-   "username":"dev",
-   "password":"password"
-}
-```
-
-The values in the payload do not matter but must be present in the request body in order to authenticate. For example, using the following request body will authenticate you as well in development mode:
-
-```json
-{
-   "username":"a",
-   "password":"a"
-}
-```
-
-This will allow you to make calls to the endpoints of the API utilziing a development account. This account will not allow for you to make calls to user specific routes like `/cart` and `/profile`. In order to do so, you will need to create an account using the endpoint `/api/v1/user/register` with the require fields in the request body:
+In order to do call any endpoints, you will need to create an account using the endpoint `/api/v1/user/register` with the required fields in the request body:
 
 ```json
 {
@@ -142,7 +115,7 @@ This will allow you to make calls to the endpoints of the API utilziing a develo
 }
 ```
 
-Once this user has been created within your database and will be authenticated. After the user is in the database, you will be able to authenticate using, `/api/v1/user/login` by providing the username and password in the request body:
+Once this user has been created within your database, the user will automatically be authenticated and you can start making calls to standard user endpoints. After the user is in the database, you will only need, instead of registering again, to authenticate using, `/api/v1/user/login` by providing the username and password in the request body:
    
    ```json
    {
@@ -153,7 +126,15 @@ Once this user has been created within your database and will be authenticated. 
 
 ### Protected Routes
 
-Once you are authenticated, you will be able to access the API's endpoints. Certain routes are protected by login only and others by admin login. In order for you to access the admin login routes, the user you login in with must be in the admins table in the database.
+Once you are authenticated, you will be able to access the API's endpoints. Certain routes are protected by login only and others by admin login. In order for you to access the admin login routes, the user you login in with must be in the admins table in the database. Currently there are no API calls that will allow you to add an admin to the admins table. You will need to manually add the user to the admins table in the database.
+
+```postgresql
+INSERT INTO admins (account_email) VALUES ('the_email_of_the_user');
+```
+
+Once the user is in the admins table, you will be able to access the admin routes once authenticated using `/api/v1/user/login`.
+
+Certain routes are protected and only accessible by the user who owns the data. For example, you can only access a user's cart if you are logged in as that user. You can only access a user's order if you are logged in as that user. With this said, an admin account currently can access all data, even if the data is ownership protected. To find out more about authorization, please refer to the authorization file `/backend/middleware/authorization.js`.
 
 ---
 
@@ -165,7 +146,15 @@ TBD
 
 ## Roadmap
 
-- Add your upcoming features and plans here (you can create checklists for progress).
+- Upcoming Features and Plans 
+  - [X] Add user authentication
+   - [ ] Implement product management
+   - [ ] Create shopping cart functionality
+   - [ ] Implement order processing
+   - [ ] Add API for developers
+   - [ ] Admin panel
+   - [ ] Dynamic hero creation within admin panel
+   - [ ] Frontend
   - [ ] Initial release
   - [ ] Add payment gateway
   - [ ] Create admin dashboard
