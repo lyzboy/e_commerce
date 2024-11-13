@@ -36,7 +36,7 @@ passport.use(
         }
         console.log("Password match");
         console.log("Authentication successful");
-        return done(null, username);
+        return done(null, user);
       }
     } catch (err) {
       console.error(err); // Log the error for debugging
@@ -45,31 +45,37 @@ passport.use(
   })
 );
 
-passport.serializeUser((username, done) => {
+passport.serializeUser((user, done) => {
   console.log("serializing user...");
-  done(null, username);
+  done(null, user);
 });
 
-passport.deserializeUser(async (username, done) => {
+passport.deserializeUser(async (user, done) => {
   try {
-    console.log("***********************");
-    console.log("Deserializing user...");
-    console.log(`Username: ${username}`);
-    console.log("Checking if user exists...");
-    const user = await userModel.getUserByUsername(username);
-    console.log("Result: ", JSON.stringify(user));
-    if (!user) {
-      console.error("No user found during deserialization");
-      return done(null, false);
-    }
-    const isAdmin = await userModel.getIsUserAdmin(user.email);
-    if (isAdmin) {
-      user.role = "admin";
+    if (process.env.DEV_MODE === "true") {
+      console.log("Development mode: bypassing authentication");
+      const user = { username: "dev", role: "admin" };
+      return done(null, user);
     } else {
-      user.role = "standard";
+      console.log("***********************");
+      console.log("Deserializing user...");
+      console.log(`Username: ${JSON.stringify(user)}`);
+      console.log("Checking if user exists...");
+      const foundUser = await userModel.getUserByUsername(user.username);
+      console.log("Result: ", JSON.stringify(foundUser));
+      if (!foundUser) {
+        console.error("No user found during deserialization");
+        return done(null, false);
+      }
+      const isAdmin = await userModel.getIsUserAdmin(foundUser.email);
+      if (isAdmin) {
+        foundUser.role = "admin";
+      } else {
+        foundUser.role = "standard";
+      }
+      console.log("User found: ", JSON.stringify(foundUser));
+      done(null, foundUser);
     }
-    console.log("User found: ", JSON.stringify(user));
-    done(null, user);
   } catch (error) {
     done(error);
   }

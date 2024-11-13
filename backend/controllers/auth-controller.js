@@ -21,7 +21,6 @@ exports.createUser = async (req, res) => {
     }
     // query the database to create a new user
     const newUser = await userModel.createUser(user);
-    res.status(201).json({ message: "User created" });
     // generate a token for the new user
     req.logIn(newUser, (err) => {
       if (err) {
@@ -44,7 +43,9 @@ exports.createUser = async (req, res) => {
 };
 
 exports.login = async (req, res) => {
+  console.log("Logging in user...");
   if (!req.user) {
+    console.error("No req,user");
     return res.status(401).json({ message: "Authentication Failed" });
   }
   const isAdmin = await userModel.getIsUserAdmin(req.user.email);
