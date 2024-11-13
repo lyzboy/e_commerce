@@ -1,9 +1,9 @@
 const express = require("express");
 const router = express.Router();
 const authController = require("../controllers/auth-controller");
-const authMiddleware = require("../middlewares/auth");
+const passport = require("passport");
 
-router.post("/login", authMiddleware.authenticate, authController.login);
+router.post("/login", passport.authenticate("local"), authController.login);
 
 router.post("/register", authController.createUser);
 

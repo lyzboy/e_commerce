@@ -35,27 +35,27 @@ exports.createUser = async (userObject) => {
     let queryText = "INSERT INTO accounts (";
     const fieldsArray = [];
     const valuesIndexes = [];
-    if(email) {
+    if (email) {
       valuesArray.push(email);
       fieldsArray.push("email");
       valuesIndexes.push(`$${valuesArray.length}`);
     }
-    if(username) {
+    if (username) {
       valuesArray.push(username);
       fieldsArray.push("username");
       valuesIndexes.push(`$${valuesArray.length}`);
     }
-    if(name) {
+    if (name) {
       valuesArray.push(name);
       fieldsArray.push("name");
       valuesIndexes.push(`$${valuesArray.length}`);
     }
-    if(password) {
+    if (password) {
       valuesArray.push(password);
       fieldsArray.push("password");
       valuesIndexes.push(`$${valuesArray.length}`);
     }
-    if(phoneId) {
+    if (phoneId) {
       valuesArray.push(phoneId);
       fieldsArray.push("phone_id");
       valuesIndexes.push(`$${valuesArray.length}`);
@@ -64,13 +64,11 @@ exports.createUser = async (userObject) => {
     queryText += ") VALUES (";
     queryText += valuesIndexes.join(", ");
     queryText += ") RETURNING *";
-    console.log(queryText);
     const results = await query(queryText, valuesArray);
     if (results.rows.length === 0) {
-       throw new Error("Unable to create user");
-     }
+      throw new Error("Unable to create user");
+    }
     return results.rows[0];
-
   } catch (error) {
     throw new Error(error);
   }
@@ -78,25 +76,29 @@ exports.createUser = async (userObject) => {
 
 exports.getUserByEmail = async (email) => {
   try {
-    
     const queryText = "SELECT * FROM accounts WHERE email = $1";
     const queryParams = [email];
     const results = await query(queryText, queryParams);
-    if(results.rows.length === 0) {
+    if (results.rows.length === 0) {
       return null;
     }
     return results.rows[0];
   } catch (error) {
-    throw new Error(error);  
+    throw new Error(error);
   }
-}
+};
 
+/**
+ * Gets a user object by the username
+ * @param {string} username - the username to search for in the database
+ * @returns - the user object with the matching username
+ */
 exports.getUserByUsername = async (username) => {
   try {
     const queryText = "SELECT * FROM accounts WHERE username = $1";
     const queryParams = [username];
     const results = await query(queryText, queryParams);
-    if(results.rows.length === 0) {
+    if (results.rows.length === 0) {
       return null;
     }
     return results.rows[0];
@@ -148,6 +150,11 @@ exports.getStateId = async (state) => {
   }
 };
 
+/**
+ * Creates a new phone number in the database if not already existing
+ * @param {string} phoneNumber - the phone number to insert into the database
+ * @returns - the created phone number's id
+ */
 exports.createPhoneNumber = async (phoneNumber) => {
   try {
     //TODO: check if phone number already exists
@@ -158,4 +165,19 @@ exports.createPhoneNumber = async (phoneNumber) => {
   } catch (error) {
     throw new Error(error);
   }
+};
+
+/**
+ * Checks if an account is an admin
+ * @param {string} account_email - the accounts email to check if they are an admin
+ * @returns a boolean indicating if the account is an admin
+ */
+exports.getIsUserAdmin = async (account_email) => {
+  const queryText = "SELECT * FROM admins WHERE account_email = $1";
+  const queryParams = [account_email];
+  const results = await query(queryText, queryParams, true);
+  if (results.rows.length === 0) {
+    return false;
+  }
+  return true;
 };

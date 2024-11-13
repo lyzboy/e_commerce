@@ -2,60 +2,51 @@ const express = require("express");
 const router = express.Router();
 const productController = require("../controllers/product-controller");
 const variantController = require("../controllers/variant-controller");
-const authMiddleware = require("../middlewares/auth");
+const authentication = require("../middlewares/authentication");
+const authorization = require("../middlewares/authorization");
 
-router.get(
-    "/",
-    authMiddleware.authenticate,
-    productController.getProducts
-);
+router.get("/", authentication.authenticateUser, productController.getProducts);
 
 router.post(
-    "/",
-    authMiddleware.authenticate,
-    authMiddleware.checkAdminRole,
-    productController.createProduct
+  "/",
+  authorization.authorizeRole("admin"),
+  productController.createProduct
 );
 
 router.get(
-    "/:id",
-    authMiddleware.authenticate,
-    productController.getProduct
+  "/:id",
+  authentication.authenticateUser,
+  productController.getProduct
 );
 
 router.put(
-    "/:id",
-    authMiddleware.authenticate,
-    authMiddleware.checkAdminRole,
-    productController.updateProduct
+  "/:id",
+  authorization.authorizeRole("admin"),
+  productController.updateProduct
 );
 
 router.delete(
-    "/:id",
-    authMiddleware.authenticate,
-    authMiddleware.checkAdminRole,
-    productController.deleteProduct
+  "/:id",
+  authorization.authorizeRole("admin"),
+  productController.deleteProduct
 );
 
 router.post(
-    "/:productId/variants",
-    authMiddleware.authenticate,
-    authMiddleware.checkAdminRole,
-    variantController.createProductVariant
+  "/:productId/variants",
+  authorization.authorizeRole("admin"),
+  variantController.createProductVariant
 );
 
 router.put(
-    "/:productId/variants/:variantId",
-    authMiddleware.authenticate,
-    authMiddleware.checkAdminRole,
-    variantController.updateProductVariant
+  "/:productId/variants/:variantId",
+  authorization.authorizeRole("admin"),
+  variantController.updateProductVariant
 );
 
 router.delete(
-    "/:productId/variants/:variantId",
-    authMiddleware.authenticate,
-    authMiddleware.checkAdminRole,
-    variantController.deleteProductVariant
+  "/:productId/variants/:variantId",
+  authorization.authorizeRole("admin"),
+  variantController.deleteProductVariant
 );
 
 module.exports = router;

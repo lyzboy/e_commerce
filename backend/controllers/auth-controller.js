@@ -1,13 +1,12 @@
-const authMiddleware = require("../middlewares/auth");
+const authentication = require("../middlewares/authentication");
 const validator = require("validator");
 
 const userModel = require("../models/user-model");
 
 exports.createUser = async (req, res) => {
   try {
-    console.log("Creating user");
-    const user = validateUser(req.body);
-    user.password = await authMiddleware.passwordHash(user.password);
+    const user = validateUserData(req.body);
+    user.password = await authentication.createHashedPassword(user.password);
 
     // check if user exists
     const emailCheck = await userModel.getUserByEmail(user.email);
@@ -19,10 +18,14 @@ exports.createUser = async (req, res) => {
     if (userCheck) {
       return res.status(409).json({ message: "Username already exists" });
     }
-    // query the database to create a new user
     const newUser = await userModel.createUser(user);
-    res.status(201).json({ message: "User created", user: newUser });
-    // generate a token for the new user
+    req.logIn(newUser, (err) => {
+      if (err) {
+        console.error("Error during login:", err);
+        return res.status(500).json({ message: "Login failed" });
+      }
+      res.status(200).json({ message: "logged in" });
+    });
   } catch (error) {
     if (error instanceof CustomError) {
       console.error(error);
@@ -35,17 +38,30 @@ exports.createUser = async (req, res) => {
 };
 
 exports.login = async (req, res) => {
-  console.log("logged in");
-  res.status(200).json({ message: "logged in" });
+  if (!req.user) {
+    console.error("No req,user");
+    return res.status(401).json({ message: "Authentication Failed" });
+  }
+  const isAdmin = await userModel.getIsUserAdmin(req.user.email);
+  if (isAdmin) {
+    req.user.role = "admin";
+  }
+  req.logIn(req.user, (err) => {
+    if (err) {
+      console.error("Error during login:", err);
+      return res.status(500).json({ message: "Login failed" });
+    }
+    res.status(200).json({ message: "logged in" });
+  });
 };
 
 exports.logout = async (req, res) => {
   req.logout((err) => {
-      if (err) {
-          console.error("Error during logout:", err);
-          return res.status(500).json({ message: "Logout failed" });
-      }
-      res.status(200).json({ message: "Logged out" });
+    if (err) {
+      console.error("Error during logout:", err);
+      return res.status(500).json({ message: "Logout failed" });
+    }
+    res.status(200).json({ message: "Logged out" });
   });
 };
 
@@ -54,7 +70,7 @@ exports.logout = async (req, res) => {
  * @param {object} param0 - the user object to validate
  * @returns {object} the validated user object
  */
-const validateUser = ({
+const validateUserData = ({
   email,
   username,
   name,
@@ -66,7 +82,6 @@ const validateUser = ({
   zipCode,
   phoneNumber,
 }) => {
-  console.log("Validating user");
   if (!email || !username || !password) {
     throw new CustomError(
       422,

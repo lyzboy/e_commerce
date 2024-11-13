@@ -1,13 +1,13 @@
 const express = require("express");
 const session = require("express-session");
-const { config } = require("dotenv");
-config();
+require("dotenv").config();
 const passport = require("passport");
 require("./config/passport-config");
 
 const authRoutes = require("./routes/auth-routes");
 const categoryRoutes = require("./routes/category-routes");
 const productRoutes = require("./routes/product-routes");
+const cartRoutes = require("./routes/carts-routes");
 
 const app = express();
 const port = 3000;
@@ -28,9 +28,10 @@ app.use(
 app.use(passport.initialize());
 app.use(passport.session());
 
-app.use("/api/v1/user", authRoutes);
+app.use("/api/v1/auth", authRoutes);
 app.use("/api/v1/categories", categoryRoutes);
 app.use("/api/v1/products", productRoutes);
+app.use("/api/v1/carts", cartRoutes);
 
 app.get("/", (req, res) => {
   res.json({ info: "Node.js, Express, and Postgres API" });
