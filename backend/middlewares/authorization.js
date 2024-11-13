@@ -5,24 +5,36 @@
  */
 exports.authorizeRole = (role) => {
   return async (req, res, next) => {
-    switch (role) {
-      case "admin":
-        const isAdmin = await verifyAdmin(req.user.email);
-        if (!isAdmin) {
-          return res.status(403).json({ message: "Access denied" });
-        }
-        break;
-      default:
-        return res
-          .status(403)
-          .json({ message: "Server error, Invalided role" });
-    }
+    try {
+      if (!req.user) {
+        return res.status(401).json({ message: "Authentication required" });
+      }
+      switch (role) {
+        case "admin":
+          const isAdmin = await verifyAdmin(req.user.email);
+          if (!isAdmin) {
+            return res.status(403).json({ message: "Access denied" });
+          }
+          break;
+        default:
+          return res
+            .status(403)
+            .json({ message: "Server error, Invalided role" });
+      }
 
-    console.log("User is an ", role);
-    next();
+      console.log("User is an ", role);
+      next();
+    } catch (error) {
+      res.status(500).json({ message: "Server Error: " + error.message });
+    }
   };
 };
 
+/**
+ * Checks with database to verify if user is an admin
+ * @param {string} userEmail - the email to check with the DB if the user is admin
+ * @returns
+ */
 const verifyAdmin = async (userEmail) => {
   const userModel = require("../models/user-model");
   const isAdmin = await userModel.getIsUserAdmin(userEmail);
@@ -40,6 +52,9 @@ const verifyAdmin = async (userEmail) => {
 exports.authorizeOwnership = (requestedModel) => {
   return async (req, res, next) => {
     try {
+      if (!req.user) {
+        return res.status(401).json({ message: "Authentication required" });
+      }
       if (req.user.role === "admin") {
         const isAdmin = await verifyAdmin(req.user.email);
         if (isAdmin) {

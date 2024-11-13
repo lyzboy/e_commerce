@@ -3,7 +3,6 @@ const productModel = require("../models/product-model");
 
 exports.getProducts = async (req, res) => {
   try {
-    console.log("Getting products");
     const { categoryId, maxPrice, minPrice } = req.body;
     const params = {};
     if (categoryId) params.categoryId = categoryId;

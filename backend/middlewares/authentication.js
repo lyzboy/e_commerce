@@ -1,17 +1,23 @@
 const bcrypt = require("bcrypt");
 const saltRounds = 15;
 
+/**
+ * Middleware to authenticate user has signed in with passport
+ * @returns
+ */
 exports.authenticateUser = async (req, res, next) => {
-  console.log("Checking if user is standard user...");
   if (!req.user) {
-    console.error("No user found. Authentication required.");
     return res.status(401).json({ message: "Authentication required" });
   }
-
-  console.log("User:", req.user);
   next();
 };
 
+/**
+ * Compares a hashed password to a plaintext password to ensure they match.
+ * @param {string} password - plain text password
+ * @param {string} hash - hashed password
+ * @returns
+ */
 exports.comparePasswords = async (password, hash) => {
   try {
     const matchFound = await bcrypt.compare(password, hash);
@@ -22,7 +28,12 @@ exports.comparePasswords = async (password, hash) => {
   return false;
 };
 
-exports.passwordHash = async (password) => {
+/**
+ * Hashes a provided plaintext password.
+ * @param {string} password - plain text password
+ * @returns a hashed password
+ */
+exports.createHashedPassword = async (password) => {
   try {
     const salt = await bcrypt.genSalt(saltRounds);
     return await bcrypt.hash(password, salt);

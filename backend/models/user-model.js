@@ -95,7 +95,6 @@ exports.getUserByEmail = async (email) => {
  */
 exports.getUserByUsername = async (username) => {
   try {
-    console.log("Getting user by username from database...");
     const queryText = "SELECT * FROM accounts WHERE username = $1";
     const queryParams = [username];
     const results = await query(queryText, queryParams);

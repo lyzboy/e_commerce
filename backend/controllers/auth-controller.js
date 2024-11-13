@@ -1,13 +1,12 @@
-const authMiddleware = require("../middlewares/authentication");
+const authentication = require("../middlewares/authentication");
 const validator = require("validator");
 
 const userModel = require("../models/user-model");
 
 exports.createUser = async (req, res) => {
   try {
-    console.log("Creating user");
-    const user = validateUser(req.body);
-    user.password = await authMiddleware.passwordHash(user.password);
+    const user = validateUserData(req.body);
+    user.password = await authentication.createHashedPassword(user.password);
 
     // check if user exists
     const emailCheck = await userModel.getUserByEmail(user.email);
@@ -19,16 +18,12 @@ exports.createUser = async (req, res) => {
     if (userCheck) {
       return res.status(409).json({ message: "Username already exists" });
     }
-    // query the database to create a new user
     const newUser = await userModel.createUser(user);
-    // generate a token for the new user
     req.logIn(newUser, (err) => {
       if (err) {
         console.error("Error during login:", err);
         return res.status(500).json({ message: "Login failed" });
       }
-      console.log("User has been logged in");
-      console.log(`User: ${JSON.stringify(req.user)}`);
       res.status(200).json({ message: "logged in" });
     });
   } catch (error) {
@@ -43,7 +38,6 @@ exports.createUser = async (req, res) => {
 };
 
 exports.login = async (req, res) => {
-  console.log("Logging in user...");
   if (!req.user) {
     console.error("No req,user");
     return res.status(401).json({ message: "Authentication Failed" });
@@ -57,8 +51,6 @@ exports.login = async (req, res) => {
       console.error("Error during login:", err);
       return res.status(500).json({ message: "Login failed" });
     }
-    console.log("User has been logged in");
-    console.log(`User: ${JSON.stringify(req.user)}`);
     res.status(200).json({ message: "logged in" });
   });
 };
@@ -78,7 +70,7 @@ exports.logout = async (req, res) => {
  * @param {object} param0 - the user object to validate
  * @returns {object} the validated user object
  */
-const validateUser = ({
+const validateUserData = ({
   email,
   username,
   name,
@@ -90,7 +82,6 @@ const validateUser = ({
   zipCode,
   phoneNumber,
 }) => {
-  console.log("Validating user");
   if (!email || !username || !password) {
     throw new CustomError(
       422,

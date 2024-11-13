@@ -10,72 +10,44 @@ const userModel = require("../models/user-model");
 
 passport.use(
   new LocalStrategy(async function verify(username, password, done) {
-    // Make LocalStrategy callback async
     try {
-      // TODO: REMOVE THIS LINE IN PRODUCTION
-      if (process.env.DEV_MODE === "true") {
-        console.log("Development mode: bypassing authentication");
-        const user = { username: "dev", role: "admin" };
-        return done(null, user);
-      } else {
-        console.log("Authenticating user in local strat...");
-        const user = await userModel.getUserByUsername(username);
-        if (!user) {
-          console.error(`No user with username ${username} found`);
-          return done(null, false);
-        }
-        console.log("User found");
-        console.log("Checking Password...");
-        const matchFound = await authMiddleware.comparePasswords(
-          password,
-          user.password
-        );
-        if (!matchFound) {
-          console.error("Password mismatch");
-          return done(null, false);
-        }
-        console.log("Password match");
-        console.log("Authentication successful");
-        return done(null, user);
+      const user = await userModel.getUserByUsername(username);
+      if (!user) {
+        return done(null, false);
       }
+      const matchFound = await authMiddleware.comparePasswords(
+        password,
+        user.password
+      );
+      if (!matchFound) {
+        return done(null, false);
+      }
+      return done(null, user);
     } catch (err) {
-      console.error(err); // Log the error for debugging
-      return done(err); // Pass the error to Passport
+      console.error(err);
+      return done(err);
     }
   })
 );
 
 passport.serializeUser((user, done) => {
-  console.log("serializing user...");
   done(null, user.username);
 });
 
 passport.deserializeUser(async (username, done) => {
   try {
-    if (process.env.DEV_MODE === "true") {
-      console.log("Development mode: bypassing authentication");
-      const user = { username: "dev", role: "admin" };
-      return done(null, user);
-    } else {
-      console.log("***********************");
-      console.log("Deserializing user...");
-      console.log(`Username: ${JSON.stringify(username)}`);
-      console.log("Checking if user exists...");
-      const foundUser = await userModel.getUserByUsername(username);
-      console.log("Result: ", JSON.stringify(foundUser));
-      if (!foundUser) {
-        console.error("No user found during deserialization");
-        return done(null, false);
-      }
-      const isAdmin = await userModel.getIsUserAdmin(foundUser.email);
-      if (isAdmin) {
-        foundUser.role = "admin";
-      } else {
-        foundUser.role = "standard";
-      }
-      console.log("User found: ", JSON.stringify(foundUser));
-      done(null, foundUser);
+    const foundUser = await userModel.getUserByUsername(username);
+    if (!foundUser) {
+      console.error("No user found during deserialization");
+      return done(null, false);
     }
+    const isAdmin = await userModel.getIsUserAdmin(foundUser.email);
+    if (isAdmin) {
+      foundUser.role = "admin";
+    } else {
+      foundUser.role = "standard";
+    }
+    done(null, foundUser);
   } catch (error) {
     done(error);
   }
