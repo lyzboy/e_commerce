@@ -77,11 +77,17 @@ exports.authorizeOwnership = (requestedModel) => {
             .json({ message: "Server error, Invalid Resource Type" });
       }
       const resource = await resourceModel.getResourceById(id);
-
+      if (!resource) {
+        const createdResource = await resourceModel.createResource(
+          req.user.email
+        );
+        req.resource = createdResource;
+        return next();
+      }
       if (resource.account_email !== req.user.email) {
         return res.status(403).json({ message: "Access denied" });
       }
-
+      req.resource = resource;
       next();
     } catch (error) {
       res.status(500).json({ message: "Server Error: " + error.message });
