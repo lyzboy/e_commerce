@@ -5,7 +5,6 @@ const saltRounds = 15;
 
 exports.authorizeUserAccess = async (req, res, next) => {
   console.log("Checking if user is standard user...");
-
   if (!req.user) {
     console.error("No user found. Authentication required.");
     return res.status(401).json({ message: "Authentication required" });

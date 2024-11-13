@@ -77,7 +77,9 @@ The web app includes an admin dashboard where store owners can manage products, 
    psql -U postgres -f create_ecommerceDB.sql
    ```
 5. **Run the project**:
+
 You will need to run the backend and frontend separately.
+
 a.) Backend
 ```bash
 cd backend
@@ -103,12 +105,30 @@ You can access the app by visiting `http://localhost:3000` in your browser.
 
 ### Calling the API
 
-If you would like to make calls to the API from a client like Postman, ensure that your environment variable `DEV_MODE` is set to true. By doing so, your token payload will use the following properties:
+If you would like to make calls to the API from a client like Postman and do so in a development mode, ensure that your environment variable `DEV_MODE` is set to true. By doing so, your token payload will use the following properties:
 
 ```js
 {
   "username": "dev",
   "role": "admin"
+}
+```
+
+In order to authenticate, you will need to use the endpoint `/api/v1/user/login` with the following request body:
+
+```json
+{
+   "username":"dev",
+   "password":"password"
+}
+```
+
+The values in the payload do not matter but must be present in the request body in order to authenticate. For example, using the following request body will authenticate you as well in development mode:
+
+```json
+{
+   "username":"a",
+   "password":"a"
 }
 ```
 
@@ -122,7 +142,18 @@ This will allow you to make calls to the endpoints of the API utilziing a develo
 }
 ```
 
-Once this user has been created within your database, you will be able to authenticate using, `/api/v1/user/login` and make calls to the endpoints.
+Once this user has been created within your database and will be authenticated. After the user is in the database, you will be able to authenticate using, `/api/v1/user/login` by providing the username and password in the request body:
+   
+   ```json
+   {
+      "username":"your_username",
+      "password":"password_8_long_1_number_1_symbol_minimum"
+   }
+   ```
+
+### Protected Routes
+
+Once you are authenticated, you will be able to access the API's endpoints. Certain routes are protected by login only and others by admin login. In order for you to access the admin login routes, the user you login in with must be in the admins table in the database.
 
 ---
 
@@ -151,8 +182,23 @@ Please read our [Contributing Guidelines](CONTRIBUTING.md) for details on the pr
 1. **Fork the repository**
 2. **Create a branch for your feature**:
    ```bash
-   git checkout -b feature/your-feature-name
+   git checkout -b feature_your-feature-name
    ```
+   Please be sure to preface your branch with a relating term like `feature`, `bug`, `requirement`, etc.
+
+   For example, if you are fixing a bug, you would create a branch like so:
+
+   ```bash
+   git checkout -b bug_your-feature-name
+   ```
+   If your branch is for a requirement from the design document, you would create a branch like so:
+
+   ```bash
+   git checkout -b requirement_your-feature-name
+   ```
+
+   Ensure that you feature name is concise and descriptive of the feature you are adding. For example, if you are adding a feature that allows users to add items to their cart, you would name your branch `feature_add-to-cart`.
+
 3. **Commit your changes**:
    ```bash
    git commit -m "Add feature details"
@@ -162,6 +208,7 @@ Please read our [Contributing Guidelines](CONTRIBUTING.md) for details on the pr
    git push origin feature/your-feature-name
    ```
 5. **Open a Pull Request**
+   Once you have pushed your changes to your branch and are finished with your feature, you can open a pull request to the main repository. Be sure to include a detailed description of your changes and any relevant information that would be helpful for the reviewer. Please use the appropriate template for your pull request. A reviewer will review your changes and provide feedback.
 
 ---
 

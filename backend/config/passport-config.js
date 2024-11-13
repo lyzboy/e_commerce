@@ -47,10 +47,10 @@ passport.use(
 
 passport.serializeUser((user, done) => {
   console.log("serializing user...");
-  done(null, user);
+  done(null, user.username);
 });
 
-passport.deserializeUser(async (user, done) => {
+passport.deserializeUser(async (username, done) => {
   try {
     if (process.env.DEV_MODE === "true") {
       console.log("Development mode: bypassing authentication");
@@ -59,9 +59,9 @@ passport.deserializeUser(async (user, done) => {
     } else {
       console.log("***********************");
       console.log("Deserializing user...");
-      console.log(`Username: ${JSON.stringify(user)}`);
+      console.log(`Username: ${JSON.stringify(username)}`);
       console.log("Checking if user exists...");
-      const foundUser = await userModel.getUserByUsername(user.username);
+      const foundUser = await userModel.getUserByUsername(username);
       console.log("Result: ", JSON.stringify(foundUser));
       if (!foundUser) {
         console.error("No user found during deserialization");
