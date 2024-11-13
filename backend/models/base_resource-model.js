@@ -1,5 +1,6 @@
 const { query } = require("../config/db");
 
+//TODO: this will not be needed as users will not be able to specify the cart id
 /**
  * Base model for all resources that require ownership verification. This allow for inheritance with the models
  * that will require ownership verification.
@@ -12,10 +13,22 @@ const BaseModel = {
    */
   getResourceById: async function (id) {
     try {
-      console.log(this.tableName);
       const queryText = `SELECT * FROM ${this.tableName} WHERE id = $1`;
       const queryParams = [id];
-      const result = await query(queryText, queryParams);
+      const result = await query(queryText, queryParams, true);
+      if (result.rows.length === 0) {
+        return null;
+      }
+      return result.rows[0];
+    } catch (error) {
+      throw new Error(error);
+    }
+  },
+  getResourceByEmail: async function (email) {
+    try {
+      const queryText = `SELECT * FROM ${this.tableName} WHERE account_email = $1`;
+      const queryParams = [email];
+      const result = await query(queryText, queryParams, true);
       if (result.rows.length === 0) {
         return null;
       }
@@ -33,7 +46,7 @@ const BaseModel = {
     try {
       const queryText = `INSERT INTO ${this.tableName} (account_email) VALUES ($1) RETURNING *`;
       const queryParams = [email];
-      const result = await query(queryText, queryParams);
+      const result = await query(queryText, queryParams, true);
       return result.rows[0];
     } catch (error) {
       throw new Error(error);

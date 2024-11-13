@@ -44,6 +44,7 @@ const verifyAdmin = async (userEmail) => {
   return false;
 };
 
+//TODO: this will not be needed as users will not be able to specify the cart id
 /**
  *
  * @param {string} requestedModel - the model to authorize data ownership of. Must be in singular form. (carts -> cart)
@@ -71,14 +72,7 @@ exports.authorizeOwnership = (requestedModel) => {
       }
       const resource = await resourceModel.getResourceById(id);
       if (!resource) {
-        if (req.user.role === "admin") {
-          return res.status(404).json({ message: "Resource not found" });
-        }
-        const createdResource = await resourceModel.createResource(
-          req.user.email
-        );
-        req.resource = createdResource;
-        return next();
+        return res.status(404).json({ message: "Resource not found" });
       }
       if (req.user.role === "admin") {
         const isAdmin = await verifyAdmin(req.user.email);
