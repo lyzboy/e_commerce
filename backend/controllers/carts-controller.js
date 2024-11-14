@@ -2,11 +2,11 @@ const cartModel = require("../models/carts-model");
 
 exports.getCartAdmin = async (req, res) => {
   try {
-    const products = await cartModel.getCart(req.params.id);
-    if (!products) {
+    const cart = await cartModel.getCart(req.params.id);
+    if (!cart) {
       return res.status(200).json({ message: "Cart is empty" });
     }
-    res.status(200).json({ products });
+    res.status(200).json(cart);
   } catch (error) {
     res.status(500).json({ message: "Server Error: " + error.message });
   }
@@ -20,19 +20,15 @@ exports.deleteCart = (req, res) => {
   res.status(200).json({ message: "Delete cart" });
 };
 
-exports.getUserCart = async (req, res) => {
+exports.getCartUser = async (req, res) => {
   try {
     // check if resources exists for user
     const cart = await cartModel.getCart(null, req.user.email);
     if (!cart) {
-      const createdResource = await cartModel.createCart(req.user.email);
+      await cartModel.createCart(req.user.email);
       return res.status(200).json({ message: "Cart is empty" });
     }
-    const products = await cartModel.getCartById(cart.id);
-    if (!products) {
-      return res.status(200).json({ message: "Cart is empty" });
-    }
-    res.status(200).json({ products });
+    res.status(200).json(cart);
   } catch (error) {
     res.status(500).json({ message: "Server Error: " + error.message });
   }

@@ -5,7 +5,7 @@ const authentication = require("../middlewares/authentication");
 const authorization = require("../middlewares/authorization");
 
 // this will be the only route for users to get their cart
-router.get("/", authentication.authenticateUser, cartController.getUserCart);
+router.get("/", authentication.authenticateUser, cartController.getCartUser);
 
 router.get(
   "/:id",
