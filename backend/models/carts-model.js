@@ -1,18 +1,5 @@
 const { query } = require("../config/db");
 
-//TODO: return products from cart here.
-exports.getCartByEmail = async (email) => {
-  try {
-    const queryText = `SELECT * FROM carts WHERE account_email = $1`;
-    const queryParams = [email];
-    const result = await query(queryText, queryParams);
-    return result.rows[0];
-  } catch (error) {
-    throw new Error(error);
-  }
-};
-
-//TODO: needs to search for variants when getting products
 /**
  * Used to get the products in a cart. If using email, provide null for cartId i.e. (null, email)
  * @param {integer} cartId - The id of the cart to get
@@ -23,6 +10,8 @@ exports.getCart = async (cartId, userEmail) => {
   try {
     let queryText = `
       SELECT
+          c.id AS cart_id,
+          cp.id AS cart_product_id,
           p.name AS name,
           p.description AS description,
           p.brand,
@@ -76,6 +65,41 @@ exports.createCart = async (email) => {
     const queryParams = [email];
     await query(queryText, queryParams, true);
     return null;
+  } catch (error) {
+    throw new Error(error);
+  }
+};
+
+exports.addProductToCart = async (
+  productId,
+  cartId,
+  quantity,
+  variantAttributeValueId
+) => {
+  try {
+    const queryText = `INSERT INTO carts_products (product_id, cart_id, quantity, variant_attribute_value_id) VALUES ($1, $2, $3, ${
+      variantAttributeValueId ? "$4" : "NULL"
+    })`;
+    const queryParams = [productId, cartId, quantity];
+    if (variantAttributeValueId) {
+      queryParams.push(variantAttributeValueId);
+    }
+    const results = await query(queryText, queryParams, true);
+    return results;
+  } catch (error) {
+    throw new Error(error);
+  }
+};
+
+exports.deleteProductFromCart = async (productId) => {
+  try {
+    const queryText = `DELETE FROM carts_products WHERE id = $1`;
+    const queryParams = [productId];
+    const results = await query(queryText, queryParams, true);
+    if (results.rowCount === 0) {
+      return null;
+    }
+    return results.rowCount;
   } catch (error) {
     throw new Error(error);
   }
