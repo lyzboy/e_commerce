@@ -368,3 +368,14 @@ INSERT INTO states (name) VALUES
 ('WV'), 
 ('WI'), 
 ('WY');
+
+
+Select 
+	products.name as name,
+  products.description as description,
+  carts_products.quantity as quantity,
+  products.price as price
+from carts_products
+JOIN carts ON carts_products.cart_id = carts.id
+JOIN products ON products.id = carts_products.product_id
+WHERE carts.id = 1;
