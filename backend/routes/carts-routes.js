@@ -4,27 +4,18 @@ const cartController = require("../controllers/carts-controller");
 const authentication = require("../middlewares/authentication");
 const authorization = require("../middlewares/authorization");
 
+// this will be the only route for users to get their cart
+router.get("/", authentication.authenticateUser, cartController.getCartUser);
+
 router.get(
   "/:id",
   authentication.authenticateUser,
-  authorization.authorizeOwnership("cart"),
-  cartController.getCart
+  authorization.authorizeRole("admin"),
+  cartController.getCartAdmin
 );
 
-router.put(
-  "/:id",
-  authentication.authenticateUser,
-  authorization.authorizeOwnership("cart"),
-  cartController.updateCart
-);
+router.put("/", authentication.authenticateUser, cartController.updateCart);
 
-router.post("/", authentication.authenticateUser, cartController.createCart);
-
-router.delete(
-  "/:id",
-  authentication.authenticateUser,
-  authorization.authorizeOwnership("cart"),
-  cartController.deleteCart
-);
+router.delete("/", authentication.authenticateUser, cartController.deleteCart);
 
 module.exports = router;
