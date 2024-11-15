@@ -1,4 +1,4 @@
-const query = require("../config/db");
+const { query } = require("../config/db");
 
 exports.getDiscountedProducts = async (limit, page, category) => {
   try {
@@ -90,4 +90,39 @@ exports.createDiscount = async (
   quantity
 ) => {};
 
-exports.getDiscounts = async (limit, page, categoryId) => {};
+exports.getDiscounts = async (limit, page, categoryId) => {
+  try {
+    let queryText = `SELECT * FROM discounts`;
+    const queryParams = [];
+    if (categoryId) {
+      queryText += `
+      JOIN products_discounts 
+      ON discounts.id = products_discounts.discount_id
+      JOIN products 
+      ON products.id = products_discounts.product_id
+      JOIN products_categories 
+      ON products.id = products_categories.product_id
+      JOIN categories 
+      ON categories.id = products_categories.category_id
+      WHERE categories.id = $1
+      `;
+      queryParams.push(categoryId);
+    }
+
+    if (limit) {
+      queryText += ` LIMIT $${queryParams.length + 1}`;
+      queryParams.push(limit);
+    }
+
+    if (page) {
+      const offset = (page - 1) * limit;
+      queryText += ` OFFSET $${queryParams.length + 1}`;
+      queryParams.push(offset);
+    }
+
+    const results = await query(queryText, queryParams);
+    return results.rows;
+  } catch (error) {
+    throw new Error(error);
+  }
+};
