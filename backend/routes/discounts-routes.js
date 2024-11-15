@@ -1,8 +1,65 @@
 const express = require("express");
 const router = express.Router();
-const discountController = require("../controllers/discount-controller");
+const discountController = require("../controllers/discounts-controller");
 const authentication = require("../middlewares/authentication");
+const authorization = require("../middlewares/authorization");
 
-router.get("/", authentication.authenticateUser, cartController.getCategories);
+router.get(
+  "/",
+  authentication.authenticateUser,
+  authorization.authorizeRole("admin"),
+  discountController.getDiscounts
+);
+
+router.post(
+  "/",
+  authentication.authenticateUser,
+  authorization.authorizeRole("admin"),
+  discountController.createDiscount
+);
+
+router.get(
+  "/:id",
+  authentication.authenticateUser,
+  authorization.authorizeRole("admin"),
+  discountController.getDiscount
+);
+
+router.put(
+  "/:id",
+  authentication.authenticateUser,
+  authorization.authorizeRole("admin"),
+  discountController.getDiscount
+);
+
+router.delete(
+  "/:id",
+  authentication.authenticateUser,
+  authorization.authorizeRole("admin"),
+  discountController.deleteDiscount
+);
+
+/**
+ * returns all products with discounts based on req.query. Standard User access
+ */
+router.get(
+  "/products",
+  authentication.authenticateUser,
+  discountController.getDiscountedProducts
+);
+
+router.post(
+  "/products/add",
+  authentication.authenticateUser,
+  authorization.authorizeRole("admin"),
+  discountController.addDiscountToProduct
+);
+
+router.delete(
+  "/products/remove",
+  authentication.authenticateUser,
+  authorization.authorizeRole("admin"),
+  discountController.removeDiscountFromProduct
+);
 
 module.exports = router;
