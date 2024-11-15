@@ -2,7 +2,7 @@ const request = require("supertest");
 const express = require("express");
 const bodyParser = require("body-parser");
 const { Pool } = require("pg");
-const categoryRoutes = require("../../routes/category-routes");
+const discountRoutes = require("../../routes/discounts-routes");
 
 // Mock the Postgres pool
 jest.mock("pg", () => {
@@ -26,9 +26,9 @@ const mockAuthMiddleware = (req, res, next) => {
 const app = express();
 app.use(bodyParser.json());
 app.use(mockAuthMiddleware); // Use the mock authentication middleware
-app.use("/categories", categoryRoutes);
+app.use("/discounts", discountRoutes);
 
-describe("Category Integration Tests", () => {
+describe("Discounts Integration Tests", () => {
   let pool;
 
   beforeAll(() => {
@@ -39,28 +39,28 @@ describe("Category Integration Tests", () => {
     pool.end();
   });
 
-  it("should get all categories", async () => {
-    const mockCategories = [
-      { id: 1, name: "Electronics" },
-      { id: 2, name: "Books" },
+  it("should get all discounts", async () => {
+    const mockDiscounts = [
+      { id: 1, percent_off: 10 },
+      { id: 2, percent_off: 5 },
     ];
-    pool.query.mockResolvedValue({ rows: mockCategories });
+    pool.query.mockResolvedValue({ rows: mockDiscounts });
 
-    const res = await request(app).get("/categories");
+    const res = await request(app).get("/");
 
     expect(res.statusCode).toEqual(200);
     expect(res.body).toEqual(mockCategories);
   });
 
   it("should create a new category", async () => {
-    const newCategory = { name: "Clothing" };
-    const mockCategory = { id: 3, ...newCategory };
-    pool.query.mockResolvedValue({ rows: [mockCategory] });
+    const newDiscount = { percent_off: 15 };
+    const mockDiscounts = { id: 3, ...newCategory };
+    pool.query.mockResolvedValue({ rows: [mockDiscounts] });
 
-    const res = await request(app).post("/categories").send(newCategory);
+    const res = await request(app).post("/").send(newDiscount);
 
     expect(res.statusCode).toEqual(201);
-    expect(res.body).toEqual(mockCategory);
+    expect(res.body).toEqual(mockDiscounts);
   });
 
   it("should update a category", async () => {
