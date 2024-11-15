@@ -19,7 +19,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(
   session({
     secret: process.env.TOKEN_SECRET,
-    cookie: { maxAge: 1800000, secure: true },
+    cookie: { maxAge: 1800000, secure: false }, //<- Set secure to true for production
     saveUninitialized: false,
     resave: false,
     store: new session.MemoryStore(),
