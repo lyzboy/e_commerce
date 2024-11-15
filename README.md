@@ -72,10 +72,20 @@ The web app includes an admin dashboard where store owners can manage products, 
    - `POOL_USER_NAME`
    - etc.
 4. **Set up the database**:
-   Create a new database in PostgreSQL and run the SQL script create_ecommerceDB.sql. This will create the database with the necessary tables and roles.
+   Create a new database in PostgreSQL called `ecommerce` by logging into the PostgreSQL shell `psql` and running:
+   
+   `CREATE DATABASE ecommerce;`
+
+   Then, exit the shell
+
+   `\q`
+
+   and run the SQL script ecommerceDB.sql from the command line. This will create the database with the necessary tables and roles.
+
    ```bash
-   psql -U postgres -f create_ecommerceDB.sql
+   psql -d ecommerce -f ecommerceDB.sql
    ```
+   
 5. **Run the project**:
 
 You will need to run the backend and frontend separately.
