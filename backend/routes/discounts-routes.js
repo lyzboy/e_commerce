@@ -22,14 +22,14 @@ router.get(
   "/:id",
   authentication.authenticateUser,
   authorization.authorizeRole("admin"),
-  discountController.getDiscount
+  discountController.getDiscountById
 );
 
 router.put(
   "/:id",
   authentication.authenticateUser,
   authorization.authorizeRole("admin"),
-  discountController.getDiscount
+  discountController.getDiscountById
 );
 
 router.delete(

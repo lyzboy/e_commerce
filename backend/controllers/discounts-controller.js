@@ -89,12 +89,22 @@ exports.deleteDiscount = async (req, res) => {
  * @param {*} req
  * @param {*} res
  */
-exports.getDiscount = async (req, res) => {
+exports.getDiscountById = async (req, res) => {
   try {
     const { id } = req.params;
     const results = await discountModel.getDiscount(id);
     res.status(200).json(results);
   } catch (error) {
+    res.status(500).json({ message: "Server Error: " + error.message });
+  }
+};
+
+exports.getDiscountByCode = async (req, res) => {
+  try {
+    const { code } = req.params;
+    const results = await discountModel.getDiscountByCode(code);
+    res.status(200).json(results);
+  }catch (error) {
     res.status(500).json({ message: "Server Error: " + error.message });
   }
 };

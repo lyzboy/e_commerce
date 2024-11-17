@@ -49,6 +49,16 @@ exports.getDiscountedProducts = async (limit, page, category) => {
   }
 };
 
+exports.getDiscountByCode = async (code) => {
+  try {
+    let queryText = `SELECT * FROM discounts WHERE code = $1`;
+    const results = await query(queryText, [code]);
+    return results.rows[0];
+  } catch (error) {
+    throw new Error(error);
+  }
+};
+
 exports.addDiscountToProduct = async (
   productId,
   discountId,
