@@ -350,9 +350,10 @@ ALTER SEQUENCE public.cities_id_seq OWNED BY public.cities.id;
 CREATE TABLE public.discounts (
     id integer NOT NULL,
     code character varying(16),
-    percent_off numeric,
+    percent_off numeric NOT NULL,
     expire_date date,
-    quantity integer
+    quantity integer,
+    amount_off money
 );
 
 
@@ -608,6 +609,42 @@ CREATE TABLE public.products_categories (
 ALTER TABLE public.products_categories OWNER TO postgres;
 
 --
+-- Name: products_discounts; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.products_discounts (
+    id integer NOT NULL,
+    product_id integer NOT NULL,
+    discount_id integer NOT NULL,
+    product_variant_id integer
+);
+
+
+ALTER TABLE public.products_discounts OWNER TO postgres;
+
+--
+-- Name: products_discounts_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.products_discounts_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER SEQUENCE public.products_discounts_id_seq OWNER TO postgres;
+
+--
+-- Name: products_discounts_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.products_discounts_id_seq OWNED BY public.products_discounts.id;
+
+
+--
 -- Name: products_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
@@ -844,6 +881,13 @@ ALTER TABLE ONLY public.products ALTER COLUMN id SET DEFAULT nextval('public.pro
 
 
 --
+-- Name: products_discounts id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.products_discounts ALTER COLUMN id SET DEFAULT nextval('public.products_discounts_id_seq'::regclass);
+
+
+--
 -- Name: reset_password_codes id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -931,6 +975,7 @@ COPY public.attributes (id, attribute_name) FROM stdin;
 COPY public.carts (id, account_email) FROM stdin;
 2	test@email.com
 5	test2@email.com
+7	admin@email.com
 \.
 
 
@@ -972,7 +1017,8 @@ COPY public.cities (id, name, state_id) FROM stdin;
 -- Data for Name: discounts; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-COPY public.discounts (id, code, percent_off, expire_date, quantity) FROM stdin;
+COPY public.discounts (id, code, percent_off, expire_date, quantity, amount_off) FROM stdin;
+1	\N	10	\N	\N	\N
 \.
 
 
@@ -1045,6 +1091,16 @@ COPY public.products (id, barcode, name, description, price, stock_quantity, bra
 --
 
 COPY public.products_categories (product_id, category_id) FROM stdin;
+\.
+
+
+--
+-- Data for Name: products_discounts; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.products_discounts (id, product_id, discount_id, product_variant_id) FROM stdin;
+1	1	1	2
+2	2	1	\N
 \.
 
 
@@ -1160,7 +1216,7 @@ SELECT pg_catalog.setval('public.attributes_id_seq', 6, true);
 -- Name: carts_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.carts_id_seq', 6, true);
+SELECT pg_catalog.setval('public.carts_id_seq', 7, true);
 
 
 --
@@ -1195,7 +1251,7 @@ SELECT pg_catalog.setval('public.cities_id_seq', 1, false);
 -- Name: discounts_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.discounts_id_seq', 1, false);
+SELECT pg_catalog.setval('public.discounts_id_seq', 1, true);
 
 
 --
@@ -1231,6 +1287,13 @@ SELECT pg_catalog.setval('public.phones_id_seq', 1, false);
 --
 
 SELECT pg_catalog.setval('public.product_variants_id_seq', 8, true);
+
+
+--
+-- Name: products_discounts_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.products_discounts_id_seq', 2, true);
 
 
 --
@@ -1387,6 +1450,14 @@ ALTER TABLE ONLY public.phones
 
 ALTER TABLE ONLY public.product_variants
     ADD CONSTRAINT product_variants_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: products_discounts products_discounts_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.products_discounts
+    ADD CONSTRAINT products_discounts_pkey PRIMARY KEY (id);
 
 
 --
@@ -1608,6 +1679,30 @@ ALTER TABLE ONLY public.products_categories
 
 ALTER TABLE ONLY public.products_categories
     ADD CONSTRAINT products_categories_product_id_fkey FOREIGN KEY (product_id) REFERENCES public.products(id);
+
+
+--
+-- Name: products_discounts products_discounts_discount_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.products_discounts
+    ADD CONSTRAINT products_discounts_discount_id_fkey FOREIGN KEY (discount_id) REFERENCES public.discounts(id);
+
+
+--
+-- Name: products_discounts products_discounts_product_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.products_discounts
+    ADD CONSTRAINT products_discounts_product_id_fkey FOREIGN KEY (product_id) REFERENCES public.products(id);
+
+
+--
+-- Name: products_discounts products_discounts_product_variant_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.products_discounts
+    ADD CONSTRAINT products_discounts_product_variant_id_fkey FOREIGN KEY (product_variant_id) REFERENCES public.product_variants(id);
 
 
 --
