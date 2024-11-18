@@ -86,11 +86,49 @@ exports.removeDiscountFromProduct = async (
   productId,
   discountId,
   productVariantId
-) => {};
+) => {
+  const queryText = `DELETE FROM products_discounts WHERE `;
+  const queryParams = [];
+  if (productDiscountId) {
+    queryText += `id = $1`;
+    queryParams.push(productDiscountId);
+  } else {
+    if (productId && discountId) {
+      queryText += `product_id = $1`;
+      queryParams.push(productId);
+      queryText += ` AND discount_id = $2`;
+      queryParams.push(discountId);
+      if (productVariantId) {
+        queryText += ` AND product_variant_id = $3`;
+        queryParams.push(productVariantId);
+      }
+    }
+  }
+  const results = await query(queryText, queryParams);
+  return results.rowCount;
+};
 
-exports.deleteDiscount = async (id) => {};
+exports.deleteDiscount = async (id) => {
+  try {
+    const queryText = `DELETE FROM discounts WHERE id = $1`;
+    const queryParams = [id];
+    const results = await query(queryText, queryParams);
+    return results.rowCount;
+  } catch (error) {
+    throw new Error(error);
+  }
+};
 
-exports.getDiscount = async (id) => {};
+exports.getDiscount = async (id) => {
+  try {
+    const queryText = `SELECT * FROM discounts WHERE id = $1`;
+    const queryParams = [id];
+    const results = await query(queryText, queryParams);
+    return results.rows[0];
+  } catch (error) {
+    throw new Error(error);
+  }
+};
 
 exports.createDiscount = async (
   code,

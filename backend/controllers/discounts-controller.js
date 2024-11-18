@@ -53,7 +53,7 @@ exports.removeDiscountFromProduct = async (req, res) => {
     const { productDiscountId, productId, discountId, productVariantId } =
       req.body;
     if (!productDiscountId) {
-      if (!productId || !discountId) {
+      if (!productId && !discountId) {
         return res.status(400).json({ message: "Invalid request object." });
       }
     }
@@ -104,7 +104,7 @@ exports.getDiscountByCode = async (req, res) => {
     const { code } = req.params;
     const results = await discountModel.getDiscountByCode(code);
     res.status(200).json(results);
-  }catch (error) {
+  } catch (error) {
     res.status(500).json({ message: "Server Error: " + error.message });
   }
 };
