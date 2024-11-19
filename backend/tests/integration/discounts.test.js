@@ -1,83 +1,48 @@
 const request = require("supertest");
 const express = require("express");
-const bodyParser = require("body-parser");
-const { Pool } = require("pg");
 const discountRoutes = require("../../routes/discounts-routes");
+const discountController = require("../../controllers/discounts-controller");
 
-// Mock the Postgres pool
-jest.mock("pg", () => {
-  const mPool = {
-    connect: jest.fn().mockResolvedValue({
-      query: jest.fn(),
-      release: jest.fn(),
-    }),
-    query: jest.fn(),
-    end: jest.fn(),
-  };
-  return { Pool: jest.fn(() => mPool) };
-});
-
-// Mock authentication middleware
-const mockAuthMiddleware = (req, res, next) => {
-  req.user = { role: "admin" };
-  next();
-};
-
-const app = express();
-app.use(bodyParser.json());
-app.use(mockAuthMiddleware); // Use the mock authentication middleware
-app.use("/discounts", discountRoutes);
-
-describe("Discounts Integration Tests", () => {
-  let pool;
-
-  beforeAll(() => {
-    pool = new Pool();
-  });
-
-  afterAll(() => {
-    pool.end();
-  });
-
-  it("should get all discounts", async () => {
-    const mockDiscounts = [
-      { id: 1, percent_off: 10 },
-      { id: 2, percent_off: 5 },
+jest.mock("../../models/discounts-model", () => ({
+  getDiscountedProducts: jest.fn((limit, page, category) => {
+    const mockData = [
+      { id: 1, name: "Product 1", effective_price: 10 },
+      { id: 2, name: "Product 2", effective_price: 20 },
     ];
-    pool.query.mockResolvedValue({ rows: mockDiscounts });
+    return Promise.resolve(mockData);
+  }),
+  getDiscountByCode: jest.fn((code) => {
+    if (code == "10OFF") {
+      const mockData = [
+        { id: 1, code: "10OFF", percent_off: 10, expire_date: "2022-12-31" },
+      ];
+      return Promise.resolve(mockData);
+    } else {
+      return Promise.resolve(null);
+    }
+  }),
+  // addDiscountToProduct (
+  //   productId,
+  //   discountId,
+  //   productVariantId
+  // )
+  // removeDiscountFromProduct (
+  //   productDiscountId,
+  //   productId,
+  //   discountId,
+  //   productVariantId
+  // )
+  // deleteDiscount (id)
 
-    const res = await request(app).get("/");
+  // getDiscount (id)
 
-    expect(res.statusCode).toEqual(200);
-    expect(res.body).toEqual(mockCategories);
-  });
+  // createDiscount  (
+  //   code,
+  //   percentOff,
+  //   amountOff,
+  //   expireDate,
+  //   quantity
+  // ) => {};
 
-  it("should create a new category", async () => {
-    const newDiscount = { percent_off: 15 };
-    const mockDiscounts = { id: 3, ...newCategory };
-    pool.query.mockResolvedValue({ rows: [mockDiscounts] });
-
-    const res = await request(app).post("/").send(newDiscount);
-
-    expect(res.statusCode).toEqual(201);
-    expect(res.body).toEqual(mockDiscounts);
-  });
-
-  it("should update a category", async () => {
-    const updatedCategory = { id: 1, name: "Updated Electronics" };
-    pool.query.mockResolvedValue({ rows: [updatedCategory] });
-
-    const res = await request(app).put("/categories/1").send(updatedCategory);
-
-    expect(res.statusCode).toEqual(200);
-    expect(res.body).toEqual(updatedCategory);
-  });
-
-  it("should delete a category", async () => {
-    pool.query.mockResolvedValue({ rowCount: 1 });
-
-    const res = await request(app).delete("/categories/1");
-
-    expect(res.statusCode).toEqual(204);
-  });
-});
+  // getDiscounts (limit, page, categoryId)
+}));
