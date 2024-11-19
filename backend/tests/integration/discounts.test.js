@@ -21,28 +21,82 @@ jest.mock("../../models/discounts-model", () => ({
       return Promise.resolve(null);
     }
   }),
-  // addDiscountToProduct (
-  //   productId,
-  //   discountId,
-  //   productVariantId
-  // )
-  // removeDiscountFromProduct (
-  //   productDiscountId,
-  //   productId,
-  //   discountId,
-  //   productVariantId
-  // )
-  // deleteDiscount (id)
+  addDiscountToProduct: jest.fn((productId, discountId, productVariantId) => {
+    return Promise.resolve({
+      id: 1,
+      productId: productId,
+      discountId: discountId,
+      productVariantId: productVariantId ? productVariantId : null,
+    });
+  }),
+  removeDiscountFromProduct: jest.fn(
+    (productDiscountId, productId, discountId, productVariantId) => {
+      if (productDiscountId === 1) {
+        return Promise.resolve(1);
+      } else {
+        return Promise.resolve(0);
+      }
+    }
+  ),
+  deleteDiscount: jest.fn((id) => {
+    if (id === 1) {
+      return Promise.resolve(1);
+    } else {
+      return Promise.resolve(0);
+    }
+  }),
 
-  // getDiscount (id)
+  getDiscount: jest.fn((id) => {
+    if (id === 1) {
+      return Promise.resolve({
+        id: 1,
+        code: "10OFF",
+        percent_off: 10,
+        expire_date: "2022-12-31",
+      });
+    } else {
+      return Promise.resolve(null);
+    }
+  }),
 
-  // createDiscount  (
-  //   code,
-  //   percentOff,
-  //   amountOff,
-  //   expireDate,
-  //   quantity
-  // ) => {};
+  createDiscount: jest.fn(
+    (code, percentOff, amountOff, expireDate, quantity) => {
+      return Promise.resolve({
+        id: 1,
+        code: code,
+        percent_off: percentOff,
+        amount_off: amountOff,
+        expire_date: expireDate,
+        quantity: quantity,
+      });
+    }
+  ),
 
-  // getDiscounts (limit, page, categoryId)
+  getDiscounts: jest.fn((limit, page, categoryId) => {
+    const mockData = [
+      { id: 1, code: "10OFF", percent_off: 10, expire_date: "2022-12-31" },
+      { id: 2, code: "20OFF", percent_off: 20, expire_date: "2022-12-31" },
+    ];
+    return Promise.resolve(mockData);
+  }),
 }));
+
+const app = express();
+
+// mock authentication middleware
+app.use((req, res, next) => {
+  req.user = { email: "admin@email.com", username: "adminTest", role: "admin" };
+  next();
+});
+
+app.use("/discounts", discountRoutes);
+
+describe("Discounts Endpoints Integration Tests", () => {
+  describe("GET /discounts", () => {
+    it("should get all discounts", async () => {
+      const response = await request(app).get("/discounts");
+
+      expect(response.status).toBe(200);
+    });
+  });
+});
