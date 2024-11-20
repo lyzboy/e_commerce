@@ -1,7 +1,7 @@
 const request = require("supertest");
 const express = require("express");
 const discountRoutes = require("../../routes/discounts-routes");
-const discountController = require("../../controllers/discounts-controller");
+const discountModel = require("../../models/discounts-model");
 
 jest.mock("../../models/discounts-model", () => ({
   getDiscountedProducts: jest.fn((limit, page, category) => {
@@ -94,9 +94,22 @@ app.use("/discounts", discountRoutes);
 describe("Discounts Endpoints Integration Tests", () => {
   describe("GET /discounts", () => {
     it("should get all discounts", async () => {
+      // arrange
+      const mockData = [
+        { id: 1, code: "10OFF", percent_off: 10, expire_date: "2022-12-31" },
+        { id: 2, code: "20OFF", percent_off: 20, expire_date: "2022-12-31" },
+      ];
+      discountModel.getDiscounts = jest
+        .fn()
+        .mockReturnValue(Promise.resolve(mockData));
+
+      // act
       const response = await request(app).get("/discounts");
 
+      //assert
       expect(response.status).toBe(200);
+      expect(response.body).toEqual(mockData);
+      expect(discountModel.getDiscounts).toHaveBeenCalled();
     });
   });
 });
