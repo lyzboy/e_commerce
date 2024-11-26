@@ -2,6 +2,7 @@ const request = require("supertest");
 const express = require("express");
 const discountRoutes = require("../../routes/discounts-routes");
 const discountModel = require("../../models/discounts-model");
+const { query } = require("../config/db");
 
 // jest.mock("../../models/discounts-model", () => ({
 //   getDiscountedProducts,
@@ -23,6 +24,30 @@ app.use((req, res, next) => {
 });
 
 app.use("/discounts", discountRoutes);
+
+// Create seeding functions for test database, call in beforeAll and afterAll
+// const seedDiscounts = async (discounts) => {
+//     try {
+//         const queries = discounts.map(discount => {
+//             const { code, percent_off, expire_date } = discount;
+//             return query(`INSERT INTO discounts (code, percent_off, expire_date) VALUES ($1, $2, $3) RETURNING *`, [code, percent_off, expire_date]);
+//         });
+//         await Promise.all(queries); // Execute all insert queries
+//     } catch (error) {
+//         throw new Error(error);
+//     }
+// };
+
+// const cleanupDiscounts = async (codes) => {
+//     try {
+//         if (codes && codes.length > 0) {
+//             const queryText = `DELETE FROM discounts WHERE code IN (${codes.map((_, i) => `$${i + 1}`).join(',')})`;
+//             await query(queryText, codes);
+//         }
+//     } catch (error) {
+//         throw new Error(error);
+//     }
+// };
 
 describe("Discounts Endpoints Integration Tests", () => {
   describe("GET /discounts", () => {
