@@ -85,8 +85,33 @@ The web app includes an admin dashboard where store owners can manage products, 
    ```bash
    psql -d ecommerce -f ecommerceDB.sql
    ```
+
+5. **Setup the Testing database**
+  Create a new database in PostgreSQL called `ecommerce_test` by logging into the PostgreSQL shell `psql` and running:
    
-5. **Run the project**:
+   `CREATE DATABASE ecommerce_test;`
+
+   Then, exit the shell
+
+   `\q`
+
+   and run the SQL script ecommerceDB.sql from the command line. This will create the database with the necessary tables and roles.
+
+   ```bash
+   psql -d ecommerce_test -f ecommerceDB.sql
+   ```
+   
+   This will create a database that can be used to run tests. You will also need to ensure that you have the correct variables in your `.env` file for the test database. You can copy the `.env.example` file and configure the following environment variables:
+   ```bash
+   TEST_DB_USER=
+   TEST_DB_HOST=
+   TEST_DB_NAME=
+   TEST_DB_PASSWORD=
+   TEST_DB_PORT=
+   ```
+   you can use the default values for the name user and password, typically `postgres` for the user and password, `localhost` for the host, and `5432` for the port.
+
+6. **Run the project**:
 
 You will need to run the backend and frontend separately.
 
