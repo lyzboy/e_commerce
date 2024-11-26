@@ -95,12 +95,14 @@ The web app includes an admin dashboard where store owners can manage products, 
 
    `\q`
 
-   and run the SQL script ecommerceDB.sql from the command line. This will create the database with the necessary tables and roles.
+   and run the SQL script ecommerceDB.sql from the command line. This will create the database with the necessary tables and roles. You will need to use the main user for postgres to run this command. You can do this by running the following command in the terminal:
 
    ```bash
-   psql -d ecommerce_test -f ecommerceDB.sql
+   psql -U postgres -d ecommerce_test -f "/path/to/project/backend/config/ecommerceDB.sql"
    ```
    
+   *Change the `/path/to/project` to the path of the project on your machine. Change the `postgres` to the user you use to access the database.*
+
    This will create a database that can be used to run tests. You will also need to ensure that you have the correct variables in your `.env` file for the test database. You can copy the `.env.example` file and configure the following environment variables:
    ```bash
    TEST_DB_USER=
@@ -113,24 +115,26 @@ The web app includes an admin dashboard where store owners can manage products, 
 
 6. **Run the project**:
 
-You will need to run the backend and frontend separately.
+   You will need to run the backend and frontend separately.
 
-a.) Backend
-```bash
-cd backend
-npm run dev
-```
-b.) Frontend
-```bash
-cd frontend
-npm run dev
-```
+   a.) Backend
+   ```bash
+   cd backend
+   npm run dev
+   ```
 
----
+   b.) Frontend
+   ```bash
+   cd frontend
+   npm run dev
+   ```
+
+___
+
 
 ## Usage
 
-- How to interact with the project, run tests, and any other necessary usage instructions.  
+How to interact with the project, run tests, and any other necessary usage instructions.  
 Example:  
 ```bash
 npm run dev
