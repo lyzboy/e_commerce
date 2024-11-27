@@ -1,8 +1,7 @@
 const request = require("supertest");
 const express = require("express");
 const discountRoutes = require("../../routes/discounts-routes");
-const discountModel = require("../../models/discounts-model");
-const { query } = require("../../config/db");
+const db = require("../../config/db");
 
 // jest.mock("../../models/discounts-model", () => ({
 //   getDiscountedProducts,
@@ -32,7 +31,7 @@ describe("Discounts Endpoints Integration Tests", () => {
         try {
           const queries = discounts.map((discount) => {
             const { code, percent_off, expire_date } = discount;
-            return query(
+            return db.query(
               `INSERT INTO discounts (code, percent_off, expire_date) 
                        VALUES ($1, $2, $3) 
                        RETURNING *`,
@@ -54,7 +53,7 @@ describe("Discounts Endpoints Integration Tests", () => {
     afterAll(async () => {
       const cleanupDiscounts = async () => {
         try {
-          await query("DELETE FROM discounts");
+          await db.query("DELETE FROM discounts");
         } catch (error) {
           throw new Error(error);
         }
@@ -80,6 +79,19 @@ describe("Discounts Endpoints Integration Tests", () => {
       expect(firstDiscount).toHaveProperty("code");
       expect(firstDiscount).toHaveProperty("percent_off");
       expect(firstDiscount).toHaveProperty("expire_date");
+    });
+
+    it("should return a status of 500 if an error occurs", async () => {
+      const originalQuery = db.query;
+      db.query = jest.fn(async () => {
+        throw new Error("Error executing query");
+      });
+      try {
+        const response = await request(app).get("/discounts");
+        expect(response.status).toBe(500);
+      } finally {
+        db.query = originalQuery;
+      }
     });
   });
 });
