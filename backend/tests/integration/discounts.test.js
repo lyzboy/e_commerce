@@ -2,6 +2,7 @@ const request = require("supertest");
 const express = require("express");
 const discountRoutes = require("../../routes/discounts-routes");
 const db = require("../../config/db");
+const discountModel = require("../../models/discounts-model");
 
 // jest.mock("../../models/discounts-model", () => ({
 //   getDiscountedProducts,
@@ -169,7 +170,43 @@ describe("Discounts Endpoints Integration Tests", () => {
       expect(firstDiscount).toHaveProperty("percent_off");
       expect(firstDiscount).toHaveProperty("expire_date");
     });
+
+    it("Should return a specific number of discounts based on limit", async () => {
+      // arrange
+      const limit = 1;
+
+      // act
+      const response = await request(app).get(`/discounts?limit=${limit}`);
+
+      // assert
+      expect(response.status).toBe(200);
+      expect(response.body).toBeDefined();
+      expect(response.body.length).toBe(limit);
+    });
+
+    it("should return 500 status code if an error occurs", async () => {
+      // Arrange
+      const originalModelGet = discountModel.getDiscounts;
+      discountModel.getDiscounts = jest.fn(async () => {
+        throw new Error("Fake Error");
+      });
+
+      // Act
+      const response = await request(app).get("/discounts");
+
+      // Assert
+      expect(response.status).toBe(500);
+      expect(response.body).toBeDefined();
+      expect(response.body).toHaveProperty(
+        "message",
+        "Server Error: Fake Error"
+      ); // Updated message
+
+      // Restore the original db.query function
+      discountModel.getDiscounts = originalModelGet;
+    });
   });
+
   describe("GET /discounts/:id", () => {
     it("should get a discount by id", async () => {
       // arrange

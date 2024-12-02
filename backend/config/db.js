@@ -53,6 +53,7 @@ const query = async (queryText, queryParams, isAdmin = false) => {
     return result;
   } catch (err) {
     console.log("Error executing query: ", err);
+    throw new Error("Error executing query");
   }
 };
 
