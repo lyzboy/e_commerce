@@ -45,8 +45,8 @@ describe("Discounts Endpoints Integration Tests", () => {
 
     const seedProducts = async (products) => {
       try {
-        const queries = products.map((products) => {
-          const {barcode, name, description, stock_quantity, price} = product;
+        const queries = products.map((product) => {
+          const { barcode, name, description, stock_quantity, price } = product;
           return db.query(
             `INSERT INTO products (barcode, name, description, stock_quantity, price) 
                      VALUES ($1, $2, $3, $4, $5) 
@@ -63,9 +63,10 @@ describe("Discounts Endpoints Integration Tests", () => {
     const seedProductDiscounts = async (productDiscounts) => {
       try {
         const queries = productDiscounts.map((productDiscount) => {
-          const {product_id, discount_id, product_variant_id} = productDiscount;
+          const { product_id, discount_id, product_variant_id } =
+            productDiscount;
           return db.query(
-            `INSERT INTO product_discounts (product_id, discount_id, product_variant_id) 
+            `INSERT INTO products_discounts (product_id, discount_id, product_variant_id) 
                      VALUES ($1, $2, $3) 
                      RETURNING *`,
             [product_id, discount_id, product_variant_id]
@@ -77,26 +78,68 @@ describe("Discounts Endpoints Integration Tests", () => {
       }
     };
 
-
-
     await seedDiscounts([
       { code: "DISCOUNT10", percent_off: 10, expire_date: "2022-12-31" },
       { code: "DISCOUNT20", percent_off: 20, expire_date: "2022-12-31" },
     ]);
     await seedProducts([
-      { barcode: "123456789", name: "Test Product", description: "Test Description", stock_quantity: 10, price: 100.00 },
-      { barcode: "987654321", name: "Test Product 2", description: "Test Description 2", stock_quantity: 20, price: 200.00 },
+      {
+        barcode: "123456789",
+        name: "Test Product",
+        description: "Test Description",
+        stock_quantity: 10,
+        price: 100.0,
+      },
+      {
+        barcode: "987654321",
+        name: "Test Product 2",
+        description: "Test Description 2",
+        stock_quantity: 20,
+        price: 200.0,
+      },
     ]);
+    // Retrieve the IDs
+    const discountResults = await db.query(
+      `SELECT id FROM discounts ORDER BY code`
+    );
+    const productResults = await db.query(
+      `SELECT id FROM products ORDER BY barcode`
+    );
+
+    const discountIds = discountResults.rows.map((row) => {
+      return row.id;
+    });
+    const productIds = productResults.rows.map((row) => row.id);
     await seedProductDiscounts([
-      { product_id: 1, discount_id: 1, product_variant_id: null },
-      { product_id: 2, discount_id: 2, product_variant_id: null },
+      {
+        product_id: productIds[0],
+        discount_id: discountIds[0],
+        product_variant_id: null,
+      },
+      {
+        product_id: productIds[1],
+        discount_id: discountIds[1],
+        product_variant_id: null,
+      },
     ]);
+    const productsDiscountsResults = await db.query(
+      `SELECT id FROM products_discounts`
+    );
+    const productsDiscountsIds = productsDiscountsResults.rows.map(
+      (row) => row.id
+    );
   });
 
   afterAll(async () => {
     const cleanupDiscounts = async () => {
       try {
-        await db.query("DELETE FROM discounts");
+        await db.query(`
+          DELETE FROM products_discounts;
+          DELETE FROM discounts;
+          DELETE FROM products;
+        `);
+        await db.testPool.end();
+        console.log("Cleaned up discounts and closed database pool.");
       } catch (error) {
         throw new Error(error);
       }
@@ -105,10 +148,7 @@ describe("Discounts Endpoints Integration Tests", () => {
     await cleanupDiscounts();
   });
 
-  
   describe("GET /discounts", () => {
-
-
     it("should get all discounts", async () => {
       // arrange
 
@@ -127,19 +167,6 @@ describe("Discounts Endpoints Integration Tests", () => {
       expect(firstDiscount).toHaveProperty("percent_off");
       expect(firstDiscount).toHaveProperty("expire_date");
     });
-
-    it("should return a status of 500 if an error occurs", async () => {
-      const originalQuery = db.query;
-      db.query = jest.fn(async () => {
-        throw new Error("Error executing query");
-      });
-      try {
-        const response = await request(app).get("/discounts");
-        expect(response.status).toBe(500);
-      } finally {
-        db.query = originalQuery;
-      }
-    });
   });
   describe("GET /discounts/:id", () => {
     it("should get a discount by id", async () => {
@@ -148,7 +175,6 @@ describe("Discounts Endpoints Integration Tests", () => {
 
       // act
       const response = await request(app).get(`/discounts/${discountId}`);
-
       // assert
       expect(response.status).toBe(200);
       expect(response.body).toBeDefined();

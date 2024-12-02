@@ -42,7 +42,7 @@ const testPool = new Pool({
  * @param {*} isAdmin - Determines where to use the adminPool or standardPool
  * @returns
  */
-exports.query = async (queryText, queryParams, isAdmin = false) => {
+const query = async (queryText, queryParams, isAdmin = false) => {
   try {
     if (process.env.JEST_WORKER_ID || process.env.NODE_ENV === "test") {
       const result = await testPool.query(queryText, queryParams);
@@ -54,4 +54,9 @@ exports.query = async (queryText, queryParams, isAdmin = false) => {
   } catch (err) {
     console.log("Error executing query: ", err);
   }
+};
+
+module.exports = {
+  query,
+  testPool,
 };
