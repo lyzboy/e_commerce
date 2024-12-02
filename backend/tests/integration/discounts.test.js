@@ -27,6 +27,8 @@ app.use("/discounts", discountRoutes);
 
 describe("Discounts Endpoints Integration Tests", () => {
   let testDiscountId = 0;
+  let testCategory;
+  let testProducts;
   beforeAll(async () => {
     const seedDiscounts = async (discounts) => {
       try {
@@ -37,6 +39,23 @@ describe("Discounts Endpoints Integration Tests", () => {
                      VALUES ($1, $2, $3) 
                      RETURNING *`,
             [code, percent_off, expire_date]
+          );
+        });
+        await Promise.all(queries);
+      } catch (error) {
+        throw new Error(error);
+      }
+    };
+
+    const seedCategories = async (categories) => {
+      try {
+        const queries = categories.map((category) => {
+          const { name, description } = category;
+          return db.query(
+            `INSERT INTO categories (name, description) 
+                   VALUES ($1, $2) 
+                   RETURNING *`,
+            [name, description]
           );
         });
         await Promise.all(queries);
@@ -80,11 +99,28 @@ describe("Discounts Endpoints Integration Tests", () => {
       }
     };
 
+    const seedProductsCategories = async (productsCategories) => {
+      try {
+        const queries = productsCategories.map((productCategory) => {
+          const { product_id, category_id } = productCategory;
+          return db.query(
+            `INSERT INTO products_categories (product_id, category_id) 
+                     VALUES ($1, $2) 
+                     RETURNING *`,
+            [product_id, category_id]
+          );
+        });
+        await Promise.all(queries);
+      } catch (error) {
+        throw new Error(error);
+      }
+    };
+
     await seedDiscounts([
       { code: "DISCOUNT10", percent_off: 10, expire_date: "2022-12-31" },
       { code: "DISCOUNT20", percent_off: 20, expire_date: "2022-12-31" },
     ]);
-    await seedProducts([
+    testProducts = await seedProducts([
       {
         barcode: "123456789",
         name: "Test Product",
@@ -99,6 +135,20 @@ describe("Discounts Endpoints Integration Tests", () => {
         stock_quantity: 20,
         price: 200.0,
       },
+      {
+        barcode: "987654568",
+        name: "Test Product 3",
+        description: "Test Description 3",
+        stock_quantity: 5,
+        price: 19.99,
+      },
+    ]);
+    testCategory = await seedCategories([
+      { name: "Test Category", description: "Test Description" },
+    ])[0];
+    await seedProductsCategories([
+      { product_id: testProducts[0].id, category_id: testCategory.id },
+      { product_id: testProducts[1].id, category_id: testCategory.id },
     ]);
     // Retrieve the IDs
     const discountResults = await db.query(
@@ -125,12 +175,6 @@ describe("Discounts Endpoints Integration Tests", () => {
         product_variant_id: null,
       },
     ]);
-    const productsDiscountsResults = await db.query(
-      `SELECT id FROM products_discounts`
-    );
-    const productsDiscountsIds = productsDiscountsResults.rows.map(
-      (row) => row.id
-    );
   });
 
   afterAll(async () => {
