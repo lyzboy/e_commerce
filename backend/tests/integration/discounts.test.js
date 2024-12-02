@@ -25,6 +25,7 @@ app.use((req, res, next) => {
 app.use("/discounts", discountRoutes);
 
 describe("Discounts Endpoints Integration Tests", () => {
+  let testDiscountId = 0;
   beforeAll(async () => {
     const seedDiscounts = async (discounts) => {
       try {
@@ -109,6 +110,7 @@ describe("Discounts Endpoints Integration Tests", () => {
     const discountIds = discountResults.rows.map((row) => {
       return row.id;
     });
+    testDiscountId = discountIds[0];
     const productIds = productResults.rows.map((row) => row.id);
     await seedProductDiscounts([
       {
@@ -171,7 +173,7 @@ describe("Discounts Endpoints Integration Tests", () => {
   describe("GET /discounts/:id", () => {
     it("should get a discount by id", async () => {
       // arrange
-      const discountId = 1;
+      const discountId = testDiscountId;
 
       // act
       const response = await request(app).get(`/discounts/${discountId}`);
