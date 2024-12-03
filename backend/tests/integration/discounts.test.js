@@ -3,7 +3,7 @@ const express = require("express");
 const discountRoutes = require("../../routes/discounts-routes");
 const db = require("../../config/db");
 const discountModel = require("../../models/discounts-model");
-const dbSeed = require("../db_seeding/seedAll");
+const dbSeed = require("../db_seeding/dbSeed");
 
 // jest.mock("../../models/discounts-model", () => ({
 //   getDiscountedProducts,
@@ -32,22 +32,7 @@ describe("Discounts Endpoints Integration Tests", () => {
   });
 
   afterAll(async () => {
-    const cleanupDiscounts = async () => {
-      try {
-        await db.query(`
-          DELETE FROM products_discounts;
-          DELETE FROM products_categories;
-          DELETE FROM discounts;
-          DELETE FROM products;
-        `);
-        await db.testPool.end();
-        console.log("Cleaned up discounts and closed database pool.");
-      } catch (error) {
-        throw new Error(error);
-      }
-    };
-
-    await cleanupDiscounts();
+    await dbSeed.cleanupDbSeed();
   });
 
   describe("GET /discounts", () => {
