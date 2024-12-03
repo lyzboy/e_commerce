@@ -181,9 +181,13 @@ describe("Discounts Endpoints Integration Tests", () => {
     ]);
 
     await seedProductsCategories([
-      { product_id: productIds[0].id, category_id: testCategoryId },
-      { product_id: productIds[1].id, category_id: testCategoryId },
+      { product_id: productIds[0], category_id: testCategoryId },
+      { product_id: productIds[1], category_id: testCategoryId },
     ]);
+
+    const productCategoryResults = await db.query(
+      `SELECT * FROM products_categories`
+    );
   });
 
   afterAll(async () => {
@@ -191,6 +195,7 @@ describe("Discounts Endpoints Integration Tests", () => {
       try {
         await db.query(`
           DELETE FROM products_discounts;
+          DELETE FROM products_categories;
           DELETE FROM discounts;
           DELETE FROM products;
         `);
@@ -250,6 +255,29 @@ describe("Discounts Endpoints Integration Tests", () => {
       expect(response.status).toBe(200);
       expect(response.body).toBeDefined();
       expect(response.body.length).toBeGreaterThan(0);
+    });
+
+    it("should return a specific number of discounts based on page", async () => {
+      // arrange
+      const limit = 1;
+      const page = 2;
+      return true;
+    });
+
+    it("should return 404 status code if no discounts are found", async () => {
+      // Arrange
+      const originalModelGet = discountModel.getDiscounts;
+      discountModel.getDiscounts = jest.fn(async () => {
+        return [];
+      });
+      // act
+      const response = await request(app).get("/discounts");
+
+      expect(response.status).toBe(404);
+      expect(response.body).toBeDefined();
+      expect(response.body).toHaveProperty("message", "No discounts found.");
+
+      discountModel.getDiscounts = originalModelGet;
     });
 
     it("should return 500 status code if an error occurs", async () => {

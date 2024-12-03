@@ -143,7 +143,7 @@ exports.getDiscounts = async (req, res) => {
   try {
     const { limit, page, categoryId } = req.query;
     const results = await discountModel.getDiscounts(limit, page, categoryId);
-    if (!results === 0) {
+    if (results.length === 0) {
       return res.status(404).json({ message: "No discounts found." });
     }
     res.status(200).json(results);
