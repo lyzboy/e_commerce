@@ -26,9 +26,8 @@ app.use((req, res, next) => {
 app.use("/discounts", discountRoutes);
 
 describe("Discounts Endpoints Integration Tests", () => {
-  let testDiscountId = 0;
-  let testCategory;
-  let testProducts;
+  let testDiscountId = 1;
+  let testCategoryId = 1;
   beforeAll(async () => {
     const seedDiscounts = async (discounts) => {
       try {
@@ -120,7 +119,8 @@ describe("Discounts Endpoints Integration Tests", () => {
       { code: "DISCOUNT10", percent_off: 10, expire_date: "2022-12-31" },
       { code: "DISCOUNT20", percent_off: 20, expire_date: "2022-12-31" },
     ]);
-    testProducts = await seedProducts([
+
+    await seedProducts([
       {
         barcode: "123456789",
         name: "Test Product",
@@ -143,26 +143,30 @@ describe("Discounts Endpoints Integration Tests", () => {
         price: 19.99,
       },
     ]);
-    testCategory = await seedCategories([
+
+    await seedCategories([
       { name: "Test Category", description: "Test Description" },
-    ])[0];
-    await seedProductsCategories([
-      { product_id: testProducts[0].id, category_id: testCategory.id },
-      { product_id: testProducts[1].id, category_id: testCategory.id },
     ]);
+
     // Retrieve the IDs
     const discountResults = await db.query(
       `SELECT id FROM discounts ORDER BY code`
     );
+    testDiscountId = discountResults.rows[0].id;
+
     const productResults = await db.query(
       `SELECT id FROM products ORDER BY barcode`
     );
+    const productIds = productResults.rows.map((row) => row.id);
+
+    const categoryResults = await db.query(`SELECT * FROM categories`);
 
     const discountIds = discountResults.rows.map((row) => {
       return row.id;
     });
-    testDiscountId = discountIds[0];
-    const productIds = productResults.rows.map((row) => row.id);
+
+    testCategoryId = categoryResults.rows[0].id;
+
     await seedProductDiscounts([
       {
         product_id: productIds[0],
@@ -174,6 +178,11 @@ describe("Discounts Endpoints Integration Tests", () => {
         discount_id: discountIds[1],
         product_variant_id: null,
       },
+    ]);
+
+    await seedProductsCategories([
+      { product_id: productIds[0].id, category_id: testCategoryId },
+      { product_id: productIds[1].id, category_id: testCategoryId },
     ]);
   });
 
@@ -226,6 +235,21 @@ describe("Discounts Endpoints Integration Tests", () => {
       expect(response.status).toBe(200);
       expect(response.body).toBeDefined();
       expect(response.body.length).toBe(limit);
+    });
+
+    it("Should return a specific number based on category ID", async () => {
+      // arrange
+      const categoryId = testCategoryId;
+
+      // act
+      const response = await request(app).get(
+        `/discounts?categoryId=${categoryId}`
+      );
+
+      // assert
+      expect(response.status).toBe(200);
+      expect(response.body).toBeDefined();
+      expect(response.body.length).toBeGreaterThan(0);
     });
 
     it("should return 500 status code if an error occurs", async () => {
