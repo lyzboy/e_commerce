@@ -142,5 +142,17 @@ describe("Discounts Endpoints Integration Tests", () => {
       expect(response.body).toBeDefined();
       expect(response.body).toHaveProperty("id", discountId);
     });
+    it("should return 404 status code if discount is not found", async () => {
+      // arrange
+      const discountId = 9999;
+
+      // act
+      const response = await request(app).get(`/discounts/${discountId}`);
+
+      // assert
+      expect(response.status).toBe(404);
+      expect(response.body).toBeDefined();
+      expect(response.body).toHaveProperty("message", "Discount not found.");
+    });
   });
 });

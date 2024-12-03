@@ -93,6 +93,9 @@ exports.getDiscountById = async (req, res) => {
   try {
     const { id } = req.params;
     const results = await discountModel.getDiscount(id);
+    if (!results) {
+      res.status(404).json({ message: "Discount not found." });
+    }
     res.status(200).json(results);
   } catch (error) {
     res.status(500).json({ message: "Server Error: " + error.message });
