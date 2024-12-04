@@ -71,7 +71,6 @@ describe("Discounts Endpoints Integration Tests", () => {
     it("Should return a specific number based on category ID", async () => {
       // arrange
       const categoryId = dbSeed.testCategoryId;
-      console.log("category id: ", categoryId);
 
       // act
       const response = await request(app).get(
@@ -153,6 +152,24 @@ describe("Discounts Endpoints Integration Tests", () => {
       expect(response.status).toBe(404);
       expect(response.body).toBeDefined();
       expect(response.body).toHaveProperty("message", "Discount not found.");
+    });
+  });
+
+  describe("POST /discounts", () => {
+    it("should create a new discount", async () => {
+      const newDiscount = {
+        code: "NEWCODE",
+        percentOff: 10,
+        expireDate: "2022-12-31",
+        quantity: 10,
+      };
+
+      const response = await request(app).post("/discounts").send(newDiscount);
+      console.log("POST /discounts->", response.body.message);
+      expect(response.status).toBe(200);
+      expect(response.body).toBeDefined();
+      expect(response.body).toEqual(expect.objectContaining(newDiscount));
+      expect(response.body).toHaveProperty("id");
     });
   });
 });

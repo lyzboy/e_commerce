@@ -136,7 +136,20 @@ exports.createDiscount = async (
   amountOff,
   expireDate,
   quantity
-) => {};
+) => {
+  try {
+    const queryText = `
+      INSERT INTO discounts (code, percent_off, amount_off, expire_date, quantity)
+      VALUES ($1, $2, $3, $4, $5)
+      RETURNING *
+    `;
+    const queryParams = [code, percentOff, amountOff, expireDate, quantity];
+    const results = await query(queryText, queryParams);
+    return results.rows[0];
+  } catch (error) {
+    throw error;
+  }
+};
 
 exports.getDiscounts = async (limit, page, categoryId) => {
   try {
@@ -171,6 +184,6 @@ exports.getDiscounts = async (limit, page, categoryId) => {
     const results = await query(queryText, queryParams);
     return results.rows;
   } catch (error) {
-    throw new Error(error);
+    throw error;
   }
 };

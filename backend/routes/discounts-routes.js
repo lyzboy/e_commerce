@@ -62,4 +62,16 @@ router.delete(
   discountController.removeDiscountFromProduct
 );
 
+router.post(
+  "/use/:code",
+  authentication.authenticateUser,
+  discountController.validateDiscountCode
+);
+
+router.post(
+  "/validate",
+  authentication.authenticateUser,
+  discountController.validateDiscount
+);
+
 module.exports = router;

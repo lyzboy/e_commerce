@@ -133,7 +133,11 @@ exports.createDiscount = async (req, res) => {
     );
     res.status(200).json(results);
   } catch (error) {
-    res.status(500).json({ message: "Server Error: " + error.message });
+    res.status(500).json({
+      message: "Server Error: " + error.message,
+      // Include the error stack for detailed debugging information
+      stack: error.stack,
+    });
   }
 };
 
@@ -154,3 +158,11 @@ exports.getDiscounts = async (req, res) => {
     res.status(500).json({ message: "Server Error: " + error.message });
   }
 };
+
+exports.validateDiscountCode = async (req, res) => {
+  try {
+    const { code } = req.params;
+  } catch (error) {}
+};
+
+exports.validateDiscount = async (req, res) => {};
