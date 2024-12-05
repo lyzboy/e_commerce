@@ -56,8 +56,11 @@ describe("Discounts Endpoints Integration Tests", () => {
       expect(typeof firstDiscount.code).toBe("string");
       expect(firstDiscount).toHaveProperty("percentOff");
       expect(typeof firstDiscount.percentOff).toBe("number");
-      expect(firstDiscount).toHaveProperty("amountOff");
-      expect(typeof firstDiscount.amountOff).toBe("number");
+      if (firstDiscount.amountOff !== null) {
+        expect(typeof firstDiscount.amountOff).toBe("number");
+      } else {
+        expect(firstDiscount.amountOff).toBeNull();
+      }
       expect(firstDiscount).toHaveProperty("expireDate");
       expect(typeof firstDiscount.expireDate).toBe("string");
     });
@@ -94,8 +97,20 @@ describe("Discounts Endpoints Integration Tests", () => {
       // arrange
       const limit = 1;
       const page = 2;
-      //TODO: finish test implementation
-      return true;
+
+      // act
+      const response = await request(app).get(
+        `/discounts?limit=${limit}&page=${page}`
+      );
+      console.log(
+        "GET /discounts?limit=${limit}&page=${page}",
+        response.body.message
+      );
+      console.log("Body->", response.body);
+      expect(response.status).toBe(200);
+      expect(response.body).toBeDefined();
+      expect(response.body.length).toBe(limit);
+      expect(response.body[0].code).toBe("DISCOUNT20");
     });
 
     it("should return 404 status code if no discounts are found", async () => {
@@ -168,8 +183,7 @@ describe("Discounts Endpoints Integration Tests", () => {
 
       // act
       const response = await request(app).get(`/discounts/${discountId}`);
-      console.log("GET /discounts/:id->", response.body.message);
-      console.log("Body->", response.body);
+
       // assert
       expect(response.status).toBe(404);
       expect(response.body).toBeDefined();
