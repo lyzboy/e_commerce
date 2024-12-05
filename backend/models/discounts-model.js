@@ -167,18 +167,21 @@ exports.createDiscount = async (
     }
     queryText += queryElements.join(", ");
     queryText += `) VALUES (${queryValues.join(", ")}) RETURNING *`;
-    console.log(queryText);
     const results = await query(queryText, queryParams);
 
     const result = results.rows[0];
 
     let formattedResults = {
       id: result.id,
-      code: result.code,
-      percentOff: result.percent_off,
-      amountOff: result.amount_off,
-      expireDate: result.expire_date,
-      quantity: result.quantity,
+      code: result.code ? result.code : undefined,
+      percentOff: parseInt(result.percent_off, 10),
+      amountOff: result.amount_off
+        ? parseFloat(result.amount_off, 10)
+        : undefined,
+      expireDate: result.expire_date
+        ? new Date(result.expire_date).toISOString().split("T")[0]
+        : undefined,
+      quantity: result.quantity ? parseInt(result.quantity, 10) : undefined,
     };
 
     return formattedResults;

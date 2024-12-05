@@ -121,7 +121,6 @@ exports.getDiscountByCode = async (req, res) => {
 exports.createDiscount = async (req, res) => {
   try {
     const { code, percentOff, amountOff, expireDate, quantity } = req.body;
-    console.log(req.body);
     if (!percentOff) {
       return res.status(400).json({ message: "Invalid request object." });
     }
