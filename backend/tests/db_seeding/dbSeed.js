@@ -12,8 +12,20 @@ const dbSeed = {
 
   seedAll: async function () {
     await seedDiscounts([
-      { code: "DISCOUNT10", percent_off: 10, expire_date: "2022-12-31" },
-      { code: "DISCOUNT20", percent_off: 20, expire_date: "2022-12-31" },
+      {
+        code: "DISCOUNT10",
+        percent_off: 10,
+        expire_date: "2022-12-31",
+        amount_off: null,
+        quantity: null,
+      },
+      {
+        code: "DISCOUNT20",
+        percent_off: 20,
+        expire_date: "2022-12-31",
+        amount_off: 10.55,
+        quantity: 5,
+      },
     ]);
 
     await seedProducts([

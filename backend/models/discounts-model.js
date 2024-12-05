@@ -124,7 +124,19 @@ exports.getDiscount = async (id) => {
     const queryText = `SELECT * FROM discounts WHERE id = $1`;
     const queryParams = [id];
     const results = await query(queryText, queryParams);
-    return results.rows[0];
+    if (results.rows.length === 0) {
+      return null;
+    }
+    const result = results.rows[0];
+    const formattedResults = {
+      id: result.id,
+      code: result.code,
+      percentOff: parseInt(result.percent_off, 10),
+      amountOff: parseFloat(result.amount_off, 10),
+      expireDate: new Date(result.expire_date).toISOString().split("T")[0],
+      quantity: parseInt(result.quantity, 10),
+    };
+    return formattedResults;
   } catch (error) {
     throw new Error(error);
   }
@@ -173,15 +185,11 @@ exports.createDiscount = async (
 
     let formattedResults = {
       id: result.id,
-      code: result.code ? result.code : undefined,
+      code: result.code,
       percentOff: parseInt(result.percent_off, 10),
-      amountOff: result.amount_off
-        ? parseFloat(result.amount_off, 10)
-        : undefined,
-      expireDate: result.expire_date
-        ? new Date(result.expire_date).toISOString().split("T")[0]
-        : undefined,
-      quantity: result.quantity ? parseInt(result.quantity, 10) : undefined,
+      amountOff: parseFloat(result.amount_off, 10),
+      expireDate: new Date(result.expire_date).toISOString().split("T")[0],
+      quantity: parseInt(result.quantity, 10),
     };
 
     return formattedResults;
@@ -221,7 +229,17 @@ exports.getDiscounts = async (limit, page, categoryId) => {
     }
 
     const results = await query(queryText, queryParams);
-    return results.rows;
+    const formattedResults = results.rows.map((result) => {
+      return {
+        id: result.id,
+        code: result.code,
+        percentOff: parseInt(result.percent_off, 10),
+        amountOff: parseFloat(result.amount_off, 10),
+        expireDate: new Date(result.expire_date).toISOString().split("T")[0],
+        quantity: parseInt(result.quantity, 10),
+      };
+    });
+    return formattedResults;
   } catch (error) {
     throw error;
   }
