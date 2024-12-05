@@ -17,6 +17,8 @@ const dbSeed = require("../db_seeding/dbSeed");
 // }));
 
 const app = express();
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 // mock authentication middleware
 app.use((req, res, next) => {
@@ -164,7 +166,10 @@ describe("Discounts Endpoints Integration Tests", () => {
         quantity: 10,
       };
 
-      const response = await request(app).post("/discounts").send(newDiscount);
+      const response = await request(app)
+        .post("/discounts")
+        .set("Content-Type", "application/json")
+        .send(newDiscount);
       console.log("POST /discounts->", response.body.message);
       expect(response.status).toBe(200);
       expect(response.body).toBeDefined();

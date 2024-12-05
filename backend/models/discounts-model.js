@@ -138,12 +138,36 @@ exports.createDiscount = async (
   quantity
 ) => {
   try {
-    const queryText = `
-      INSERT INTO discounts (code, percent_off, amount_off, expire_date, quantity)
-      VALUES ($1, $2, $3, $4, $5)
-      RETURNING *
+    let queryText = `
+      INSERT INTO discounts (percent_off,
+
     `;
-    const queryParams = [code, percentOff, amountOff, expireDate, quantity];
+    const queryElements = [];
+    const queryParams = [percentOff];
+    const queryValues = ["$1"];
+    if (code) {
+      queryElements.push("code");
+      queryParams.push(code);
+      queryValues.push(`$${queryParams.length}`);
+    }
+    if (amountOff) {
+      queryElements.push("amount_off");
+      queryParams.push(amountOff);
+      queryValues.push(`$${queryParams.length}`);
+    }
+    if (expireDate) {
+      queryElements.push("expire_date");
+      queryParams.push(expireDate);
+      queryValues.push(`$${queryParams.length}`);
+    }
+    if (quantity) {
+      queryElements.push("quantity");
+      queryParams.push(quantity);
+      queryValues.push(`$${queryParams.length}`);
+    }
+    queryText += queryElements.join(", ");
+    queryText += `) VALUES (${queryValues.join(", ")}) RETURNING *`;
+    console.log(queryText);
     const results = await query(queryText, queryParams);
     return results.rows[0];
   } catch (error) {

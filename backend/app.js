@@ -11,10 +11,10 @@ const cartRoutes = require("./routes/carts-routes");
 const discountRoutes = require("./routes/discounts-routes");
 
 const app = express();
-const port = 3000;
-
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+const port = 3000;
 
 app.use(
   session({
