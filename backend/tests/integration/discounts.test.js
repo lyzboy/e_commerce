@@ -53,8 +53,13 @@ describe("Discounts Endpoints Integration Tests", () => {
       const firstDiscount = response.body[0];
       expect(firstDiscount).toHaveProperty("id");
       expect(firstDiscount).toHaveProperty("code");
-      expect(firstDiscount).toHaveProperty("percent_off");
-      expect(firstDiscount).toHaveProperty("expire_date");
+      expect(typeof firstDiscount.code).toBe("string");
+      expect(firstDiscount).toHaveProperty("percentOff");
+      expect(typeof firstDiscount.percentOff).toBe("number");
+      expect(firstDiscount).toHaveProperty("amountOff");
+      expect(typeof firstDiscount.amountOff).toBe("number");
+      expect(firstDiscount).toHaveProperty("expireDate");
+      expect(typeof firstDiscount.expireDate).toBe("string");
     });
 
     it("Should return a specific number of discounts based on limit", async () => {
@@ -89,6 +94,7 @@ describe("Discounts Endpoints Integration Tests", () => {
       // arrange
       const limit = 1;
       const page = 2;
+      //TODO: finish test implementation
       return true;
     });
 
