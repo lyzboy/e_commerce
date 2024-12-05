@@ -169,7 +169,19 @@ exports.createDiscount = async (
     queryText += `) VALUES (${queryValues.join(", ")}) RETURNING *`;
     console.log(queryText);
     const results = await query(queryText, queryParams);
-    return results.rows[0];
+
+    const result = results.rows[0];
+
+    let formattedResults = {
+      id: result.id,
+      code: result.code,
+      percentOff: result.percent_off,
+      amountOff: result.amount_off,
+      expireDate: result.expire_date,
+      quantity: result.quantity,
+    };
+
+    return formattedResults;
   } catch (error) {
     throw error;
   }
