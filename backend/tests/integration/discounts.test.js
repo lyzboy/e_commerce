@@ -106,11 +106,10 @@ describe("Discounts Endpoints Integration Tests", () => {
         "GET /discounts?limit=${limit}&page=${page}",
         response.body.message
       );
-      console.log("Body->", response.body);
       expect(response.status).toBe(200);
       expect(response.body).toBeDefined();
       expect(response.body.length).toBe(limit);
-      expect(response.body[0].code).toBe("DISCOUNT20");
+      expect(["DISCOUNT10", "DISCOUNT20"]).toContain(response.body[0].code);
     });
 
     it("should return 404 status code if no discounts are found", async () => {

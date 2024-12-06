@@ -227,7 +227,6 @@ exports.getDiscounts = async (limit, page, categoryId) => {
       queryText += ` OFFSET $${queryParams.length + 1}`;
       queryParams.push(offset);
     }
-
     const results = await query(queryText, queryParams);
     const formattedResults = results.rows.map((result) => {
       return {
