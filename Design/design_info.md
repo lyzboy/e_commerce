@@ -8,6 +8,7 @@
 [**Redux Store Documentation**](design_docs/redux_store_documentation.md)  <br>
 [**Testing Documentation**](design_docs/testing_documentation.md)<br>
 [**Design Layout Brainstorm**](design_docs/design_layout_brainstorm.md) X<br>
+[**Database Table Guide**](design_docs/db_table_guide.md)<br>
 
 ## Table of Contents
 
