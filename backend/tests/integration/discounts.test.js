@@ -188,6 +188,28 @@ describe("Discounts Endpoints Integration Tests", () => {
       expect(response.body).toBeDefined();
       expect(response.body).toHaveProperty("message", "Discount not found.");
     });
+
+    it("should return 500 status code if an error occurs", async () => {
+      // Arrange
+      const originalModelGet = discountModel.getDiscount;
+      discountModel.getDiscount = jest.fn(async () => {
+        throw new Error("Fake Error");
+      });
+
+      // Act
+      const response = await request(app).get("/discounts/9999");
+
+      // Assert
+      expect(response.status).toBe(500);
+      expect(response.body).toBeDefined();
+      expect(response.body).toHaveProperty(
+        "message",
+        "Server Error: Fake Error"
+      ); // Updated message
+
+      // Restore the original db.query function
+      discountModel.getDiscount = originalModelGet;
+    });
   });
 
   describe("POST /discounts", () => {
