@@ -230,5 +230,24 @@ describe("Discounts Endpoints Integration Tests", () => {
       expect(response.body).toEqual(expect.objectContaining(newDiscount));
       expect(response.body).toHaveProperty("id");
     });
+
+    it("should return 400 if percentOff is not provided", async () => {
+      const newDiscount = {
+        code: "NEWCODE",
+        expireDate: "2022-12-31",
+        quantity: 10,
+      };
+
+      const response = await request(app)
+        .post("/discounts")
+        .set("Content-Type", "application/json")
+        .send(newDiscount);
+      expect(response.status).toBe(400);
+      expect(response.body).toBeDefined();
+      expect(response.body).toHaveProperty(
+        "message",
+        "Invalid request object."
+      );
+    });
   });
 });
