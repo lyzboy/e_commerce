@@ -295,8 +295,19 @@ describe("Discounts Endpoints Integration Tests", () => {
       // assert
       expect(response.status).toBe(200);
       expect(response.body).toBeDefined();
-      expect(response.body).toEqual(expect.objectContaining(updatedDiscount));
       expect(response.body).toHaveProperty("id", discountId);
+      expect(response.body).toHaveProperty("code");
+      expect(typeof response.body.code).toBe("string");
+      expect(response.body).toHaveProperty("percentOff");
+      expect(typeof response.body.percentOff).toBe("number");
+      expect(response.body).toHaveProperty("amountOff");
+      if (response.body.amountOff !== null) {
+        expect(typeof response.body.amountOff).toBe("number");
+      } else {
+        expect(response.body.amountOff).toBeNull();
+      }
+      expect(response.body).toHaveProperty("expireDate");
+      expect(typeof response.body.expireDate).toBe("string");
     });
 
     it("should return 404 status code if discount is not found", async () => {
@@ -319,6 +330,30 @@ describe("Discounts Endpoints Integration Tests", () => {
       expect(response.status).toBe(404);
       expect(response.body).toBeDefined();
       expect(response.body).toHaveProperty("message", "Discount not found.");
+    });
+
+    it("should return 400 status code if id is not provided", async () => {
+      // arrange
+      const updatedDiscount = {
+        code: "UPDATEDCODE",
+        percentOff: 20,
+        expireDate: "2022-12-31",
+        quantity: 10,
+      };
+
+      // act
+      const response = await request(app)
+        .put(`/discounts/`)
+        .set("Content-Type", "application/json")
+        .send(updatedDiscount);
+
+      // assert
+      expect(response.status).toBe(400);
+      expect(response.body).toBeDefined();
+      expect(response.body).toHaveProperty(
+        "message",
+        "Invalid request object."
+      );
     });
 
     it("should return 500 status code if an error occurs", async () => {

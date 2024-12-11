@@ -116,7 +116,7 @@ exports.updateDiscount = async (req, res) => {
   try {
     const { id } = req.params;
     const { code, percentOff, amountOff, expireDate, quantity } = req.body;
-    if (!percentOff) {
+    if (!id) {
       return res.status(400).json({ message: "Invalid request object." });
     }
     const results = await discountModel.updateDiscount(
