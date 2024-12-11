@@ -151,6 +151,69 @@ describe("Discounts Endpoints Integration Tests", () => {
     });
   });
 
+  describe("POST /discounts", () => {
+    it("should create a new discount", async () => {
+      const newDiscount = {
+        code: "NEWCODE",
+        percentOff: 10,
+        expireDate: "2022-12-31",
+        quantity: 10,
+      };
+
+      const response = await request(app)
+        .post("/discounts")
+        .set("Content-Type", "application/json")
+        .send(newDiscount);
+      expect(response.status).toBe(200);
+      expect(response.body).toBeDefined();
+      expect(response.body).toEqual(expect.objectContaining(newDiscount));
+      expect(response.body).toHaveProperty("id");
+    });
+
+    it("should return 400 if percentOff is not provided", async () => {
+      const newDiscount = {
+        code: "NEWCODE",
+        expireDate: "2022-12-31",
+        quantity: 10,
+      };
+
+      const response = await request(app)
+        .post("/discounts")
+        .set("Content-Type", "application/json")
+        .send(newDiscount);
+      expect(response.status).toBe(400);
+      expect(response.body).toBeDefined();
+      expect(response.body).toHaveProperty(
+        "message",
+        "Invalid request object."
+      );
+    });
+    it("should return 500 status code if an error occurs", async () => {
+      // Arrange
+      const originalModelPost = discountModel.createDiscount;
+      discountModel.createDiscount = jest.fn(async () => {
+        throw new Error("Fake Error");
+      });
+
+      // Act
+      const response = await request(app)
+        .post("/discounts")
+        .set("Content-Type", "application/json")
+        .send({ percentOff: 40 });
+
+      // Assert
+      expect(response.status).toBe(500);
+      expect(response.body).toBeDefined();
+      expect(response.body).toHaveProperty(
+        "message",
+        "Server Error: Fake Error"
+      ); // Updated message
+
+      // Restore the original db.query function
+      discountModel.createDiscount = originalModelPost;
+    });
+  });
+
   describe("GET /discounts/:id", () => {
     it("should get a discount by id", async () => {
       // arrange
@@ -212,42 +275,75 @@ describe("Discounts Endpoints Integration Tests", () => {
     });
   });
 
-  describe("POST /discounts", () => {
-    it("should create a new discount", async () => {
-      const newDiscount = {
-        code: "NEWCODE",
-        percentOff: 10,
+  describe("PUT /discounts/:id", () => {
+    it("should update a discount by id", async () => {
+      // arrange
+      const discountId = dbSeed.testDiscountId;
+      const updatedDiscount = {
+        code: "UPDATEDCODE",
+        percentOff: 20,
         expireDate: "2022-12-31",
         quantity: 10,
       };
 
+      // act
       const response = await request(app)
-        .post("/discounts")
+        .put(`/discounts/${discountId}`)
         .set("Content-Type", "application/json")
-        .send(newDiscount);
+        .send(updatedDiscount);
+
+      // assert
       expect(response.status).toBe(200);
       expect(response.body).toBeDefined();
-      expect(response.body).toEqual(expect.objectContaining(newDiscount));
-      expect(response.body).toHaveProperty("id");
+      expect(response.body).toEqual(expect.objectContaining(updatedDiscount));
+      expect(response.body).toHaveProperty("id", discountId);
     });
 
-    it("should return 400 if percentOff is not provided", async () => {
-      const newDiscount = {
-        code: "NEWCODE",
+    it("should return 404 status code if discount is not found", async () => {
+      // arrange
+      const discountId = 9999;
+      const updatedDiscount = {
+        code: "UPDATEDCODE",
+        percentOff: 20,
         expireDate: "2022-12-31",
         quantity: 10,
       };
 
+      // act
       const response = await request(app)
-        .post("/discounts")
+        .put(`/discounts/${discountId}`)
         .set("Content-Type", "application/json")
-        .send(newDiscount);
-      expect(response.status).toBe(400);
+        .send(updatedDiscount);
+
+      // assert
+      expect(response.status).toBe(404);
+      expect(response.body).toBeDefined();
+      expect(response.body).toHaveProperty("message", "Discount not found.");
+    });
+
+    it("should return 500 status code if an error occurs", async () => {
+      // Arrange
+      const originalModelPut = discountModel.getDiscount;
+      discountModel.getDiscount = jest.fn(async () => {
+        throw new Error("Fake Error");
+      });
+
+      // Act
+      const response = await request(app)
+        .put("/discounts/9999")
+        .set("Content-Type", "application/json")
+        .send({ percentOff: 40 });
+
+      // Assert
+      expect(response.status).toBe(500);
       expect(response.body).toBeDefined();
       expect(response.body).toHaveProperty(
         "message",
-        "Invalid request object."
-      );
+        "Server Error: Fake Error"
+      ); // Updated message
+
+      // Restore the original db.query function
+      discountModel.getDiscount = originalModelPut;
     });
   });
 });

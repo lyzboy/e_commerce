@@ -29,7 +29,7 @@ router.put(
   "/:id",
   authentication.authenticateUser,
   authorization.authorizeRole("admin"),
-  discountController.getDiscountById
+  discountController.updateDiscount
 );
 
 router.delete(

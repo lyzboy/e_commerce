@@ -112,6 +112,27 @@ exports.getDiscountByCode = async (req, res) => {
   }
 };
 
+exports.updateDiscount = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { code, percentOff, amountOff, expireDate, quantity } = req.body;
+    if (!percentOff) {
+      return res.status(400).json({ message: "Invalid request object." });
+    }
+    const results = await discountModel.updateDiscount(
+      id,
+      code,
+      percentOff,
+      amountOff,
+      expireDate,
+      quantity
+    );
+    res.status(200).json(results);
+  } catch (error) {
+    res.status(500).json({ message: "Server Error: " + error.message });
+  }
+};
+
 /**
  * Create a discount based on the given request object.
  * @param {*} req

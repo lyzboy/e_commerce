@@ -243,3 +243,12 @@ exports.getDiscounts = async (limit, page, categoryId) => {
     throw error;
   }
 };
+
+exports.updateDiscount = async (
+  id,
+  code,
+  percentOff,
+  amountOff,
+  expireDate,
+  quantity
+) => {};
