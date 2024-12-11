@@ -72,30 +72,69 @@ The web app includes an admin dashboard where store owners can manage products, 
    - `POOL_USER_NAME`
    - etc.
 4. **Set up the database**:
-   Create a new database in PostgreSQL and run the SQL script create_ecommerceDB.sql. This will create the database with the necessary tables and roles.
+   Create a new database in PostgreSQL called `ecommerce` by logging into the PostgreSQL shell `psql` and running:
+   
+   `CREATE DATABASE ecommerce;`
+
+   Then, exit the shell
+
+   `\q`
+
+   and run the SQL script ecommerceDB.sql from the command line. This will create the database with the necessary tables and roles.
+
    ```bash
-   psql -U postgres -f create_ecommerceDB.sql
+   psql -d ecommerce -f ecommerceDB.sql
    ```
-5. **Run the project**:
 
-You will need to run the backend and frontend separately.
+5. **Setup the Testing database**
+  Create a new database in PostgreSQL called `ecommerce_test` by logging into the PostgreSQL shell `psql` and running:
+   
+   `CREATE DATABASE ecommerce_test;`
 
-a.) Backend
-```bash
-cd backend
-npm run dev
-```
-b.) Frontend
-```bash
-cd frontend
-npm run dev
-```
+   Then, exit the shell
 
----
+   `\q`
+
+   and run the SQL script ecommerceDB.sql from the command line. This will create the database with the necessary tables and roles. You will need to use the main user for postgres to run this command. You can do this by running the following command in the terminal:
+
+   ```bash
+   psql -U postgres -d ecommerce_test -f "/path/to/project/backend/config/ecommerceDB.sql"
+   ```
+   
+   *Change the `/path/to/project` to the path of the project on your machine. Change the `postgres` to the user you use to access the database.*
+
+   This will create a database that can be used to run tests. You will also need to ensure that you have the correct variables in your `.env` file for the test database. You can copy the `.env.example` file and configure the following environment variables:
+   ```bash
+   TEST_DB_USER=
+   TEST_DB_HOST=
+   TEST_DB_NAME=
+   TEST_DB_PASSWORD=
+   TEST_DB_PORT=
+   ```
+   you can use the default values for the name user and password, typically `postgres` for the user and password, `localhost` for the host, and `5432` for the port.
+
+6. **Run the project**:
+
+   You will need to run the backend and frontend separately.
+
+   a.) Backend
+   ```bash
+   cd backend
+   npm run dev
+   ```
+
+   b.) Frontend
+   ```bash
+   cd frontend
+   npm run dev
+   ```
+
+___
+
 
 ## Usage
 
-- How to interact with the project, run tests, and any other necessary usage instructions.  
+How to interact with the project, run tests, and any other necessary usage instructions.  
 Example:  
 ```bash
 npm run dev
