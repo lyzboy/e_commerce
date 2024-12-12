@@ -116,9 +116,6 @@ exports.updateDiscount = async (req, res) => {
   try {
     const { id } = req.params;
     const { code, percentOff, amountOff, expireDate, quantity } = req.body;
-    if (!id) {
-      return res.status(400).json({ message: "Invalid request object." });
-    }
     const results = await discountModel.updateDiscount(
       id,
       code,
@@ -127,6 +124,9 @@ exports.updateDiscount = async (req, res) => {
       expireDate,
       quantity
     );
+    if (!results) {
+      return res.status(404).json({ message: "Discount not found." });
+    }
     res.status(200).json(results);
   } catch (error) {
     res.status(500).json({ message: "Server Error: " + error.message });

@@ -288,8 +288,6 @@ describe("Discounts Endpoints Integration Tests", () => {
         .set("Content-Type", "application/json")
         .send(updatedDiscount);
 
-      console.log("PUT /discounts/:id", response.body);
-
       // assert
       expect(response.status).toBe(200);
       expect(response.body).toBeDefined();
@@ -330,34 +328,10 @@ describe("Discounts Endpoints Integration Tests", () => {
       expect(response.body).toHaveProperty("message", "Discount not found.");
     });
 
-    it("should return 400 status code if id is not provided", async () => {
-      // arrange
-      const updatedDiscount = {
-        code: "UPDATEDCODE",
-        percentOff: 20,
-        expireDate: "2022-12-31",
-        quantity: 10,
-      };
-
-      // act
-      const response = await request(app)
-        .put(`/discounts/`)
-        .set("Content-Type", "application/json")
-        .send(updatedDiscount);
-
-      // assert
-      expect(response.status).toBe(400);
-      expect(response.body).toBeDefined();
-      expect(response.body).toHaveProperty(
-        "message",
-        "Invalid request object."
-      );
-    });
-
     it("should return 500 status code if an error occurs", async () => {
       // Arrange
       const originalModelPut = discountModel.getDiscount;
-      discountModel.getDiscount = jest.fn(async () => {
+      discountModel.updateDiscount = jest.fn(async () => {
         throw new Error("Fake Error");
       });
 

@@ -263,5 +263,8 @@ exports.updateDiscount = async (
   const queryCondition = ` WHERE id = $1`;
   const finalQuery = queryText + queryValues + queryCondition + " RETURNING *";
   const results = await query(finalQuery, queryParams);
+  if (results.rows.length === 0) {
+    return null;
+  }
   return formatDiscount(results.rows[0]);
 };
