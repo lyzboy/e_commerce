@@ -121,6 +121,7 @@ exports.removeDiscountFromProduct = async (
 
 exports.deleteDiscount = async (id) => {
   try {
+    //TODO: remove all references to this discount in product_discounts before deleting
     const queryText = `DELETE FROM discounts WHERE id = $1`;
     const queryParams = [id];
     const results = await query(queryText, queryParams);
