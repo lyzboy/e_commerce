@@ -1,5 +1,16 @@
 const { query } = require("../config/db");
 
+const formatDiscount = (result) => {
+  return {
+    id: result.id,
+    code: result.code,
+    percentOff: parseInt(result.percent_off, 10),
+    amountOff: parseFloat(result.amount_off, 10),
+    expireDate: new Date(result.expire_date).toISOString().split("T")[0],
+    quantity: parseInt(result.quantity, 10),
+  };
+};
+
 exports.getDiscountedProducts = async (limit, page, category) => {
   try {
     let queryText = `
@@ -53,7 +64,7 @@ exports.getDiscountByCode = async (code) => {
   try {
     let queryText = `SELECT * FROM discounts WHERE code = $1`;
     const results = await query(queryText, [code]);
-    return results.rows[0];
+    return formatDiscount(results.rows[0]);
   } catch (error) {
     throw new Error(error);
   }
@@ -127,16 +138,7 @@ exports.getDiscount = async (id) => {
     if (results.rows.length === 0) {
       return null;
     }
-    const result = results.rows[0];
-    const formattedResults = {
-      id: result.id,
-      code: result.code,
-      percentOff: parseInt(result.percent_off, 10),
-      amountOff: parseFloat(result.amount_off, 10),
-      expireDate: new Date(result.expire_date).toISOString().split("T")[0],
-      quantity: parseInt(result.quantity, 10),
-    };
-    return formattedResults;
+    return formatDiscount(results.rows[0]);
   } catch (error) {
     throw new Error(error);
   }
@@ -181,18 +183,7 @@ exports.createDiscount = async (
     queryText += `) VALUES (${queryValues.join(", ")}) RETURNING *`;
     const results = await query(queryText, queryParams);
 
-    const result = results.rows[0];
-
-    let formattedResults = {
-      id: result.id,
-      code: result.code,
-      percentOff: parseInt(result.percent_off, 10),
-      amountOff: parseFloat(result.amount_off, 10),
-      expireDate: new Date(result.expire_date).toISOString().split("T")[0],
-      quantity: parseInt(result.quantity, 10),
-    };
-
-    return formattedResults;
+    return formatDiscount(results.rows[0]);
   } catch (error) {
     throw error;
   }
@@ -229,14 +220,7 @@ exports.getDiscounts = async (limit, page, categoryId) => {
     }
     const results = await query(queryText, queryParams);
     const formattedResults = results.rows.map((result) => {
-      return {
-        id: result.id,
-        code: result.code,
-        percentOff: parseInt(result.percent_off, 10),
-        amountOff: parseFloat(result.amount_off, 10),
-        expireDate: new Date(result.expire_date).toISOString().split("T")[0],
-        quantity: parseInt(result.quantity, 10),
-      };
+      return formatDiscount(result);
     });
     return formattedResults;
   } catch (error) {
@@ -251,4 +235,33 @@ exports.updateDiscount = async (
   amountOff,
   expireDate,
   quantity
-) => {};
+) => {
+  const queryText = `UPDATE discounts SET `;
+  const queryElements = [];
+  const queryParams = [id];
+  if (code) {
+    queryElements.push(`code = $${queryParams.length + 1}`);
+    queryParams.push(code);
+  }
+  if (percentOff) {
+    queryElements.push(`percent_off = $${queryParams.length + 1}`);
+    queryParams.push(percentOff);
+  }
+  if (amountOff) {
+    queryElements.push(`amount_off = $${queryParams.length + 1}`);
+    queryParams.push(amountOff);
+  }
+  if (expireDate) {
+    queryElements.push(`expire_date = $${queryParams.length + 1}`);
+    queryParams.push(expireDate);
+  }
+  if (quantity) {
+    queryElements.push(`quantity = $${queryParams.length + 1}`);
+    queryParams.push(quantity);
+  }
+  const queryValues = queryElements.join(", ");
+  const queryCondition = ` WHERE id = $1`;
+  const finalQuery = queryText + queryValues + queryCondition + " RETURNING *";
+  const results = await query(finalQuery, queryParams);
+  return formatDiscount(results.rows[0]);
+};

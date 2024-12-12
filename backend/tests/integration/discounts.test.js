@@ -102,10 +102,6 @@ describe("Discounts Endpoints Integration Tests", () => {
       const response = await request(app).get(
         `/discounts?limit=${limit}&page=${page}`
       );
-      console.log(
-        "GET /discounts?limit=${limit}&page=${page}",
-        response.body.message
-      );
       expect(response.status).toBe(200);
       expect(response.body).toBeDefined();
       expect(response.body.length).toBe(limit);
@@ -291,6 +287,8 @@ describe("Discounts Endpoints Integration Tests", () => {
         .put(`/discounts/${discountId}`)
         .set("Content-Type", "application/json")
         .send(updatedDiscount);
+
+      console.log("PUT /discounts/:id", response.body);
 
       // assert
       expect(response.status).toBe(200);
