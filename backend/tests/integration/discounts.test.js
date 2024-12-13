@@ -383,4 +383,61 @@ describe("Discounts Endpoints Integration Tests", () => {
       discountModel.deleteDiscount = originalModelDelete;
     });
   });
+
+  describe("GET /discounts/products", () => {
+    it("should get all products with discounts", async () => {
+      // arrange
+
+      // act
+      const response = await request(app).get("/discounts/products");
+
+      //assert
+      expect(response.status).toBe(200);
+      expect(response.body.length).toBeGreaterThan(0); // Check if it's not empty
+
+      // Check the properties of the first discount object (example)
+      const firstDiscount = response.body[0];
+      expect(firstDiscount).toBeDefined();
+      expect(firstDiscount).toHaveProperty("id");
+      expect(firstDiscount).toHaveProperty("name");
+      expect(firstDiscount).toHaveProperty("price");
+      expect(firstDiscount).toHaveProperty("discount");
+    });
+    it("should return 404 status code if no products with discounts are found", async () => {
+      // Arrange
+      const originalModelGet = discountModel.getDiscountedProducts;
+      discountModel.getDiscountedProducts = jest.fn(async () => {
+        return [];
+      });
+      // act
+      const response = await request(app).get("/discounts/products");
+
+      expect(response.status).toBe(404);
+      expect(response.body).toBeDefined();
+      expect(response.body).toHaveProperty("message", "No products found.");
+
+      discountModel.getDiscountedProducts = originalModelGet;
+    });
+    it("should return 500 status code if an error occurs", async () => {
+      // Arrange
+      const originalModelGet = discountModel.getDiscountedProducts;
+      discountModel.getDiscountedProducts = jest.fn(async () => {
+        throw new Error("Fake Error");
+      });
+
+      // Act
+      const response = await request(app).get("/discounts/products");
+
+      // Assert
+      expect(response.status).toBe(500);
+      expect(response.body).toBeDefined();
+      expect(response.body).toHaveProperty(
+        "message",
+        "Server Error: Fake Error"
+      ); // Updated message
+
+      // Restore the original db.query function
+      discountModel.getDiscountedProducts = originalModelGet;
+    });
+  });
 });
