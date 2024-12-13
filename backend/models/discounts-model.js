@@ -121,10 +121,23 @@ exports.removeDiscountFromProduct = async (
 
 exports.deleteDiscount = async (id) => {
   try {
-    //TODO: remove all references to this discount in product_discounts before deleting
-    const queryText = `DELETE FROM discounts WHERE id = $1`;
-    const queryParams = [id];
-    const results = await query(queryText, queryParams);
+    const queryTables = [
+      {
+        name: "products_discounts",
+        condition: "discount_id",
+      },
+      {
+        name: "discounts",
+        condition: "id",
+      },
+    ];
+    let results = null;
+    for (const table of queryTables) {
+      const queryText = `DELETE FROM ${table.name} WHERE ${table.condition} = $1`;
+      const queryParams = [id];
+      results = await query(queryText, queryParams, true);
+      return { message: "Discount deleted.", rowsDeleted: results.rowCount };
+    }
     return results.rowCount;
   } catch (error) {
     throw new Error(error);

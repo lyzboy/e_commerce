@@ -355,7 +355,7 @@ describe("Discounts Endpoints Integration Tests", () => {
 
       // act
       const response = await request(app).delete(`/discounts/${discountId}`);
-
+      console.log(response.body);
       // assert
       expect(response.status).toBe(404);
       expect(response.body).toBeDefined();
