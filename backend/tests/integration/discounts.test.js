@@ -401,6 +401,27 @@ describe("Discounts Endpoints Integration Tests", () => {
       expect(firstDiscount).toHaveProperty("price");
       expect(firstDiscount).toHaveProperty("percent_off");
     });
+    it("should return a specific number of products based on limit", async () => {
+      // arrange
+      const limit = 1;
+      const results = await request(app).get(
+        `/discounts/products?limit=${limit}`
+      );
+      expect(results.status).toBe(200);
+      expect(results.body).toBeDefined();
+      expect(results.body.length).toBe(limit);
+    });
+    it("should return a specific number of products based on page", async () => {
+      // arrange
+      const limit = 1;
+      const page = 1;
+      const results = await request(app).get(
+        `/discounts/products?limit=${limit}&page=${page}`
+      );
+      expect(results.status).toBe(200);
+      expect(results.body).toBeDefined();
+      expect(results.body.length).toBe(limit);
+    });
     it("should return 404 status code if no products with discounts are found", async () => {
       // Arrange
       const originalModelGet = discountModel.getDiscountedProducts;
@@ -412,7 +433,10 @@ describe("Discounts Endpoints Integration Tests", () => {
 
       expect(response.status).toBe(404);
       expect(response.body).toBeDefined();
-      expect(response.body).toHaveProperty("message", "No products found.");
+      expect(response.body).toHaveProperty(
+        "message",
+        "No discounted products found."
+      );
 
       discountModel.getDiscountedProducts = originalModelGet;
     });
@@ -431,7 +455,7 @@ describe("Discounts Endpoints Integration Tests", () => {
       expect(response.body).toBeDefined();
       expect(response.body).toHaveProperty(
         "message",
-        "Server Error: Fake Error"
+        "Server error: Fake Error"
       ); // Updated message
 
       // Restore the original db.query function
