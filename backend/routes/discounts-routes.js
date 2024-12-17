@@ -28,14 +28,14 @@ router.get(
 );
 
 router.post(
-  "/products/add",
+  "/products",
   authentication.authenticateUser,
   authorization.authorizeRole("admin"),
   discountController.addDiscountToProduct
 );
 
 router.delete(
-  "/products/remove",
+  "/products",
   authentication.authenticateUser,
   authorization.authorizeRole("admin"),
   discountController.removeDiscountFromProduct

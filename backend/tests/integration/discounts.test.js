@@ -462,4 +462,48 @@ describe("Discounts Endpoints Integration Tests", () => {
       discountModel.getDiscountedProducts = originalModelGet;
     });
   });
+  describe("POST /discounts/products", () => {
+    it("should add a discount to a product", async () => {
+      // arrange
+      const productId = dbSeed.testProductId;
+      const discountId = dbSeed.testDiscountId;
+      // act
+      const response = await request(app)
+        .post("/discounts/products")
+        .set("Content-Type", "application/json")
+        .send({ productId, discountId });
+
+      // assert
+      expect(response.status).toBe(200);
+      expect(response.body).toBeDefined();
+      expect(response.body).toHaveProperty("id");
+      expect(response.body).toHaveProperty("productId", productId);
+      expect(response.body).toHaveProperty("discountId", discountId);
+      expect(response.body).toHaveProperty("productVariantId");
+    });
+    it("should return 500 status code if an error occurs", async () => {
+      // Arrange
+      const originalModelPost = discountModel.addDiscountToProduct;
+      discountModel.addDiscountToProduct = jest.fn(async () => {
+        throw new Error("Fake Error");
+      });
+
+      // Act
+      const response = await request(app)
+        .post("/discounts/products")
+        .set("Content-Type", "application/json")
+        .send({ productId: 1, discountId: 1 });
+
+      // Assert
+      expect(response.status).toBe(500);
+      expect(response.body).toBeDefined();
+      expect(response.body).toHaveProperty(
+        "message",
+        "Server Error: Fake Error"
+      ); // Updated message
+
+      // Restore the original db.query function
+      discountModel.addDiscountToProduct = originalModelPost;
+    });
+  });
 });

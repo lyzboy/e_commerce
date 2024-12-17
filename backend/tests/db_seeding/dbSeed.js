@@ -9,6 +9,7 @@ const seedProductsCategories = require("./seedProductsCategories");
 const dbSeed = {
   testDiscountId: 1,
   testCategoryId: 1,
+  testProductId: 1,
 
   seedAll: async function () {
     await seedDiscounts([
@@ -61,11 +62,11 @@ const dbSeed = {
       `SELECT id FROM discounts ORDER BY code`
     );
     this.testDiscountId = discountResults.rows[0].id;
-
     const productResults = await db.query(
       `SELECT id FROM products ORDER BY barcode`
     );
     const productIds = productResults.rows.map((row) => row.id);
+    this.testProductId = productIds[0];
 
     const categoryResults = await db.query(`SELECT * FROM categories`);
 

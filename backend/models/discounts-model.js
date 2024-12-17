@@ -85,7 +85,7 @@ exports.addDiscountToProduct = async (
 ) => {
   try {
     let queryText = `
-      INSERT INTO product_discounts (product_id, discount_id, product_variant_id)
+      INSERT INTO products_discounts (product_id, discount_id, product_variant_id)
       VALUES ($1, $2, ${productVariantId ? "$3" : "NULL"})
       RETURNING *
     `;
@@ -94,7 +94,15 @@ exports.addDiscountToProduct = async (
       queryParams.push(productVariantId);
     }
     const results = await query(queryText, queryParams);
-    return results.rows[0];
+    const result = results.rows[0];
+    return {
+      productVariantId: result.product_variant_id
+        ? result.product_variant_id
+        : null,
+      id: result.id,
+      productId: result.product_id,
+      discountId: result.discount_id,
+    };
   } catch (error) {
     throw new Error(error);
   }
