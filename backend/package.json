@@ -4,7 +4,7 @@
   "description": "A e-commerce website that can be used as a framework for any e-commerce website.",
   "main": "index.js",
   "scripts": {
-    "test": "jest --verbose=true --silent=false --watch -f",
+    "test": "jest --verbose=true --silent=false --watch --runInBand",
     "start": "node app.js",
     "dev": "nodemon app.js"
   },
