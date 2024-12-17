@@ -465,14 +465,6 @@ paths:
         delete:
             tags:
                 - Heros
-    /api/v1/roles/{id}:
-        description: Endpoints relating to user roles.
-        get:
-            tags:
-                - Roles
-        put:
-            tags:
-                - Roles
     /api/v1/discounts:
         description: Endpoints relating to product discounts
         get:
@@ -482,12 +474,19 @@ paths:
             tags:
                 - Discounts
     /api/v1/discounts/{id}:
+        get:
+            tags:
+                - Discounts
         put:
             tags:
                 - Discounts
         delete:
             tags:
                 - Discounts
+    /api/v1/discounts/products:
+        get:
+            tags:
+                - Discounts 
     /api/v1/carts:
         description: Endpoints relating to user carts.
         post:
@@ -532,20 +531,14 @@ paths:
                                 - email
                                 - name
                                 - password
-                                - address
                             properties:
                                 email:
                                     type: string
                                 username:
                                     type: string
-                                name:
-                                    type: string
                                 password:
                                     type: string
-                                phone_id:
-                                    type: number
-                                address_id:
-                                    type: number
+
             responses:
                 "200":
                     description: Create user successful

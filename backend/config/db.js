@@ -27,6 +27,14 @@ const standardPool = new Pool({
   port: process.env.POOL_PORT,
 });
 
+const testPool = new Pool({
+  user: process.env.TEST_DB_USER,
+  host: process.env.TEST_DB_HOST,
+  database: process.env.TEST_DB_NAME,
+  password: process.env.TEST_DB_PASSWORD,
+  port: process.env.TEST_DB_PORT,
+});
+
 /**
  * This function is used to query the database.
  * @param {string} queryText - The query statement
@@ -34,12 +42,24 @@ const standardPool = new Pool({
  * @param {*} isAdmin - Determines where to use the adminPool or standardPool
  * @returns
  */
-exports.query = async (queryText, queryParams, isAdmin = false) => {
+const query = async (queryText, queryParams, isAdmin = false) => {
   try {
+    if (process.env.JEST_WORKER_ID || process.env.NODE_ENV === "test") {
+      const result = await testPool.query(queryText, queryParams);
+      return result;
+    }
     const pool = isAdmin ? adminPool : standardPool;
     const result = await pool.query(queryText, queryParams);
     return result;
   } catch (err) {
-    console.log(err);
+    console.log(
+      `Error executing query (${queryText}, ${queryParams}):  ${err}`
+    );
+    throw new Error("Error executing query");
   }
+};
+
+module.exports = {
+  query,
+  testPool,
 };
