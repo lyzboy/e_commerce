@@ -18,27 +18,6 @@ router.post(
   discountController.createDiscount
 );
 
-router.get(
-  "/:id",
-  authentication.authenticateUser,
-  authorization.authorizeRole("admin"),
-  discountController.getDiscountById
-);
-
-router.put(
-  "/:id",
-  authentication.authenticateUser,
-  authorization.authorizeRole("admin"),
-  discountController.updateDiscount
-);
-
-router.delete(
-  "/:id",
-  authentication.authenticateUser,
-  authorization.authorizeRole("admin"),
-  discountController.deleteDiscount
-);
-
 /**
  * returns all products with discounts based on req.query. Standard User access
  */
@@ -72,6 +51,27 @@ router.post(
   "/validate",
   authentication.authenticateUser,
   discountController.validateDiscount
+);
+
+router.get(
+  "/:id",
+  authentication.authenticateUser,
+  authorization.authorizeRole("admin"),
+  discountController.getDiscountById
+);
+
+router.put(
+  "/:id",
+  authentication.authenticateUser,
+  authorization.authorizeRole("admin"),
+  discountController.updateDiscount
+);
+
+router.delete(
+  "/:id",
+  authentication.authenticateUser,
+  authorization.authorizeRole("admin"),
+  discountController.deleteDiscount
 );
 
 module.exports = router;

@@ -355,7 +355,6 @@ describe("Discounts Endpoints Integration Tests", () => {
 
       // act
       const response = await request(app).delete(`/discounts/${discountId}`);
-      console.log(response.body);
       // assert
       expect(response.status).toBe(404);
       expect(response.body).toBeDefined();
@@ -390,7 +389,6 @@ describe("Discounts Endpoints Integration Tests", () => {
 
       // act
       const response = await request(app).get("/discounts/products");
-
       //assert
       expect(response.status).toBe(200);
       expect(response.body.length).toBeGreaterThan(0); // Check if it's not empty
@@ -401,7 +399,7 @@ describe("Discounts Endpoints Integration Tests", () => {
       expect(firstDiscount).toHaveProperty("id");
       expect(firstDiscount).toHaveProperty("name");
       expect(firstDiscount).toHaveProperty("price");
-      expect(firstDiscount).toHaveProperty("discount");
+      expect(firstDiscount).toHaveProperty("percent_off");
     });
     it("should return 404 status code if no products with discounts are found", async () => {
       // Arrange

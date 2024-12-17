@@ -52,7 +52,9 @@ const query = async (queryText, queryParams, isAdmin = false) => {
     const result = await pool.query(queryText, queryParams);
     return result;
   } catch (err) {
-    console.log("Error executing query: ", err);
+    console.log(
+      `Error executing query (${queryText}, ${queryParams}):  ${err}`
+    );
     throw new Error("Error executing query");
   }
 };

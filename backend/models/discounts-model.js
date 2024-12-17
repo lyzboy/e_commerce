@@ -15,22 +15,28 @@ exports.getDiscountedProducts = async (limit, page, category) => {
   try {
     let queryText = `
       SELECT 
-      products.*,
-      COALESCE(MIN(product_variants.price), products.price) AS effective_price
+        products.*,
+        COALESCE(MIN(product_variants.price), products.price) AS effective_price,
+        d.amount_off,  -- Add amount_off
+        d.percent_off  -- Add percent_off
       FROM 
-      products
+        products
       LEFT JOIN 
-      product_variants ON products.id = product_variants.product_id
+        product_variants ON products.id = product_variants.product_id
+      INNER JOIN
+        products_discounts pd ON products.id = pd.product_id
+      INNER JOIN  -- Join with the discounts table
+        discounts d ON pd.discount_id = d.id
     `;
     const queryParams = [];
     const conditions = [];
 
     if (category) {
       queryText += `
-      JOIN products_categories 
-      ON products.id = products_categories.product_id
-      JOIN categories 
-      ON categories.id = products_categories.category_id
+        JOIN products_categories 
+          ON products.id = products_categories.product_id
+        JOIN categories 
+          ON categories.id = products_categories.category_id
       `;
       conditions.push(`categories.id = $${queryParams.length + 1}`);
       queryParams.push(category);
@@ -38,9 +44,11 @@ exports.getDiscountedProducts = async (limit, page, category) => {
 
     if (conditions.length > 0) {
       queryText += ` WHERE ` + conditions.join(" AND ");
+    } else {
+      queryText += ` WHERE pd.product_id IS NOT NULL`; // Ensure at least one product is returned
     }
 
-    queryText += ` GROUP BY products.id`;
+    queryText += ` GROUP BY products.id, d.amount_off, d.percent_off`; // Include discount columns in GROUP BY
 
     if (limit !== undefined) {
       queryText += ` LIMIT $${queryParams.length + 1}`;
