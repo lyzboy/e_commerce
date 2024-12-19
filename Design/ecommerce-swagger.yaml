@@ -466,27 +466,284 @@ paths:
             tags:
                 - Heros
     /api/v1/discounts:
-        description: Endpoints relating to product discounts
+        summary: Discount Management
+        description: >-
+            Endpoints related to retrieving and managing all discounts within the
+            store's database.
         get:
+            summary: Search and filter discounts
+            description: Retrieves discounts from the store's database based on search criteria.
+            operationId: search_discounts
+            parameters:
+            - 
+                in: query
+                name: limit
+                schema:
+                    type: integer
+                description: Maximum number of discounts to return.
+            - 
+                in: query
+                name: page
+                schema:
+                    type: integer
+                description: Page number for pagination.
+            - 
+                in: query
+                name: categoryId
+                schema:
+                    type: integer
+                description: Filter discounts by category ID.
+            responses:
+                '200':
+                    description: A list of discounts.
+                    content:
+                        application/json:
+                            schema:
+                                type: array
+                                items:
+                                    $ref: '#/components/schemas/Discount'  # Assuming you have a Discount schema defined
+                '404':
+                    description: No discounts found.
+                '500':
+                    description: Internal server error.
+            security:
+            - bearerAuth: []
             tags:
-                - Discounts
+            - Discounts
         post:
+            summary: Add a discount
+            description: Adds a new discount to the database.
+            operationId: add_discount
+            security:
+            - bearerAuth: []
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/Discount'  # Assuming you have a Discount schema defined
+            responses:
+                '200':
+                    description: The created discount.
+                '400':
+                    description: Invalid request object.
+                '500':
+                    description: Internal server error.
             tags:
-                - Discounts
+            - Discounts
+
     /api/v1/discounts/{id}:
+        summary: Retrieve a single discount by ID
+        description: Retrieves a single discount from the database by given ID.
         get:
+            summary: Get a discount
+            description: This operation retrieves an object with the matching id.
+            operationId: get_discount_id
+            parameters:
+            - 
+                name: id
+                in: path
+                description: The id of the discount.
+                required: true
+                schema:
+                    type: string
+            responses:
+                '200':
+                    description: The discount was successfully retrieved.
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Discount'  # Assuming you have a Discount schema defined
+                '404':
+                    description: Discount not found.
+                '500':
+                    description: Internal server error.
+            security:
+            - bearerAuth: []
             tags:
-                - Discounts
+            - Discounts
         put:
+            summary: Update a discount.
+            description: This operation updates an object with the matching id.
+            operationId: update_discount_id
+            parameters:
+            - 
+                name: id
+                in: path
+                description: The id of the discount.
+                required: true
+                schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/Discount'  # Assuming you have a Discount schema defined
+            responses:
+                '200':
+                    description: The discount was successfully updated.
+                '404':
+                    description: Discount not found.
+                '500':
+                    description: Internal server error.
+            security:
+            - bearerAuth: []
             tags:
-                - Discounts
+            - Discounts
         delete:
+            summary: Delete a discount.
+            description: This product deletes an object with the matching id.
+            operationId: delete_discount_id
+            parameters:
+            - 
+                name: id
+                in: path
+                schema:
+                    type: string
+                required: true
+            responses:
+                '200':
+                    description: The discount was deleted successfully.
+                '404':
+                    description: Discount not found.
+                '500':
+                    description: Server error.
+            security:
+            - bearerAuth: []
             tags:
-                - Discounts
+            - Discounts
+
     /api/v1/discounts/products:
+        summary: Manage discounts on products
+        description: Endpoints for adding and removing discounts from products.
         get:
+            summary: Get discounted products
+            description: Retrieves a list of products with discounts, with optional pagination and filtering by category.
+            operationId: get_discounted_products
+            parameters:
+            - 
+                in: query
+                name: limit
+                schema:
+                    type: integer
+                description: Maximum number of products to return.
+            - 
+                in: query
+                name: page
+                schema:
+                    type: integer
+                description: Page number for pagination.
+            - 
+                in: query
+                name: category
+                schema:
+                    type: integer
+                description: Filter products by category ID.
+            responses:
+                '200':
+                    description: A list of discounted products.
+                '404':
+                    description: No discounted products found.
+                '500':
+                    description: Internal server error.
+            security:
+            - bearerAuth: []
             tags:
-                - Discounts 
+            - Discounts
+        post:
+            summary: Add a discount to a product
+            description: Add a discount to a product or product variant.
+            operationId: add_discount_to_product
+            security:
+            - bearerAuth: []
+
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            properties:
+                                productId:
+                                    type: integer
+                                    description: ID of the product.
+                                discountId:
+                                    type: integer
+                                    description: ID of the discount to add.
+                                productVariantId:
+                                    type: integer
+                                    description: ID of the product variant (optional).
+            responses:
+                '200':
+                    description: Discount added to product successfully.
+                '400':
+                    description: Invalid request object.
+                '500':
+                    description: Internal server error.
+            tags:
+            - Discounts
+        delete:
+            summary: Remove a discount from a product
+            description: Remove a discount from a product or product variant.
+            operationId: remove_discount_from_product
+            security:
+            - bearerAuth: []
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            properties:
+                                productDiscountId:
+                                    type: integer
+                                    description: ID of the product_discount entry (optional).
+                                productId:
+                                    type: integer
+                                    description: ID of the product.
+                                discountId:
+                                    type: integer
+                                    description: ID of the discount to remove.
+                                productVariantId:
+                                    type: integer
+                                    description: ID of the product variant (optional).
+            responses:
+                '200':
+                    description: Discount removed from product successfully.
+                '400':
+                    description: Invalid request object.
+                '404':
+                    description: Discount not found on product.
+                '500':
+                    description: Internal server error.
+            tags:
+            - Discounts
+
+    /api/v1/discounts/code/{code}:
+        summary: Retrieve a single discount by code
+        description: Retrieves a single discount from the database by given code.
+        post:  # Changed to POST as per your routes file
+            summary: Get a discount by code
+            description: This operation retrieves an object with the matching code.
+            operationId: get_discount_code
+            parameters:
+            - 
+                name: code
+                in: path
+                description: The code of the discount.
+                required: true
+                schema:
+                    type: string
+            responses:
+                '200':
+                    description: The discount was successfully retrieved.
+                '404':
+                    description: Discount not found.
+                '500':
+                    description: Internal server error.
+            security:
+            - bearerAuth: []
+            tags:
+            - Discounts
     /api/v1/carts:
         description: Endpoints relating to user carts.
         post:
@@ -608,6 +865,27 @@ components:
                     type: string
                 phoneNumber:
                     type: string
+        Discount:
+            type: object
+            properties:
+                id:
+                    type: integer
+                    description: The id for the discount (PK)
+                code:
+                    type: string
+                    description: The code (if needed) for the discount.
+                percentOff:
+                    type: integer
+                    description: The percentage amount off as a whole number.
+                amountOff: 
+                    type: number
+                    description: The dollar amount the discount takes off of the product price
+                expireDate:
+                    type: string
+                    description: the date the discount expires
+                quantity:
+                    type: integer
+                    description: The quantity of the discount available.
         Order:
             type: object
             properties:
