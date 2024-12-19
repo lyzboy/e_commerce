@@ -8,17 +8,18 @@ const authRoutes = require("./routes/auth-routes");
 const categoryRoutes = require("./routes/category-routes");
 const productRoutes = require("./routes/product-routes");
 const cartRoutes = require("./routes/carts-routes");
+const discountRoutes = require("./routes/discounts-routes");
 
 const app = express();
-const port = 3000;
-
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+const port = 3000;
 
 app.use(
   session({
     secret: process.env.TOKEN_SECRET,
-    cookie: { maxAge: 300000000, secure: false },
+    cookie: { maxAge: 1800000, secure: false }, //<- Set secure to true for production
     saveUninitialized: false,
     resave: false,
     store: new session.MemoryStore(),
@@ -32,6 +33,7 @@ app.use("/api/v1/auth", authRoutes);
 app.use("/api/v1/categories", categoryRoutes);
 app.use("/api/v1/products", productRoutes);
 app.use("/api/v1/carts", cartRoutes);
+app.use("/api/v1/discounts", discountRoutes);
 
 app.get("/", (req, res) => {
   res.json({ info: "Node.js, Express, and Postgres API" });
