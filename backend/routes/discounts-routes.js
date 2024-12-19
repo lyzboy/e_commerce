@@ -44,13 +44,7 @@ router.delete(
 router.post(
   "/code/:code",
   authentication.authenticateUser,
-  discountController.validateDiscountCode
-);
-
-router.post(
-  "/code/:code/use",
-  authentication.authenticateUser,
-  discountController.validateDiscount
+  discountController.getDiscountByCode
 );
 
 router.get(

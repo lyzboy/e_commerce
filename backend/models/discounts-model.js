@@ -72,6 +72,9 @@ exports.getDiscountByCode = async (code) => {
   try {
     let queryText = `SELECT * FROM discounts WHERE code = $1`;
     const results = await query(queryText, [code]);
+    if (results.rows.length === 0) {
+      return { message: "Discount not found." };
+    }
     return formatDiscount(results.rows[0]);
   } catch (error) {
     throw new Error(error);

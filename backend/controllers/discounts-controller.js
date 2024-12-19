@@ -192,10 +192,15 @@ exports.getDiscounts = async (req, res) => {
   }
 };
 
-exports.validateDiscountCode = async (req, res) => {
+exports.getDiscountByCode = async (req, res) => {
   try {
     const { code } = req.params;
-  } catch (error) {}
+    const results = await discountModel.getDiscountByCode(code);
+    if (results.id === undefined) {
+      return res.status(404).json({ message: "Discount not found." });
+    }
+    res.status(200).json(results);
+  } catch (error) {
+    res.status(500).json({ message: "Server Error: " + error.message });
+  }
 };
-
-exports.validateDiscount = async (req, res) => {};
