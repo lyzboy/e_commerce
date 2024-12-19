@@ -96,7 +96,7 @@ exports.addDiscountToProduct = async (
     if (productVariantId) {
       queryParams.push(productVariantId);
     }
-    const results = await query(queryText, queryParams);
+    const results = await query(queryText, queryParams, true);
     const result = results.rows[0];
     return {
       productVariantId: result.product_variant_id
@@ -134,7 +134,7 @@ exports.removeDiscountFromProduct = async (
       }
     }
   }
-  const results = await query(queryText, queryParams);
+  const results = await query(queryText, queryParams, true);
   if (results.rowCount === 0) {
     return {
       message: "Discount not found",
@@ -172,7 +172,7 @@ exports.deleteDiscount = async (id) => {
   }
 };
 
-exports.getDiscount = async (id) => {
+exports.getDiscountById = async (id) => {
   try {
     const queryText = `SELECT * FROM discounts WHERE id = $1`;
     const queryParams = [id];
@@ -223,7 +223,7 @@ exports.createDiscount = async (
     }
     queryText += queryElements.join(", ");
     queryText += `) VALUES (${queryValues.join(", ")}) RETURNING *`;
-    const results = await query(queryText, queryParams);
+    const results = await query(queryText, queryParams, true);
 
     return formatDiscount(results.rows[0]);
   } catch (error) {
@@ -304,7 +304,7 @@ exports.updateDiscount = async (
   const queryValues = queryElements.join(", ");
   const queryCondition = ` WHERE id = $1`;
   const finalQuery = queryText + queryValues + queryCondition + " RETURNING *";
-  const results = await query(finalQuery, queryParams);
+  const results = await query(finalQuery, queryParams, true);
   if (results.rows.length === 0) {
     return null;
   }
