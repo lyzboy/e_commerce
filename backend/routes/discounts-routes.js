@@ -42,15 +42,15 @@ router.delete(
 );
 
 router.post(
-  "/use/:code",
+  "/code/validate",
   authentication.authenticateUser,
-  discountController.validateDiscountCode
+  discountController.validateDiscount
 );
 
 router.post(
-  "/validate",
+  "/code/:code",
   authentication.authenticateUser,
-  discountController.validateDiscount
+  discountController.validateDiscountCode
 );
 
 router.get(
