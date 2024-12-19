@@ -1018,7 +1018,7 @@ COPY public.cities (id, name, state_id) FROM stdin;
 --
 
 COPY public.discounts (id, code, percent_off, expire_date, quantity, amount_off) FROM stdin;
-1	\N	10	\N	\N	\N
+1	DISCOUNT20	20	\N	\N	\N
 \.
 
 
@@ -2009,6 +2009,14 @@ GRANT ALL ON TABLE public.products TO admin_user;
 
 GRANT SELECT ON TABLE public.products_categories TO standard_user;
 GRANT ALL ON TABLE public.products_categories TO admin_user;
+
+
+--
+-- Name: TABLE products_discounts; Type: ACL; Schema: public; Owner: postgres
+--
+
+GRANT SELECT ON TABLE public.products_discounts TO admin_user;
+GRANT SELECT ON TABLE public.products_discounts TO standard_user;
 
 
 --

@@ -103,7 +103,7 @@ exports.deleteDiscount = async (req, res) => {
 exports.getDiscountById = async (req, res) => {
   try {
     const { id } = req.params;
-    const results = await discountModel.getDiscount(id);
+    const results = await discountModel.getDiscountById(id);
     if (!results) {
       return res.status(404).json({ message: "Discount not found." });
     }
