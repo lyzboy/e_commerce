@@ -28,27 +28,6 @@ app.use((req, res, next) => {
 
 app.use("/discounts", discountRoutes);
 
-const assertDiscountProperties = (discount, discountId) => {
-  expect(discount).toBeDefined();
-  if (discountId) {
-    expect(discount).toHaveProperty("id", discountId);
-  } else {
-    expect(discount).toHaveProperty("id");
-  }
-  expect(discount).toHaveProperty("code");
-  expect(typeof discount.code).toBe("string");
-  expect(discount).toHaveProperty("percentOff");
-  expect(typeof discount.percentOff).toBe("number");
-  expect(discount).toHaveProperty("amountOff");
-  if (discount.amountOff !== null) {
-    expect(typeof discount.amountOff).toBe("number");
-  } else {
-    expect(discount.amountOff).toBeNull();
-  }
-  expect(discount).toHaveProperty("expireDate");
-  expect(typeof discount.expireDate).toBe("string");
-};
-
 describe("Discounts Endpoints Integration Tests", () => {
   beforeAll(async () => {
     await dbSeed.seedAll();
@@ -179,6 +158,82 @@ describe("Discounts Endpoints Integration Tests", () => {
 
       // Restore the original db.query function
       discountModel.addDiscountToProduct = originalModelPost;
+    });
+  });
+  describe("DELETE /discounts/products", () => {
+    it("should delete a discount from a product by productDiscountId", async () => {
+      const productDiscountId = dbSeed.testProductDiscountId;
+      const response = await request(app)
+        .delete("/discounts/products")
+        .set("Content-Type", "application/json")
+        .send({ productDiscountId });
+
+      expect(response.status).toBe(200);
+      expect(response.body).toBeDefined();
+      expect(response.body).toHaveProperty(
+        "message",
+        "Discount removed from product"
+      );
+    });
+    it("should delete a discount from a product by productId and discountId", async () => {
+      // arrange
+      const productId = dbSeed.testProductId;
+      const discountId = dbSeed.testDiscountId;
+
+      // act
+      const response = await request(app)
+        .delete("/discounts/products")
+        .set("Content-Type", "application/json")
+        .send({ productId, discountId });
+      // assert
+      expect(response.status).toBe(200);
+      expect(response.body).toBeDefined();
+      expect(response.body).toHaveProperty(
+        "message",
+        "Discount removed from product"
+      );
+    });
+
+    it("should return 404 if no discount on product is found", async () => {
+      const response = await request(app)
+        .delete("/discounts/products")
+        .set("Content-Type", "application/json")
+        .send({ productId: 9999, discountId: 9999 });
+      expect(response.status).toBe(404);
+      expect(response.body).toBeDefined();
+      expect(response.body).toHaveProperty(
+        "message",
+        "Discount not found on product."
+      );
+    });
+    it("should return 400 status code if invalid request object", async () => {
+      const response = await request(app)
+        .delete("/discounts/products")
+        .set("Content-Type", "application/json")
+        .send({ productId: 1 });
+      expect(response.status).toBe(400);
+      expect(response.body).toBeDefined();
+      expect(response.body).toHaveProperty(
+        "message",
+        "Invalid request object."
+      );
+    });
+    it("should return 500 status code if an error occurs", async () => {
+      const originalModelDelete = discountModel.removeDiscountFromProduct;
+      discountModel.removeDiscountFromProduct = jest.fn(async () => {
+        throw new Error("Fake Error");
+      });
+      const response = await request(app)
+        .delete("/discounts/products")
+        .set("Content-Type", "application/json")
+        .send({ productId: 1, discountId: 1 });
+      expect(response.status).toBe(500);
+      expect(response.body).toBeDefined();
+      expect(response.body).toHaveProperty(
+        "message",
+        "Server Error: Fake Error"
+      );
+      discountModel.removeDiscountFromProduct = originalModelDelete;
     });
   });
 });

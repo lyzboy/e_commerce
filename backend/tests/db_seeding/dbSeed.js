@@ -10,6 +10,7 @@ const dbSeed = {
   testDiscountId: 1,
   testCategoryId: 1,
   testProductId: 1,
+  testProductDiscountId: 1,
 
   seedAll: async function () {
     await seedDiscounts([
@@ -88,6 +89,8 @@ const dbSeed = {
         product_variant_id: null,
       },
     ]);
+    const productDiscounts = await db.query("SELECT * FROM products_discounts");
+    this.testProductDiscountId = productDiscounts.rows[0].id;
 
     await seedProductsCategories([
       { product_id: productIds[0], category_id: this.testCategoryId },

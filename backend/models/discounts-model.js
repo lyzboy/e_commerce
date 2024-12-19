@@ -114,8 +114,8 @@ exports.removeDiscountFromProduct = async (
   discountId,
   productVariantId
 ) => {
-  const queryText = `DELETE FROM products_discounts WHERE `;
-  const queryParams = [];
+  let queryText = `DELETE FROM products_discounts WHERE `;
+  let queryParams = [];
   if (productDiscountId) {
     queryText += `id = $1`;
     queryParams.push(productDiscountId);
@@ -132,7 +132,16 @@ exports.removeDiscountFromProduct = async (
     }
   }
   const results = await query(queryText, queryParams);
-  return results.rowCount;
+  if (results.rowCount === 0) {
+    return {
+      message: "Discount not found",
+      rowsDeleted: results.rowCount,
+    };
+  }
+  return {
+    message: "Discount removed from product",
+    rowsDeleted: results.rowCount,
+  };
 };
 
 exports.deleteDiscount = async (id) => {

@@ -55,18 +55,23 @@ exports.removeDiscountFromProduct = async (req, res) => {
   try {
     const { productDiscountId, productId, discountId, productVariantId } =
       req.body;
-    if (!productDiscountId) {
-      if (!productId && !discountId) {
-        return res.status(400).json({ message: "Invalid request object." });
+
+    if ((productId && discountId) || productDiscountId) {
+      const results = await discountModel.removeDiscountFromProduct(
+        productDiscountId,
+        productId,
+        discountId,
+        productVariantId
+      );
+      if (results.rowsDeleted === 0) {
+        return res
+          .status(404)
+          .json({ message: "Discount not found on product." });
       }
+      res.status(200).json(results);
+    } else {
+      return res.status(400).json({ message: "Invalid request object." });
     }
-    const results = await discountModel.removeDiscountFromProduct(
-      productDiscountId,
-      productId,
-      discountId,
-      productVariantId
-    );
-    res.status(200).json(results);
   } catch (error) {
     res.status(500).json({ message: "Server Error: " + error.message });
   }
