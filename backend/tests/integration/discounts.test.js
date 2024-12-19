@@ -246,8 +246,8 @@ describe("Discounts Endpoints Integration Tests", () => {
 
     it("should return 500 status code if an error occurs", async () => {
       // Arrange
-      const originalModelGet = discountModel.getDiscount;
-      discountModel.getDiscount = jest.fn(async () => {
+      const originalModelGet = discountModel.getDiscountById;
+      discountModel.getDiscountById = jest.fn(async () => {
         throw new Error("Fake Error");
       });
 
@@ -263,7 +263,7 @@ describe("Discounts Endpoints Integration Tests", () => {
       ); // Updated message
 
       // Restore the original db.query function
-      discountModel.getDiscount = originalModelGet;
+      discountModel.getDiscountById = originalModelGet;
     });
   });
 
