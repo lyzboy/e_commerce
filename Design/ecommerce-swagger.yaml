@@ -759,7 +759,7 @@ paths:
         delete:
             tags:
                 - Carts
-    /api/auth/login:
+    /api/v1/auth/login:
         post:
             responses:
                 "200":
@@ -772,7 +772,7 @@ paths:
                                         type: string
             tags:
                 - Auth
-    /api/auth/register:
+    /api/v1/auth/register:
         post:
             summary: create user
             description: used to create a user account
@@ -806,19 +806,135 @@ paths:
                                 properties:
                                     accessToken:
                                         type: string
+            security:
+                - bearerAuth: []
             tags:
                 - Auth
-    /api/auth/logout:
+    /api/v1/auth/logout:
         post:
+            summary: logout user
+            description: used to log a user out
+            operationId: logout_user
+            responses:
+                "200":
+                    description: User logged out
+                "500":
+                    description: Server error
             tags:
                 - Auth
+    /api/v1/auth/admin:
+        post:
+            summary: create admin
+            description: used to create an admin account
+            operationId: create_admin
+            requestBody:
+                description: the admin to be created
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            required:
+                                - email
+                            properties:
+                                email:
+                                    type: string
+            responses:
+                "200":
+                    description: Create admin successful
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    message:
+                                        type: string
+                                        example: "Admin created"
+                "404":
+                    description: User not found
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    message:
+                                        type: string
+                                        example: "User with email not found"
+                "500":
+                    description: Server error
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    message:
+                                        type: string
+                                        example: "Server error"
+            security:
+            - bearerAuth: []
+            tags:
+                - Auth
+        delete:
+            summary: remove admin
+            description: used to remove an account from admin
+            operationId: delete_admin
+            requestBody:
+                description: the admin to be remove
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            required:
+                                - email
+                            properties:
+                                email:
+                                    type: string
+            responses:
+                "200":
+                    description: Remove admin successful
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    message:
+                                        type: string
+                                        example: "Admin removed"
+                                    email:
+                                        type: string
+                                        example: "adminTest@email.com"
+                "404":
+                    description: User not found
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    message:
+                                        type: string
+                                        example: "User with email not found"
+                "500":
+                    description: Server error
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    message:
+                                        type: string
+                                        example: "Server error"
+            security:
+            - bearerAuth: []
+            tags:
+                - Auth
+
 
 components:
     securitySchemes:
         bearerAuth:
             type: http
-            scheme: bearer
-            bearerFormat: JWT
+            scheme: basic
 
     schemas:
         Category:
