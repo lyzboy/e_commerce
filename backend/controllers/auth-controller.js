@@ -158,6 +158,22 @@ const validateUserData = ({
   };
 };
 
+exports.addAdmin = async (req, res) => {
+  try {
+    res.status(200).json({ message: "Admin added" });
+  } catch (error) {
+    res.status(500).json({ message: "Server Error: " + error.message });
+  }
+};
+
+exports.removeAdmin = async (req, res) => {
+  try {
+    res.status(200).json({ message: "Admin removed" });
+  } catch (error) {
+    res.status(500).json({ message: "Server Error: " + error.message });
+  }
+};
+
 class CustomError extends Error {
   constructor(statusCode = 500, ...params) {
     // Pass remaining arguments (including vendor specific ones) to parent constructor
