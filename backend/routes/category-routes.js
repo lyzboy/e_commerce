@@ -12,6 +12,7 @@ router.get(
 
 router.post(
   "/",
+  authentication.authenticateUser,
   authorization.authorizeRole("admin"),
   categoryController.createCategory
 );
@@ -24,12 +25,14 @@ router.get(
 
 router.put(
   "/:id",
+  authentication.authenticateUser,
   authorization.authorizeRole("admin"),
   categoryController.updateCategory
 );
 
 router.delete(
   "/:id",
+  authentication.authenticateUser,
   authorization.authorizeRole("admin"),
   categoryController.deleteCategory
 );
