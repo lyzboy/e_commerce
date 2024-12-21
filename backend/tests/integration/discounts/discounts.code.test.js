@@ -1,21 +1,9 @@
 const request = require("supertest");
 const express = require("express");
-const discountRoutes = require("../../routes/discounts-routes");
-const db = require("../../config/db");
-const discountModel = require("../../models/discounts-model");
-const dbSeed = require("../db_seeding/dbSeed");
-
-// jest.mock("../../models/discounts-model", () => ({
-//   getDiscountedProducts,
-//   getDiscountByCode,
-//   addDiscountToProduct,
-//   removeDiscountFromProduct,
-//   deleteDiscount,
-//   getDiscount,
-//   createDiscount,
-//   getDiscounts,
-// }));
-
+const discountRoutes = require("../../../routes/discounts-routes");
+const db = require("../../../config/db");
+const discountModel = require("../../../models/discounts-model");
+const dbSeed = require("../../db_seeding/dbSeed");
 const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
