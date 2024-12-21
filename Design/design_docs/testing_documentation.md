@@ -45,7 +45,7 @@ Include functional testing (validating user flows), non-functional testing (perf
 ## 4. Backend Section
 ### **API Tests**:
   - Test CRUD operations on key resources (e.g., products, users).
-  - Test authentication and authorization (OAuth2, JWT).
+  - Test authentication and authorization (OAuth2, Passport Local).
   - Test third-party API integrations (e.g., payment processing).
 ### **Database Tests**:
   - Ensure correct data persistence and retrieval (PostgreSQL).
