@@ -2,6 +2,7 @@ const authentication = require("../middlewares/authentication");
 const validator = require("validator");
 
 const userModel = require("../models/user-model");
+const authModel = require("../models/admin-model");
 
 exports.createUser = async (req, res) => {
   try {
@@ -160,9 +161,14 @@ const validateUserData = ({
 
 exports.addAdmin = async (req, res) => {
   try {
-    res.status(200).json({ message: "Admin added" });
+    const { email } = req.body;
+    const result = await authModel.addAdmin(email);
+    if (result === null) {
+      return res.status(404).json({ message: "Admin already exists" });
+    }
+    res.status(200).json({ message: "Admin created" });
   } catch (error) {
-    res.status(500).json({ message: "Server Error: " + error.message });
+    res.status(500).json({ message: "Server Error" });
   }
 };
 

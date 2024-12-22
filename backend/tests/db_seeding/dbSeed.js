@@ -12,6 +12,15 @@ const dbSeed = {
   testProductId: 1,
   testProductDiscountId: 1,
 
+  testQuery: async function (query, params) {
+    try {
+      const result = await db.query(query, params, true);
+      return result;
+    } catch (error) {
+      throw new Error(error);
+    }
+  },
+
   seedAll: async function () {
     await seedDiscounts([
       {
