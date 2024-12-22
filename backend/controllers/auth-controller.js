@@ -174,9 +174,14 @@ exports.addAdmin = async (req, res) => {
 
 exports.removeAdmin = async (req, res) => {
   try {
+    const { email } = req.body;
+    const result = await authModel.deleteAdmin(email);
+    if (result === 0) {
+      return res.status(404).json({ message: "Email not found" });
+    }
     res.status(200).json({ message: "Admin removed" });
   } catch (error) {
-    res.status(500).json({ message: "Server Error: " + error.message });
+    res.status(500).json({ message: error.message });
   }
 };
 

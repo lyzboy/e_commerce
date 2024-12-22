@@ -20,3 +20,16 @@ exports.addAdmin = async (email) => {
     throw new Error(error);
   }
 };
+
+exports.deleteAdmin = async (email) => {
+  try {
+    const results = await query(
+      "DELETE FROM admins WHERE account_email = $1 RETURNING *",
+      [email],
+      true
+    );
+    return results.rowCount;
+  } catch (error) {
+    throw new Error(error);
+  }
+};
