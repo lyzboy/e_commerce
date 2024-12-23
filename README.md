@@ -165,13 +165,29 @@ Once this user has been created within your database, the user will automaticall
 
 ### Protected Routes
 
-Once you are authenticated, you will be able to access the API's endpoints. Certain routes are protected by login only and others by admin login. In order for you to access the admin login routes, the user you login in with must be in the admins table in the database. Currently there are no API calls that will allow you to add an admin to the admins table. You will need to manually add the user to the admins table in the database.
+Once you are authenticated, you will be able to access the API's endpoints. Certain routes are protected by login only and others by admin login. In order for you to access the admin login routes, the user you login in with must be in the admins table in the database. The default admin account is:
 
-```postgresql
-INSERT INTO admins (account_email) VALUES ('the_email_of_the_user');
+```
+username: adminTest
+email: admin@email.com
+password: Password1!
 ```
 
-Once the user is in the admins table, you will be able to access the admin routes once authenticated using `/api/v1/user/login`.
+You can add additional admin accounts by creating an account using the `/api/v1/user/register` endpoint and then adding the user to the admin table using `POST /api/v1/auth/admin` while logged in as the default admin account. The request body should look like this:
+
+```json
+{
+   "email":"your_email"
+}
+```
+
+Once the user is in the admins table, you will be able to access the admin routes once authenticated using `/api/v1/user/login`. Once an admin account has been created, you should remove the default admin account from the database using the `DELETE /api/v1/auth/admin` endpoint. You can do this by providing the default admin email in the request body:
+
+```json
+{
+   "email":"admin@email.com"
+}
+```
 
 Certain routes are protected and only accessible by the user who owns the data. For example, you can only access a user's cart if you are logged in as that user. You can only access a user's order if you are logged in as that user. With this said, an admin account currently can access all data, even if the data is ownership protected. To find out more about authorization, please refer to the authorization file `/backend/middleware/authorization.js`.
 
@@ -179,7 +195,7 @@ Certain routes are protected and only accessible by the user who owns the data. 
 
 ## Features
 
-TBD
+See the [Design](Design/design_info.md/#needed-functions) document for a list of features and technologies used in this project.
 
 ---
 

@@ -2,6 +2,7 @@ const authentication = require("../middlewares/authentication");
 const validator = require("validator");
 
 const userModel = require("../models/user-model");
+const authModel = require("../models/admin-model");
 
 exports.createUser = async (req, res) => {
   try {
@@ -156,6 +157,32 @@ const validateUserData = ({
     zipCode,
     phoneNumber,
   };
+};
+
+exports.addAdmin = async (req, res) => {
+  try {
+    const { email } = req.body;
+    const result = await authModel.addAdmin(email);
+    if (result === null) {
+      return res.status(404).json({ message: "Admin already exists" });
+    }
+    res.status(200).json({ message: "Admin created" });
+  } catch (error) {
+    res.status(500).json({ message: "Server Error" });
+  }
+};
+
+exports.removeAdmin = async (req, res) => {
+  try {
+    const { email } = req.body;
+    const result = await authModel.deleteAdmin(email);
+    if (result === 0) {
+      return res.status(404).json({ message: "Email not found" });
+    }
+    res.status(200).json({ message: "Admin removed" });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
 };
 
 class CustomError extends Error {
