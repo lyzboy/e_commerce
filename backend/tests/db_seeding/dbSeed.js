@@ -1,10 +1,12 @@
 const db = require("../../config/db");
+const authentication = require("../../middlewares/authentication");
 
 const seedDiscounts = require("./seedDiscounts");
 const seedCategories = require("./seedCategories");
 const seedProducts = require("./seedProducts");
 const seedProductDiscounts = require("./seedProductDiscounts");
 const seedProductsCategories = require("./seedProductsCategories");
+const seedUserAccounts = require("./seedUserAccounts");
 
 const dbSeed = {
   testDiscountId: 1,
@@ -105,15 +107,30 @@ const dbSeed = {
       { product_id: productIds[0], category_id: this.testCategoryId },
       { product_id: productIds[1], category_id: this.testCategoryId },
     ]);
+
+    const testUserPassword = "Password1!";
+
+    await seedUserAccounts([
+      {
+        email: "testUser@email.com",
+        username: "testUser",
+        name: "Test User",
+        password: authentication.createHashedPassword(testUserPassword),
+      },
+    ]);
   },
 
   cleanupDbSeed: async function () {
     try {
+      //BUG: check recovery password table name
       await db.query(`
         DELETE FROM products_discounts;
         DELETE FROM products_categories;
         DELETE FROM discounts;
         DELETE FROM products;
+        DELETE FROM categories;
+        DELETE FROM accounts;
+        DELETE FROM recovery_password_codes;
       `);
       await db.testPool.end();
       console.log("Cleaned up discounts and closed database pool.");

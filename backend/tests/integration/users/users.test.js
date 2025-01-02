@@ -24,10 +24,91 @@ describe("Users Endpoints Integration Tests", () => {
   afterAll(async () => {
     await dbSeed.cleanupDbSeed();
   });
+
+  // *** EXAMPLES ***
+  // const testUserPassword = "Password1!";
+
+  // await seedUserAccounts([
+  //   {
+  //     email: "testUser@email.com",
+  //     username: "testUser",
+  //     name: "Test User",
+  //     password: authentication.createHashedPassword(testUserPassword),
+  //   },
+
+  // it("should return 500 status code if an error occurs", async () => {
+  //   const originalModelDelete = discountModel.removeDiscountFromProduct;
+  //   discountModel.removeDiscountFromProduct = jest.fn(async () => {
+  //     throw new Error("Fake Error");
+  //   });
+  //   const response = await request(app)
+  //     .delete("/discounts/products")
+  //     .set("Content-Type", "application/json")
+  //     .send({ productId: 1, discountId: 1 });
+  //   expect(response.status).toBe(500);
+  //   expect(response.body).toBeDefined();
+  //   expect(response.body).toHaveProperty(
+  //     "message",
+  //     "Server Error: Fake Error"
+  //   );
+  //   discountModel.removeDiscountFromProduct = originalModelDelete;
+  // });
+
+  // // create a new account
+  // const newAdmin = Object.values({
+  //   email: "aTestAdmin@email.com",
+  //   username: "aTestAdmin",
+  //   password: "aTestAdminPassword",
+  // });
+  // beforeEach(async () => {
+  //   await dbSeed.testQuery(
+  //     `INSERT INTO accounts (email, username, password) Values ($1, $2, $3)`,
+  //     newAdmin
+  //   );
+  // });
+  // afterEach(async () => {
+  //   await dbSeed.testQuery(`DELETE FROM admins WHERE account_email = $1`, [
+  //     newAdmin[0],
+  //   ]);
+  //   await dbSeed.testQuery(`DELETE FROM accounts WHERE email = $1`, [
+  //     newAdmin[0],
+  //   ]);
+  // });
+
+  // it("should remove a admin from the database", async () => {
+  //   await dbSeed.testQuery("INSERT INTO admins (account_email) VALUES ($1)", [
+  //     newAdmin[0],
+  //   ]);
+  //   const response = await request(app).delete("/auth/admin").send({
+  //     email: newAdmin[0],
+  //   });
+  //   expect(response.status).toBe(200);
+  //   expect(response.body).toBeDefined();
+  //   expect(response.body).toHaveProperty("message");
+  //   expect(response.body.message).toBe("Admin removed");
+  // });
+
+  describe("POST /user/verify", () => {
+    // verify the user code and allow user to change password
+    it("should return status:verified if code is correct", async () => {});
+    it("should return status:unverified if code is incorrect", async () => {});
+  });
   describe("POST /user/recovery", () => {
-    // TODO: figure out correct way to implement password recovery using code.
+    // generate a code and send an email to the user.
     it("should send a password code to the user's email for recovery", async () => {});
-    it("should update the user's password if the code is correct", async () => {});
+    it("should return status 500 if there is a server error.", async () => {});
+  });
+  describe("POST /user/recovery/:code", () => {
+    // reset the password of the account with the associated code
+    it("should change the password with the correct code", async () => {
+      // TODO: populate the test database with a user password recover code.
+
+      const results = await request(app).post("/user/recovery/1234");
+      // .set("Content-Type", "application/json")
+      // .send({ productDiscountId });
+    });
+    it("should return status 500 if there is a server error.", async () => {});
+    it("should return 401 if the code is incorrect", async () => {});
   });
   describe("GET /users/:id", () => {
     it("should get the user's object only if the user is an admin", async () => {
