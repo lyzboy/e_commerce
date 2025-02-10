@@ -7,6 +7,7 @@ const seedProducts = require("./seedProducts");
 const seedProductDiscounts = require("./seedProductDiscounts");
 const seedProductsCategories = require("./seedProductsCategories");
 const seedUserAccounts = require("./seedUserAccounts");
+const seedAdmins = require("./seedAdmins");
 
 const dbSeed = {
   testDiscountId: 1,
@@ -24,6 +25,28 @@ const dbSeed = {
   },
 
   seedAll: async function () {
+    const testUserPassword = "Password1!";
+
+    await seedUserAccounts([
+      {
+        email: "testUser99@email.com",
+        username: "testUser",
+        name: "Test User",
+        password: authentication.createHashedPassword(testUserPassword),
+      },
+      {
+        email: "admin@email.com",
+        username: "adminTest",
+        password: authentication.createHashedPassword(testUserPassword),
+      },
+    ]);
+
+    await seedAdmins([
+      {
+        email: "admin@email.com",
+      },
+    ]);
+
     await seedDiscounts([
       {
         code: "DISCOUNT10",
@@ -107,17 +130,6 @@ const dbSeed = {
       { product_id: productIds[0], category_id: this.testCategoryId },
       { product_id: productIds[1], category_id: this.testCategoryId },
     ]);
-
-    const testUserPassword = "Password1!";
-
-    await seedUserAccounts([
-      {
-        email: "testUser@email.com",
-        username: "testUser",
-        name: "Test User",
-        password: authentication.createHashedPassword(testUserPassword),
-      },
-    ]);
   },
 
   cleanupDbSeed: async function () {
@@ -129,8 +141,10 @@ const dbSeed = {
         DELETE FROM discounts;
         DELETE FROM products;
         DELETE FROM categories;
-        DELETE FROM accounts;
-        DELETE FROM recovery_password_codes;
+        DELETE FROM carts;
+        DELETE FROM admins;
+        DELETE FROM accounts; 
+        DELETE FROM reset_password_codes;
       `);
       await db.testPool.end();
       console.log("Cleaned up discounts and closed database pool.");
