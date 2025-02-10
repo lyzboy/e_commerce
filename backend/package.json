@@ -9,7 +9,7 @@
     "dev": "nodemon app.js"
   },
   "keywords": [],
-  "author": "",
+  "author": "Joshua Sanford, Lyz Studios",
   "license": "ISC",
   "dependencies": {
     "bcrypt": "^5.1.1",
