@@ -1,20 +1,20 @@
 const request = require("supertest");
 const express = require("express");
-//const userRoutes = require("../../../routes/users-routes");
+const userRoutes = require("../../../routes/user-routes");
 const db = require("../../../config/db");
-//const userModel = require("../../../models/users-model");
+const userModel = require("../../../models/user-model");
 const dbSeed = require("../../db_seeding/dbSeed");
 const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // mock authentication middleware
-app.use((req, res, next) => {
-  req.user = { email: "admin@email.com", username: "adminTest", role: "admin" };
-  next();
-});
+// app.use((req, res, next) => {
+//   req.user = { email: "testUser99@email.com", username: "testUser" };
+//   next();
+// });
 
-//app.use("/user", userRoutes);
+app.use("/user", userRoutes);
 
 describe("Users Endpoints Integration Tests", () => {
   beforeAll(async () => {
@@ -26,16 +26,6 @@ describe("Users Endpoints Integration Tests", () => {
   });
 
   // *** EXAMPLES ***
-  // const testUserPassword = "Password1!";
-
-  // await seedUserAccounts([
-  //   {
-  //     email: "testUser@email.com",
-  //     username: "testUser",
-  //     name: "Test User",
-  //     password: authentication.createHashedPassword(testUserPassword),
-  //   },
-
   // it("should return 500 status code if an error occurs", async () => {
   //   const originalModelDelete = discountModel.removeDiscountFromProduct;
   //   discountModel.removeDiscountFromProduct = jest.fn(async () => {
@@ -95,7 +85,28 @@ describe("Users Endpoints Integration Tests", () => {
   });
   describe("POST /user/recovery", () => {
     // generate a code and send an email to the user.
-    it("should send a password code to the user's email for recovery", async () => {});
+    it("should generate a password code for the user's email for recovery and put within the reset table", async () => {
+      //Arrange
+      const email = "testUser99@email.com";
+      //Act
+      const response = await request(app)
+        .post("/user/recovery")
+        .set("Content-Type", "application/json")
+        .send({ email });
+      //Assert
+      expect(response.status).toBe(200);
+      const dbResult = await db.query(
+        "SELECT reset_code FROM reset_password_codes WHERE email = $1",
+        [email]
+      );
+      expect(dbResult.rows.length).toBe(1); // Verify that a row was created
+      expect(dbResult.rows[0].reset_code).toBeDefined(); // Verify that a code exists
+      expect(dbResult.rows[0].reset_code).not.toBeNull(); // Make sure it's not null
+      expect(typeof dbResult.rows[0].reset_code).toBe("string"); // Check code is string
+      expect(dbResult.rows[0].reset_code.length).toBeGreaterThan(0); // Check code is not empty
+    });
+    it("should set an expiration date for the code", async () => {});
+    it("should return status 400 if the email is not found", async () => {});
     it("should return status 500 if there is a server error.", async () => {});
   });
   describe("POST /user/recovery/:code", () => {

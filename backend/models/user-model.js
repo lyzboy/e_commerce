@@ -1,4 +1,5 @@
 const { query } = require("../config/db");
+const { generateResetCode } = require("../util/helpers");
 
 exports.findUserById = async (id) => {
   try {
@@ -9,6 +10,24 @@ exports.findUserById = async (id) => {
   } catch (error) {
     throw new Error(error);
   }
+};
+
+exports.setPasswordRecovery = async (email) => {
+  const code = generateResetCode();
+  const expire_date = new Date();
+  expire_date.setMinutes(expire_date.getMinutes() + 15);
+  const queryText =
+    "INSERT INTO reset_password_codes (email, expire_time, reset_code) VALUES ($1, $2, $3) RETURNING *";
+  const queryParams = [email, expire_date, code];
+  const results = await query(queryText, queryParams);
+  const finalResults = {
+    id: results.rows[0].id,
+    email: results.rows[0].email,
+    code: results.rows[0].reset_code,
+    expireTime: results.rows[0].expire_time,
+  };
+  console.log(finalResults);
+  return finalResults;
 };
 
 exports.createUser = async (userObject) => {

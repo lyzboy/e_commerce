@@ -140,11 +140,11 @@ const dbSeed = {
         DELETE FROM products_categories;
         DELETE FROM discounts;
         DELETE FROM products;
+        DELETE FROM reset_password_codes;
         DELETE FROM categories;
         DELETE FROM carts;
         DELETE FROM admins;
         DELETE FROM accounts; 
-        DELETE FROM reset_password_codes;
       `);
       await db.testPool.end();
       console.log("Cleaned up discounts and closed database pool.");

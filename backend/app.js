@@ -9,6 +9,7 @@ const categoryRoutes = require("./routes/category-routes");
 const productRoutes = require("./routes/product-routes");
 const cartRoutes = require("./routes/carts-routes");
 const discountRoutes = require("./routes/discounts-routes");
+const userRoutes = require("./routes/user-routes");
 
 const app = express();
 app.use(express.json());
@@ -34,6 +35,7 @@ app.use("/api/v1/categories", categoryRoutes);
 app.use("/api/v1/products", productRoutes);
 app.use("/api/v1/carts", cartRoutes);
 app.use("/api/v1/discounts", discountRoutes);
+app.use("/api/v1/users", userRoutes);
 
 app.get("/", (req, res) => {
   res.json({ info: "Node.js, Express, and Postgres API" });
