@@ -14,8 +14,7 @@ exports.findUserById = async (id) => {
 
 exports.setPasswordRecovery = async (email) => {
   const code = generateResetCode();
-  const expire_date = new Date();
-  expire_date.setMinutes(expire_date.getMinutes() + 15);
+  const expire_date = new Date(Date.now() + 15 * 60 * 1000);
   const queryText =
     "INSERT INTO reset_password_codes (email, expire_time, reset_code) VALUES ($1, $2, $3) RETURNING *";
   const queryParams = [email, expire_date, code];
@@ -26,7 +25,6 @@ exports.setPasswordRecovery = async (email) => {
     code: results.rows[0].reset_code,
     expireTime: results.rows[0].expire_time,
   };
-  console.log(finalResults);
   return finalResults;
 };
 

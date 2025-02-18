@@ -21,6 +21,10 @@ describe("Users Endpoints Integration Tests", () => {
     await dbSeed.seedAll();
   });
 
+  afterEach(async () => {
+    await dbSeed.cleanupDbPasswordReset();
+  });
+
   afterAll(async () => {
     await dbSeed.cleanupDbSeed();
   });
@@ -96,16 +100,22 @@ describe("Users Endpoints Integration Tests", () => {
       //Assert
       expect(response.status).toBe(200);
       const dbResult = await db.query(
-        "SELECT reset_code FROM reset_password_codes WHERE email = $1",
+        "SELECT * FROM reset_password_codes WHERE email = $1",
         [email]
       );
+      console.log(dbResult.rows);
       expect(dbResult.rows.length).toBe(1); // Verify that a row was created
       expect(dbResult.rows[0].reset_code).toBeDefined(); // Verify that a code exists
       expect(dbResult.rows[0].reset_code).not.toBeNull(); // Make sure it's not null
       expect(typeof dbResult.rows[0].reset_code).toBe("string"); // Check code is string
       expect(dbResult.rows[0].reset_code.length).toBeGreaterThan(0); // Check code is not empty
+      expect(dbResult.rows[0].expire_time).toBeDefined(); // Verify that an expiration time exists
+      const expireTime = new Date(dbResult.rows[0].expire_time);
+      const currentTime = new Date();
+      const timeDifference = (expireTime - currentTime) / 1000 / 60; // difference in minutes
+      expect(timeDifference).toBeGreaterThan(14);
+      expect(timeDifference).toBeLessThan(16);
     });
-    it("should set an expiration date for the code", async () => {});
     it("should return status 400 if the email is not found", async () => {});
     it("should return status 500 if there is a server error.", async () => {});
   });

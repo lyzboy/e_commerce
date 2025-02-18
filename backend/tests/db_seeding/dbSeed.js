@@ -152,6 +152,15 @@ const dbSeed = {
       throw new Error(error);
     }
   },
+  cleanupDbPasswordReset: async function () {
+    try {
+      await db.query(`
+        DELETE FROM reset_password_codes;
+      `);
+    } catch (error) {
+      throw new Error(error);
+    }
+  },
 };
 
 module.exports = dbSeed;
