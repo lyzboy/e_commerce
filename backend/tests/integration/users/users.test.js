@@ -8,11 +8,11 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// mock authentication middleware
-// app.use((req, res, next) => {
-//   req.user = { email: "testUser99@email.com", username: "testUser" };
-//   next();
-// });
+//mock authentication middleware
+app.use((req, res, next) => {
+  req.user = { email: "testUser99@email.com", username: "testUser" };
+  next();
+});
 
 app.use("/user", userRoutes);
 
@@ -84,8 +84,59 @@ describe("Users Endpoints Integration Tests", () => {
 
   describe("POST /user/verify", () => {
     // verify the user code and allow user to change password
-    it("should return status:verified if code is correct", async () => {});
-    it("should return status:unverified if code is incorrect", async () => {});
+    it("should return status:verified if code is correct", async () => {
+      const email = "testUser99@email.com";
+      await request(app)
+        .post("/user/recovery")
+        .set("Content_Type", "application/json")
+        .send({ email });
+      const passwordCode = await db.query(
+        "SELECT reset_code FROM reset_password_codes WHERE email = $1",
+        [email]
+      );
+      const code = passwordCode.rows[0].reset_code;
+      const response = await request(app)
+        .post(`/user/verify`)
+        .set("Content-Type", "application/json")
+        .send({ code });
+      expect(response.status).toBe(200);
+      expect(response.body).toBeDefined();
+      expect(response.body).toHaveProperty("message");
+      expect(response.body.message).toBe("verified");
+    }, 10000);
+    it("should return status:unverified if code is incorrect", async () => {
+      const response = await request(app)
+        .post(`/user/verify`)
+        .set("Content-Type", "application/json")
+        .send({ code: "notAcode" });
+      expect(response.status).toBe(401);
+      expect(response.body).toBeDefined();
+      expect(response.body).toHaveProperty("message");
+      expect(response.body.message).toBe("unverified");
+    });
+    it("should return status 400 if missing code", async () => {
+      const response = await request(app)
+        .post(`/user/verify`)
+        .set("Content-Type", "application/json");
+      expect(response.status).toBe(400);
+      expect(response.body).toBeDefined();
+      expect(response.body).toHaveProperty("message");
+      expect(response.body.message).toBe("Bad Request: Missing code");
+    });
+    it("should return status 500 if there is a server error.", async () => {
+      const originalVerifyPasswordCode = userModel.verifyPasswordCode;
+      userModel.verifyPasswordCode = jest.fn(() => {
+        throw new Error("Server Error");
+      });
+      const code = "notAcode";
+      const results = await request(app)
+        .post(`/user/verify`)
+        .set("Content-Type", "application/json")
+        .send({ code });
+      expect(results.status).toBe(500);
+      expect(results.body.message).toBe("Server Error: Server Error");
+      userModel.verifyPasswordCode = originalVerifyPasswordCode;
+    });
   });
   describe("POST /user/recovery", () => {
     // generate a code and send an email to the user.

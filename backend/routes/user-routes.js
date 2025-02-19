@@ -6,6 +6,8 @@ const authorization = require("../middlewares/authorization");
 
 router.post("/recovery", userController.setPasswordRecovery);
 
+router.post("/verify", userController.verifyPasswordCode);
+
 // router.post(
 //   "/",
 //   authorization.authorizeRole("admin"),

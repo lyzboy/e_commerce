@@ -36,6 +36,21 @@ exports.setPasswordRecovery = async (email) => {
   }
 };
 
+exports.verifyPasswordCode = async (code) => {
+  try {
+    const queryText =
+      "SELECT * FROM reset_password_codes WHERE reset_code = $1";
+    const queryParams = [code];
+    const results = await query(queryText, queryParams);
+    if (results.rows.length === 0) {
+      return { message: "unverified" };
+    }
+    return { message: "verified" };
+  } catch (error) {
+    throw new Error(error);
+  }
+};
+
 exports.createUser = async (userObject) => {
   try {
     //TODO: finish implementing the rest of the user fields
