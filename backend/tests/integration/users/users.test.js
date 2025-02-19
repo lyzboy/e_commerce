@@ -103,7 +103,6 @@ describe("Users Endpoints Integration Tests", () => {
         "SELECT * FROM reset_password_codes WHERE email = $1",
         [email]
       );
-      console.log(dbResult.rows);
       expect(dbResult.rows.length).toBe(1); // Verify that a row was created
       expect(dbResult.rows[0].reset_code).toBeDefined(); // Verify that a code exists
       expect(dbResult.rows[0].reset_code).not.toBeNull(); // Make sure it's not null
@@ -116,8 +115,40 @@ describe("Users Endpoints Integration Tests", () => {
       expect(timeDifference).toBeGreaterThan(14);
       expect(timeDifference).toBeLessThan(16);
     });
-    it("should return status 400 if the email is not found", async () => {});
-    it("should return status 500 if there is a server error.", async () => {});
+    it("should return status 404 if the email is not found", async () => {
+      const email = "notAnEmail";
+      const response = await request(app)
+        .post("/user/recovery")
+        .set("Content-Type", "application/json")
+        .send({ email });
+      expect(response.status).toBe(404);
+      expect(response.body).toBeDefined();
+      expect(response.body).toHaveProperty("message");
+      expect(response.body.message).toBe("Email not found.");
+    });
+    it("should return status 400 if missing email", async () => {
+      const response = await request(app)
+        .post("/user/recovery")
+        .set("Content-Type", "application/json");
+      expect(response.status).toBe(400);
+      expect(response.body).toBeDefined();
+      expect(response.body).toHaveProperty("message");
+      expect(response.body.message).toBe("Bad Request: Missing email address");
+    });
+    it("should return status 500 if there is a server error.", async () => {
+      const originalSetPasswordRecovery = userModel.setPasswordRecovery;
+      userModel.setPasswordRecovery = jest.fn(() => {
+        throw new Error("Server Error");
+      });
+      const email = "testEmail";
+      const results = await request(app)
+        .post(`/user/recovery`)
+        .set("Content-Type", "application/json")
+        .send({ email });
+      expect(results.status).toBe(500);
+      expect(results.body.message).toBe("Server Error: Server Error");
+      userModel.setPasswordRecovery = originalSetPasswordRecovery;
+    });
   });
   describe("POST /user/recovery/:code", () => {
     // reset the password of the account with the associated code
@@ -128,8 +159,9 @@ describe("Users Endpoints Integration Tests", () => {
       // .set("Content-Type", "application/json")
       // .send({ productDiscountId });
     });
-    it("should return status 500 if there is a server error.", async () => {});
     it("should return 401 if the code is incorrect", async () => {});
+    it("should remove the instance of the code in the reset_password_codes table", async () => {});
+    it("should return status 500 if there is a server error.", async () => {});
   });
   describe("GET /users/:id", () => {
     it("should get the user's object only if the user is an admin", async () => {

@@ -4,12 +4,14 @@ const userModel = require("../models/user-model");
 exports.setPasswordRecovery = async (req, res) => {
   try {
     const { email } = req.body;
-    console.log(email);
     if (!email)
       return res
         .status(400)
         .json({ message: "Bad Request: Missing email address" });
     const results = await userModel.setPasswordRecovery(email);
+    if (!results) {
+      return res.status(404).json({ message: "Email not found." });
+    }
     res.status(200).json(results);
   } catch (error) {
     res.status(500).json({ message: "Server Error: " + error.message });

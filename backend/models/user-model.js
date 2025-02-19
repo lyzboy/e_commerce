@@ -13,19 +13,27 @@ exports.findUserById = async (id) => {
 };
 
 exports.setPasswordRecovery = async (email) => {
-  const code = generateResetCode();
-  const expire_date = new Date(Date.now() + 15 * 60 * 1000);
-  const queryText =
-    "INSERT INTO reset_password_codes (email, expire_time, reset_code) VALUES ($1, $2, $3) RETURNING *";
-  const queryParams = [email, expire_date, code];
-  const results = await query(queryText, queryParams);
-  const finalResults = {
-    id: results.rows[0].id,
-    email: results.rows[0].email,
-    code: results.rows[0].reset_code,
-    expireTime: results.rows[0].expire_time,
-  };
-  return finalResults;
+  try {
+    const validEmail = await this.getUserByEmail(email);
+    if (!validEmail) {
+      return false;
+    }
+    const code = generateResetCode();
+    const expire_date = new Date(Date.now() + 15 * 60 * 1000);
+    const queryText =
+      "INSERT INTO reset_password_codes (email, expire_time, reset_code) VALUES ($1, $2, $3) RETURNING *";
+    const queryParams = [email, expire_date, code];
+    const results = await query(queryText, queryParams);
+    const finalResults = {
+      id: results.rows[0].id,
+      email: results.rows[0].email,
+      code: results.rows[0].reset_code,
+      expireTime: results.rows[0].expire_time,
+    };
+    return finalResults;
+  } catch (error) {
+    throw new Error(error);
+  }
 };
 
 exports.createUser = async (userObject) => {
