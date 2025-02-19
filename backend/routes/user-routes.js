@@ -4,9 +4,23 @@ const userController = require("../controllers/user-controller");
 const authentication = require("../middlewares/authentication");
 const authorization = require("../middlewares/authorization");
 
+/***
+ * Route that creates a recovery code for a user
+ */
 router.post("/recovery", userController.setPasswordRecovery);
 
-router.post("/verify", userController.verifyPasswordCode);
+/***
+ * Route that verifies a recovery code for a user
+ * will return message: "unverified" if code is invalid or expired
+ * will return message: "verified" if code is valid
+ */
+router.post("/recovery/verify", userController.verifyPasswordCode);
+
+/***
+ *  Route to update a password using recovery code
+ *  will return message: "unverified" if code is invalid or expired
+ */
+router.post("/recovery/update", userController.updatePasswordWithRecovery);
 
 // router.post(
 //   "/",

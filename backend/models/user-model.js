@@ -36,6 +36,32 @@ exports.setPasswordRecovery = async (email) => {
   }
 };
 
+exports.updatePasswordWithRecovery = async (code, password) => {
+  try {
+    const queryText =
+      "SELECT * FROM reset_password_codes WHERE reset_code = $1";
+    const queryParams = [code];
+    const results = await query(queryText, queryParams);
+    if (results.rows.length === 0) {
+      return { message: "unverified" };
+    }
+    const expire_time = new Date(results.rows[0].expire_time);
+    if (expire_time < new Date()) {
+      return { message: "unverified" };
+    }
+    const email = results.rows[0].email;
+    const queryText2 = "UPDATE accounts SET password = $1 WHERE email = $2";
+    const queryParams2 = [password, email];
+    await query(queryText2, queryParams2);
+    queryText3 = "DELETE FROM reset_password_codes WHERE reset_code = $1";
+    queryParams3 = [code];
+    await query(queryText3, queryParams3);
+    return { message: "Password updated" };
+  } catch (error) {
+    throw new Error(error);
+  }
+};
+
 exports.verifyPasswordCode = async (code) => {
   try {
     const queryText =

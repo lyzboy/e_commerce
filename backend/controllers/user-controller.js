@@ -34,6 +34,23 @@ exports.verifyPasswordCode = async (req, res) => {
   }
 };
 
+exports.updatePasswordWithRecovery = async (req, res) => {
+  try {
+    const { code, password } = req.body;
+    if (!code || !password)
+      return res
+        .status(400)
+        .json({ message: "Bad Request: Missing code or password" });
+    const results = await userModel.updatePasswordWithRecovery(code, password);
+    if (results.message === "unverified") {
+      return res.status(400).json({ message: results.message });
+    }
+    res.status(200).json(results);
+  } catch (error) {
+    res.status(500).json({ message: "Server Error: " + error.message });
+  }
+};
+
 // exports.getProducts = async (req, res) => {
 //   try {
 //     const { categoryId, maxPrice, minPrice } = req.body;

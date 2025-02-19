@@ -82,7 +82,7 @@ describe("Users Endpoints Integration Tests", () => {
   //   expect(response.body.message).toBe("Admin removed");
   // });
 
-  describe("POST /user/verify", () => {
+  describe("POST /user/recovery/verify", () => {
     // verify the user code and allow user to change password
     it("should return status:verified if code is correct", async () => {
       const email = "testUser99@email.com";
@@ -96,7 +96,7 @@ describe("Users Endpoints Integration Tests", () => {
       );
       const code = passwordCode.rows[0].reset_code;
       const response = await request(app)
-        .post(`/user/verify`)
+        .post(`/user/recovery/verify`)
         .set("Content-Type", "application/json")
         .send({ code });
       expect(response.status).toBe(200);
@@ -106,7 +106,7 @@ describe("Users Endpoints Integration Tests", () => {
     }, 10000);
     it("should return status 400:unverified if code is incorrect", async () => {
       const response = await request(app)
-        .post(`/user/verify`)
+        .post(`/user/recovery/verify`)
         .set("Content-Type", "application/json")
         .send({ code: "notAcode" });
       expect(response.status).toBe(400);
@@ -130,7 +130,7 @@ describe("Users Endpoints Integration Tests", () => {
         [new Date(Date.now() - 15 * 60 * 1000), email]
       );
       const response = await request(app)
-        .post(`/user/verify`)
+        .post(`/user/recovery/verify`)
         .set("Content-Type", "application/json")
         .send({ code });
       expect(response.status).toBe(400);
@@ -140,7 +140,7 @@ describe("Users Endpoints Integration Tests", () => {
     });
     it("should return status 400 if missing code", async () => {
       const response = await request(app)
-        .post(`/user/verify`)
+        .post(`/user/recovery/verify`)
         .set("Content-Type", "application/json");
       expect(response.status).toBe(400);
       expect(response.body).toBeDefined();
@@ -154,7 +154,7 @@ describe("Users Endpoints Integration Tests", () => {
       });
       const code = "notAcode";
       const results = await request(app)
-        .post(`/user/verify`)
+        .post(`/user/recovery/verify`)
         .set("Content-Type", "application/json")
         .send({ code });
       expect(results.status).toBe(500);
@@ -225,16 +225,78 @@ describe("Users Endpoints Integration Tests", () => {
       userModel.setPasswordRecovery = originalSetPasswordRecovery;
     });
   });
-  describe("POST /user/recovery/:code", () => {
-    // reset the password of the account with the associated code
-    it("should change the password with the correct code", async () => {
-      const results = await request(app).post("/user/recovery/1234");
-      // .set("Content-Type", "application/json")
-      // .send({ productDiscountId });
+  describe("POST /user/recovery/update", () => {
+    beforeEach(async () => {
+      //Arrange
+      const email = "testUser99@email.com";
+      //Act
+      const response = await request(app)
+        .post("/user/recovery")
+        .set("Content-Type", "application/json")
+        .send({ email });
+      //Assert
+      expect(response.status).toBe(200);
+      const dbResult = await db.query(
+        "SELECT * FROM reset_password_codes WHERE email = $1",
+        [email]
+      );
+      this.generatedCode = dbResult.rows[0].reset_code;
+      this.email = dbResult.rows[0].email;
     });
-    it("should return 401 if the code is incorrect", async () => {});
-    it("should remove the instance of the code in the reset_password_codes table", async () => {});
-    it("should return status 500 if there is a server error.", async () => {});
+    afterEach(async () => {
+      await dbSeed.cleanupDbPasswordReset();
+    });
+    // reset the password of the account with the associated code
+    it("should change the password with the correct code and remove the instance of the code in the reset_password_codes table", async () => {
+      const newPassword = "newPassword";
+      const results = await request(app)
+        .post(`/user/recovery/update`)
+        .set("Content-Type", "application/json")
+        .send({ code: this.generatedCode, password: newPassword });
+      const accountResults = await db.query(
+        "SELECT * FROM accounts WHERE email = $1",
+        [this.email]
+      );
+      expect(results.status).toBe(200);
+      expect(results.body).toBeDefined();
+      expect(results.body).toHaveProperty("message");
+      expect(results.body.message).toBe("Password updated");
+      expect(accountResults.rows[0].password).toBe(newPassword);
+
+      const dbResult = await db.query(
+        "SELECT * FROM reset_password_codes WHERE email = $1",
+        [this.email]
+      );
+      expect(dbResult.rows.length).toBe(0);
+    });
+    it("should return 400 if the code is incorrect", async () => {
+      const code = "notAcode";
+      const password = "newPassword";
+      const results = await request(app)
+        .post(`/user/recovery/update`)
+        .set("Content-Type", "application/json")
+        .send({ code, password });
+      expect(results.status).toBe(400);
+      expect(results.body).toBeDefined();
+      expect(results.body).toHaveProperty("message");
+      expect(results.body.message).toBe("unverified");
+    });
+    it("should return status 500 if there is a server error.", async () => {
+      const originalUpdatePasswordWithRecovery =
+        userModel.updatePasswordWithRecovery;
+      userModel.updatePasswordWithRecovery = jest.fn(() => {
+        throw new Error("Server Error");
+      });
+      const code = "notAcode";
+      const password = "newPassword";
+      const results = await request(app)
+        .post(`/user/recovery/update`)
+        .set("Content-Type", "application/json")
+        .send({ code, password });
+      expect(results.status).toBe(500);
+      expect(results.body.message).toBe("Server Error: Server Error");
+      userModel.updatePasswordWithRecovery = originalUpdatePasswordWithRecovery;
+    });
   });
   describe("GET /users/:id", () => {
     it("should get the user's object only if the user is an admin", async () => {
