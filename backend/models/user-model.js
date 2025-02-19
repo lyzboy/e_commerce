@@ -45,6 +45,10 @@ exports.verifyPasswordCode = async (code) => {
     if (results.rows.length === 0) {
       return { message: "unverified" };
     }
+    const expire_time = new Date(results.rows[0].expire_time);
+    if (expire_time < new Date()) {
+      return { message: "unverified" };
+    }
     return { message: "verified" };
   } catch (error) {
     throw new Error(error);

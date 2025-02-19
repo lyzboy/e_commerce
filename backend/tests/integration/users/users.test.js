@@ -104,12 +104,36 @@ describe("Users Endpoints Integration Tests", () => {
       expect(response.body).toHaveProperty("message");
       expect(response.body.message).toBe("verified");
     }, 10000);
-    it("should return status:unverified if code is incorrect", async () => {
+    it("should return status 400:unverified if code is incorrect", async () => {
       const response = await request(app)
         .post(`/user/verify`)
         .set("Content-Type", "application/json")
         .send({ code: "notAcode" });
-      expect(response.status).toBe(401);
+      expect(response.status).toBe(400);
+      expect(response.body).toBeDefined();
+      expect(response.body).toHaveProperty("message");
+      expect(response.body.message).toBe("unverified");
+    });
+    it("should return status 400 if time has expired", async () => {
+      const email = "testUser99@email.com";
+      await request(app)
+        .post("/user/recovery")
+        .set("Content_Type", "application/json")
+        .send({ email });
+      const passwordCode = await db.query(
+        "SELECT reset_code FROM reset_password_codes WHERE email = $1",
+        [email]
+      );
+      const code = passwordCode.rows[0].reset_code;
+      await db.query(
+        "UPDATE reset_password_codes SET expire_time = $1 WHERE email = $2",
+        [new Date(Date.now() - 15 * 60 * 1000), email]
+      );
+      const response = await request(app)
+        .post(`/user/verify`)
+        .set("Content-Type", "application/json")
+        .send({ code });
+      expect(response.status).toBe(400);
       expect(response.body).toBeDefined();
       expect(response.body).toHaveProperty("message");
       expect(response.body.message).toBe("unverified");
@@ -204,8 +228,6 @@ describe("Users Endpoints Integration Tests", () => {
   describe("POST /user/recovery/:code", () => {
     // reset the password of the account with the associated code
     it("should change the password with the correct code", async () => {
-      // TODO: populate the test database with a user password recover code.
-
       const results = await request(app).post("/user/recovery/1234");
       // .set("Content-Type", "application/json")
       // .send({ productDiscountId });

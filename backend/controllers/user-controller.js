@@ -26,7 +26,7 @@ exports.verifyPasswordCode = async (req, res) => {
       return res.status(400).json({ message: "Bad Request: Missing code" });
     const results = await userModel.verifyPasswordCode(code);
     if (results.message === "unverified") {
-      return res.status(401).json({ message: results.message });
+      return res.status(400).json({ message: results.message });
     }
     res.status(200).json(results);
   } catch (error) {
