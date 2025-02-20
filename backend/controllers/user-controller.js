@@ -34,6 +34,60 @@ exports.verifyPasswordCode = async (req, res) => {
   }
 };
 
+exports.getUser = async (req, res) => {
+  try {
+    const email = req.user.email;
+    if (!email)
+      return res.status(400).json({ message: "Bad Request: Missing User ID" });
+    const results = await userModel.getUserByEmail(email);
+    const returnedResults = {
+      email: results.email,
+      username: results.username,
+      name: results.name,
+    };
+
+    //TODO: query for phone and address
+    if (results.phone_id == null) {
+      returnedResults.phone = null;
+    }
+    if (results.address_id == null) {
+      returnedResults.address = null;
+    }
+    res.status(200).json(returnedResults);
+  } catch (error) {
+    res.status(500).json({ message: "Server Error: " + error.message });
+  }
+};
+
+exports.updateUser = async (req, res) => {
+  try {
+    const email = req.body.email;
+    // get the rest of the body details. found in users.test.js
+    const loggedInEmail = req.user.email;
+    if (!email)
+      return res.status(400).json({ message: "Bad Request: Missing User ID" });
+    // send the user object, not just the email. This object needs to contain all
+    // data that needs updated. don't leave null if not updated.
+    const results = await userModel.updateUserByEmail(email);
+    const returnedResults = {
+      email: results.email,
+      username: results.username,
+      name: results.name,
+    };
+
+    //TODO: query for phone and address
+    if (results.phone_id == null) {
+      returnedResults.phone = null;
+    }
+    if (results.address_id == null) {
+      returnedResults.address = null;
+    }
+    res.status(200).json(returnedResults);
+  } catch (error) {
+    res.status(500).json({ message: "Server Error: " + error.message });
+  }
+};
+
 exports.updatePasswordWithRecovery = async (req, res) => {
   try {
     const { code, password } = req.body;
@@ -51,7 +105,7 @@ exports.updatePasswordWithRecovery = async (req, res) => {
   }
 };
 
-exports.getUser = async (req, res) => {
+exports.getUserByEmail = async (req, res) => {
   try {
     const { id } = req.params;
     if (!id)
@@ -76,92 +130,3 @@ exports.getUser = async (req, res) => {
     res.status(500).json({ message: "Server Error: " + error.message });
   }
 };
-
-// exports.getProducts = async (req, res) => {
-//   try {
-//     const { categoryId, maxPrice, minPrice } = req.body;
-//     const params = {};
-//     if (categoryId) params.categoryId = categoryId;
-//     if (maxPrice) params.maxPrice = maxPrice;
-//     if (minPrice) params.minPrice = minPrice;
-
-//     const results = await productModel.getProducts(params);
-
-//     res.status(200).json(results);
-//   } catch (error) {
-//     res.status(500).json({ message: "Server Error: " + error.message });
-//   }
-// };
-// exports.createProduct = async (req, res) => {
-//   try {
-//     const { barcode, name, description, price, stock_quantity, variants } =
-//       req.body;
-
-//     if (!name) {
-//       return res
-//         .status(400)
-//         .json({ message: "Bad Request. Missing product name" });
-//     }
-
-//     const params = {};
-//     params.name = name;
-
-//     if (barcode) params.barcode = barcode;
-//     if (description) params.description = description;
-//     if (price) params.price = price;
-//     if (stock_quantity) params.stock_quantity = stock_quantity;
-//     if (variants) params.variants = variants;
-//     const results = await productModel.createProduct(params);
-//     res.status(200).json(results);
-//   } catch (error) {
-//     res.status(500).json({ message: "Error: " + error });
-//   }
-// };
-// exports.getProduct = async (req, res) => {
-//   try {
-//     const { id } = req.params;
-//     if (!id)
-//       return res
-//         .status(400)
-//         .json({ message: "Bad Request: Missing Product ID." });
-//     const results = await productModel.getProductWithVariants(id);
-//     res.status(200).json(results);
-//   } catch (error) {
-//     res.status(500).json({ message: "There was a server error: " + error });
-//   }
-// };
-// exports.updateProduct = async (req, res) => {
-//   try {
-//     const { id } = req.params;
-//     if (!id)
-//       return res
-//         .status(400)
-//         .json({ message: "Bad Request: Missing Product ID" });
-//     const { barcode, name, description, price, stock_quantity, variants } =
-//       req.body;
-
-//     const params = { id };
-//     if (barcode) params.barcode = barcode;
-//     if (name) params.name = name;
-//     if (description) params.description = description;
-//     if (price) params.price = price;
-//     if (stock_quantity) params.stock_quantity = stock_quantity;
-//     if (variants) params.variants = variants;
-//     const results = await productModel.updateProduct(params);
-//     res.status(200).json(results);
-//   } catch (error) {
-//     res.status(500).json({ message: error });
-//   }
-// };
-// exports.deleteProduct = async (req, res) => {
-//   try {
-//     const { id } = req.params;
-//     if (!id)
-//       return res
-//         .status(400)
-//         .json({ message: "Bad Request. Missing Product ID" });
-//     const results = await productModel.deleteProduct(id);
-//     res.status(200).json({ message: `Deleted ${results} row(s)` });
-//   } catch (error) {
-//     res.status(500).json({ message: error });
-//   }

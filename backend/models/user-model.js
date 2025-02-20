@@ -1,17 +1,6 @@
 const { query } = require("../config/db");
 const { generateResetCode } = require("../util/helpers");
 
-exports.findUserById = async (id) => {
-  try {
-    const queryText = "SELECT * FROM users WHERE id = $1";
-    const queryParams = [id];
-    const results = await query(queryText, queryParams);
-    return results.rows[0];
-  } catch (error) {
-    throw new Error(error);
-  }
-};
-
 exports.setPasswordRecovery = async (email) => {
   try {
     const validEmail = await this.getUserByEmail(email);
@@ -153,6 +142,15 @@ exports.getUserByEmail = async (email) => {
       return null;
     }
     return results.rows[0];
+  } catch (error) {
+    throw new Error(error);
+  }
+};
+
+exports.updateUser = async (userObject) => {
+  try {
+    // finish query, add parameters if they are found in user object
+    const queryText = "UPDATE TABLE accounts SET ";
   } catch (error) {
     throw new Error(error);
   }

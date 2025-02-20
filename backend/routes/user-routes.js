@@ -4,6 +4,12 @@ const userController = require("../controllers/user-controller");
 const authentication = require("../middlewares/authentication");
 const authorization = require("../middlewares/authorization");
 
+// get logged in user's info
+router.get("/", authentication.authenticateUser, userController.getUser);
+
+// update logged in user's info
+router.put("/", authentication.authenticateUser, userController.updateUser);
+
 /***
  * Route that creates a recovery code for a user
  */
@@ -26,7 +32,7 @@ router.get(
   "/:id",
   authentication.authenticateUser,
   authorization.authorizeRole("admin"),
-  userController.getUser
+  userController.getUserByEmail
 );
 
 module.exports = router;
