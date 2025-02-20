@@ -22,46 +22,11 @@ router.post("/recovery/verify", userController.verifyPasswordCode);
  */
 router.post("/recovery/update", userController.updatePasswordWithRecovery);
 
-// router.post(
-//   "/",
-//   authorization.authorizeRole("admin"),
-//   productController.createProduct
-// );
-
-// router.get(
-//   "/:id",
-//   authentication.authenticateUser,
-//   productController.getProduct
-// );
-
-// router.put(
-//   "/:id",
-//   authorization.authorizeRole("admin"),
-//   productController.updateProduct
-// );
-
-// router.delete(
-//   "/:id",
-//   authorization.authorizeRole("admin"),
-//   productController.deleteProduct
-// );
-
-// router.post(
-//   "/:productId/variants",
-//   authorization.authorizeRole("admin"),
-//   variantController.createProductVariant
-// );
-
-// router.put(
-//   "/:productId/variants/:variantId",
-//   authorization.authorizeRole("admin"),
-//   variantController.updateProductVariant
-// );
-
-// router.delete(
-//   "/:productId/variants/:variantId",
-//   authorization.authorizeRole("admin"),
-//   variantController.deleteProductVariant
-// );
+router.get(
+  "/:id",
+  authentication.authenticateUser,
+  authorization.authorizeRole("admin"),
+  userController.getUser
+);
 
 module.exports = router;

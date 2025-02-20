@@ -51,6 +51,32 @@ exports.updatePasswordWithRecovery = async (req, res) => {
   }
 };
 
+exports.getUser = async (req, res) => {
+  try {
+    const { id } = req.params;
+    if (!id)
+      return res.status(400).json({ message: "Bad Request: Missing User ID" });
+    const results = await userModel.getUserByEmail(id);
+
+    const returnedResults = {
+      email: results.email,
+      username: results.username,
+      name: results.name,
+    };
+
+    //TODO: query for phone and address
+    if (results.phone_id == null) {
+      returnedResults.phone = null;
+    }
+    if (results.address_id == null) {
+      returnedResults.address = null;
+    }
+    res.status(200).json(returnedResults);
+  } catch (error) {
+    res.status(500).json({ message: "Server Error: " + error.message });
+  }
+};
+
 // exports.getProducts = async (req, res) => {
 //   try {
 //     const { categoryId, maxPrice, minPrice } = req.body;
