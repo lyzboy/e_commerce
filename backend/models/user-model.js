@@ -1,5 +1,6 @@
 const { query } = require("../config/db");
 const { generateResetCode } = require("../util/helpers");
+const authentication = require("../middlewares/authentication");
 
 exports.setPasswordRecovery = async (email) => {
   try {
@@ -150,7 +151,49 @@ exports.getUserByEmail = async (email) => {
 exports.updateUser = async (userObject) => {
   try {
     // finish query, add parameters if they are found in user object
-    const queryText = "UPDATE TABLE accounts SET ";
+    let queryText = "UPDATE accounts SET ";
+    const valuesArray = [userObject.email];
+    const fieldsArray = [];
+    if (userObject.username) {
+      valuesArray.push(userObject.username);
+      fieldsArray.push(`username = $${valuesArray.length}`);
+    }
+    if (userObject.password) {
+      const newPassword = await authentication.createHashedPassword(
+        userObject.password
+      );
+      valuesArray.push(newPassword);
+      fieldsArray.push(`password = $${valuesArray.length}`);
+    }
+    if (userObject.name) {
+      valuesArray.push(userObject.name);
+      fieldsArray.push(`name = $${valuesArray.length}`);
+    }
+    if (userObject.phone) {
+      //TODO: create function to search for phone and return id
+      let phoneQueryText = "SELECT id FROM phones WHERE number = $1";
+      const queryParams = [userObject.phone];
+      const phoneResults = await query(phoneQueryText, queryParams);
+      if (phoneResults.rows.length > 0) {
+        valuesArray.push(phoneResults.rows[0].id);
+      } else {
+        const newPhoneId = await this.createPhoneNumber(userObject.phone);
+        valuesArray.push(newPhoneId);
+      }
+      fieldsArray.push(`phone_id = $${valuesArray.length}`);
+    }
+    if (userObject.address) {
+      //TODO: create function to search for address and return id
+      // see if address exists
+      // if not, create it
+    }
+    queryText += fieldsArray.join(", ");
+    queryText += " WHERE email = $1 RETURNING *";
+    const results = await query(queryText, valuesArray);
+    if (results.rows.length === 0) {
+      throw new Error("Unable to update user");
+    }
+    return results.rows[0];
   } catch (error) {
     throw new Error(error);
   }
@@ -226,7 +269,8 @@ exports.getStateId = async (state) => {
 exports.createPhoneNumber = async (phoneNumber) => {
   try {
     //TODO: check if phone number already exists
-    const queryText = "INSERT INTO phones VALUES ($1) RETURNING *";
+    const queryText = "INSERT INTO phones VALUES (DEFAULT, $1) RETURNING *";
+
     const queryParams = [phoneNumber];
     const results = await query(queryText, queryParams);
     return results.rows[0].id;

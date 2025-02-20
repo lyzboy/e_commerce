@@ -54,7 +54,7 @@ describe("Users Endpoints Integration Tests", () => {
       const changeUsername = "changedTestUser";
       const changeName = "changedTestName";
       const changedPassword = "changedTestPassword";
-      const changedPhone = "changedTestPhone";
+      const changedPhone = "9705555555";
       const changedAddress = "changedTestAddress";
       const res = await request(app).put(`/user`).send({
         email: "testUser99@email.com",
