@@ -50,12 +50,15 @@ describe("Users Endpoints Integration Tests", () => {
   });
   describe("PUT /user", () => {
     it("should update a user's object if the user is the same user", async () => {
-      //CAN"T CHANGE EMAIL
       const changeUsername = "changedTestUser";
       const changeName = "changedTestName";
       const changedPassword = "changedTestPassword";
       const changedPhone = "9705555555";
-      const changedAddress = "changedTestAddress";
+      const changedAddress = {
+        streetName: "changedTestAddress",
+        city: "newCity",
+        state: "CO",
+      };
       const res = await request(app).put(`/user`).send({
         email: "testUser99@email.com",
         username: changeUsername,

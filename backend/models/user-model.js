@@ -170,12 +170,9 @@ exports.updateUser = async (userObject) => {
       fieldsArray.push(`name = $${valuesArray.length}`);
     }
     if (userObject.phone) {
-      //TODO: create function to search for phone and return id
-      let phoneQueryText = "SELECT id FROM phones WHERE number = $1";
-      const queryParams = [userObject.phone];
-      const phoneResults = await query(phoneQueryText, queryParams);
-      if (phoneResults.rows.length > 0) {
-        valuesArray.push(phoneResults.rows[0].id);
+      const phoneId = this.getPhoneNumber(userObject.phone);
+      if (phoneId) {
+        valuesArray.push(phoneId);
       } else {
         const newPhoneId = await this.createPhoneNumber(userObject.phone);
         valuesArray.push(newPhoneId);
@@ -183,9 +180,29 @@ exports.updateUser = async (userObject) => {
       fieldsArray.push(`phone_id = $${valuesArray.length}`);
     }
     if (userObject.address) {
-      //TODO: create function to search for address and return id
-      // see if address exists
-      // if not, create it
+      const { streetName, city, state } = userObject.address;
+      if (
+        streetName === undefined ||
+        city === undefined ||
+        state === undefined
+      ) {
+        throw new Error("Missing address fields");
+      }
+      const retrievedStreetNameId = await this.getStreetNameId(streetName);
+      const retrievedCityId = await this.getCityIdByName(city);
+      const retrievedStateId = await this.getStateId(state);
+      if (!retrievedCityId) {
+        retrievedCityId = await this.createCity(city, retrievedStateId);
+      }
+      if (!retrievedStreetNameId) {
+        // create street name
+        retrievedStreetNameId = await this.createStreetName(
+          streetName,
+          retrievedCityId
+        );
+      }
+      valuesArray.push(retrievedStreetNameId);
+      fieldsArray.push(`address_id = $${valuesArray.length}`);
     }
     queryText += fieldsArray.join(", ");
     queryText += " WHERE email = $1 RETURNING *";
@@ -193,7 +210,16 @@ exports.updateUser = async (userObject) => {
     if (results.rows.length === 0) {
       throw new Error("Unable to update user");
     }
-    return results.rows[0];
+    const finalResults = {
+      email: results.rows[0].email,
+      username: results.rows[0].username,
+      name: results.rows[0].name,
+    };
+    finalResults.phone = await this.getPhoneNumber(results.rows[0].number);
+    finalResults.address = await this.getAddressById(
+      results.rows[0].address_id
+    );
+    return finalResults;
   } catch (error) {
     throw new Error(error);
   }
@@ -220,22 +246,23 @@ exports.getUserByUsername = async (username) => {
 
 exports.createCity = async (city, state) => {
   try {
-    const results = await this.getCityByName(city);
-    if (results) {
-      return results;
+    const stateId = await this.getStateId(state);
+    if (stateId === null) {
+      throw new Error(`State not found for: ${state}`);
     }
-
-    const stateId = this.getState(state);
-    const queryText = "INSERT INTO cities VALUES ($1, $2) RETURNING *";
+    const queryText = "INSERT INTO cities VALUES (DEFAULT, $1, $2) RETURNING *";
     const queryParams = [city, stateId];
     results = await query(queryText, queryParams);
-    return results.rows[0].id;
+    if (results.rows.length === 0) {
+      throw new Error(`Unable to create city: ${city}, ${state}`);
+    }
+    return results.rows[0];
   } catch (error) {
     throw new Error(error);
   }
 };
 
-exports.getCityByName = async (city) => {
+exports.getCityIdByName = async (city) => {
   try {
     const queryText = "SELECT id FROM cities WHERE name = $1";
     const queryParams = [city];
@@ -248,14 +275,98 @@ exports.getCityByName = async (city) => {
     throw new Error(error);
   }
 };
+exports.getCityNameById = async (cityId) => {
+  try {
+    const queryText = "SELECT name FROM cities WHERE id = $1";
+    const queryParams = [cityId];
+    const results = await query(queryText, queryParams);
+    return results.rows[0].name;
+  } catch (error) {
+    throw new Error(error);
+  }
+};
+exports.getAddress = async (streetNameId) => {
+  try {
+    const queryText = `SELECT addresses.name AS street, cities.name AS city, state.name AS state FROM addresses join
+     cities on addresses.city_id = cities.id join
+     states on states.id = cities.state_id WHERE addresses.id = $1`;
+    const queryParams = [streetNameId];
+    const results = await query(queryText, queryParams);
+    return {
+      streetName: results.rows[0].street,
+      city: results.rows[0].city,
+      state: results.rows[0].state,
+    };
+  } catch (error) {
+    throw new Error(error);
+  }
+};
+exports.getStateNameById = async (stateId) => {
+  try {
+    const queryText = "SELECT name FROM states WHERE id = $1";
+    const queryParams = [stateId];
+    const results = await query(queryText, queryParams);
+    return results.rows[0].name;
+  } catch (error) {
+    throw new Error(error);
+  }
+};
+
+exports.createStreetName = async (streetName, cityId) => {
+  try {
+    const queryText =
+      "INSERT INTO street_names VALUES (DEFAULT, $1, $2) RETURNING *";
+    const queryParams = [streetName, cityId];
+    const results = await query(queryText, queryParams);
+    if (results.rows.length === 0) {
+      throw new Error(`Unable to create street name: ${streetName}, ${cityId}`);
+    }
+    return results.rows[0].id;
+  } catch (error) {
+    throw new Error(error);
+  }
+};
+
+exports.getStreetNameId = async (streetName) => {
+  try {
+    streetName = streetName.toLowerCase();
+    const results = await query(
+      "SELECT * FROM addresses WHERE street_name = $1",
+      [streetName]
+    );
+    if (results.rows.length === 0) {
+      return null;
+    }
+    return results.rows[0].id;
+  } catch (error) {
+    throw new Error(error);
+  }
+};
 
 exports.getStateId = async (state) => {
   try {
     const queryText =
-      "SELECT id FROM states WHERE name = $1 OR short_name = $1";
+      "SELECT id FROM states WHERE name = $1 OR abbreviation = $1";
     const queryParams = [state];
     const results = await query(queryText, queryParams);
-    return results.rows[0].id;
+    if (results.rows.length === 0) {
+      throw new Error(`State not found: ${state}`);
+    }
+    return results.rows[0];
+  } catch (error) {
+    throw new Error(error);
+  }
+};
+
+exports.getPhoneNumber = async (phoneNumber) => {
+  try {
+    const queryText = "SELECT * FROM phones WHERE number = $1";
+    const queryParams = [phoneNumber];
+    const results = await query(queryText, queryParams);
+    if (results.rows.length === 0) {
+      return null;
+    }
+    return results.rows[0];
   } catch (error) {
     throw new Error(error);
   }
@@ -268,7 +379,6 @@ exports.getStateId = async (state) => {
  */
 exports.createPhoneNumber = async (phoneNumber) => {
   try {
-    //TODO: check if phone number already exists
     const queryText = "INSERT INTO phones VALUES (DEFAULT, $1) RETURNING *";
 
     const queryParams = [phoneNumber];

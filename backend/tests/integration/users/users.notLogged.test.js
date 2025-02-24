@@ -239,16 +239,25 @@ describe("Users Endpoints Integration Tests", () => {
       userModel.updatePasswordWithRecovery = originalUpdatePasswordWithRecovery;
     });
   });
-  describe("GET /users/:id", () => {
-    it("should return 403 if the user is not an admin", async () => {
+  describe("POST /user/register", () => {
+    it("should return 200 if user is created", async () => {});
+    it("should return 400 if email is missing", async () => {});
+    it("should return 400 if email is invalid", async () => {});
+    it("should return 400 if username is missing", async () => {});
+    it("should return 400 if password is missing", async () => {});
+    it("should return 400 if password is invalid", async () => {});
+    it("should return 409 if email already exists", async () => {});
+  });
+  describe("GET /user/:id", () => {
+    it("should return 401 if the user is not an admin", async () => {
       const res = await request(app).get(`/user/testUser99@email.com`);
-      expect(res.statusCode).toEqual(403);
+      expect(res.statusCode).toEqual(401);
     });
   });
   describe("PUT /user", () => {
-    it("should return 403 if the user is not logged in", async () => {
+    it("should return 401 if the user is not logged in", async () => {
       const res = await request(app).get(`/user`);
-      expect(res.statusCode).toEqual(403);
+      expect(res.statusCode).toEqual(401);
     });
   });
   describe("DELETE /user/:id", () => {

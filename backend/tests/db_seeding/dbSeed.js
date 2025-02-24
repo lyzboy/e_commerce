@@ -8,6 +8,7 @@ const seedProductDiscounts = require("./seedProductDiscounts");
 const seedProductsCategories = require("./seedProductsCategories");
 const seedUserAccounts = require("./seedUserAccounts");
 const seedAdmins = require("./seedAdmins");
+const seedStates = require("./seedStates");
 
 const dbSeed = {
   testDiscountId: 1,
@@ -46,6 +47,8 @@ const dbSeed = {
         email: "admin@email.com",
       },
     ]);
+
+    await seedStates();
 
     await seedDiscounts([
       {
