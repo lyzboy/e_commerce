@@ -79,10 +79,11 @@ describe("Users Endpoints Integration Tests", () => {
         ["testUser99@email.com"],
         true
       );
-      const hashedPassword = await authentication.createHashedPassword(
-        changedPassword
+      const comparedPasswords = await authentication.comparePasswords(
+        changedPassword,
+        userPassword.rows[0].password
       );
-      expect(userPassword.rows[0].password).toEqual(hashedPassword);
+      expect(comparedPasswords).toEqual(true);
     });
   });
   describe("DELETE /user", () => {

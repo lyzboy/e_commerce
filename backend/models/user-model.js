@@ -158,7 +158,6 @@ exports.updateUser = async (userObject) => {
       fieldsArray.push(`username = $${valuesArray.length}`);
     }
     if (userObject.password) {
-      console.log("Password: ", userObject.password);
       const newPassword = await authentication.createHashedPassword(
         userObject.password
       );
@@ -219,7 +218,6 @@ exports.updateUser = async (userObject) => {
       results.rows[0].phone_id
     );
     finalResults.address = await this.getAddress(results.rows[0].address_id);
-    console.log("Final Results: ", finalResults);
     return finalResults;
   } catch (error) {
     throw new Error(error);
