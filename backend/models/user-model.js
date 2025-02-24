@@ -2,6 +2,8 @@ const { query } = require("../config/db");
 const { generateResetCode } = require("../util/helpers");
 const authentication = require("../middlewares/authentication");
 
+const userAddressDao = require("./dao/user-address-dao");
+
 exports.setPasswordRecovery = async (email) => {
   try {
     const validEmail = await this.getUserByEmail(email);
@@ -187,15 +189,20 @@ exports.updateUser = async (userObject) => {
       ) {
         throw new Error("Missing address fields");
       }
-      let retrievedStreetNameId = await this.getStreetNameId(streetName);
-      let retrievedCityId = await this.getCityIdByName(city);
-      const retrievedStateId = await this.getStateId(state);
+      let retrievedStreetNameId = await userAddressDao.getStreetNameId(
+        streetName
+      );
+      let retrievedCityId = await userAddressDao.getCityIdByName(city);
+      const retrievedStateId = await userAddressDao.getStateId(state);
       if (!retrievedCityId) {
-        retrievedCityId = await this.createCity(city, retrievedStateId);
+        retrievedCityId = await userAddressDao.createCity(
+          city,
+          retrievedStateId
+        );
       }
       if (!retrievedStreetNameId) {
         // create street name
-        retrievedStreetNameId = await this.createStreetName(
+        retrievedStreetNameId = await userAddressDao.createStreetName(
           streetName,
           retrievedCityId
         );
@@ -217,7 +224,9 @@ exports.updateUser = async (userObject) => {
     finalResults.phone = await this.getPhoneNumberById(
       results.rows[0].phone_id
     );
-    finalResults.address = await this.getAddress(results.rows[0].address_id);
+    finalResults.address = await userAddressDao.getAddress(
+      results.rows[0].address_id
+    );
     return finalResults;
   } catch (error) {
     throw new Error(error);
@@ -238,136 +247,6 @@ exports.getUserByUsername = async (username) => {
       return null;
     }
     return results.rows[0];
-  } catch (error) {
-    throw new Error(error);
-  }
-};
-
-/**
- *
- * @param {string} city
- * @param {int} state - the state's id
- * @returns
- */
-exports.createCity = async (city, state) => {
-  try {
-    if (state === null) {
-      throw new Error(`State not found for: ${state}`);
-    }
-    const queryText = "INSERT INTO cities VALUES (DEFAULT, $1, $2) RETURNING *";
-    const queryParams = [city, state];
-    results = await query(queryText, queryParams);
-    if (results.rows.length === 0) {
-      throw new Error(`Unable to create city: ${city}, ${state}`);
-    }
-    return results.rows[0].id;
-  } catch (error) {
-    throw new Error(error);
-  }
-};
-
-exports.getCityIdByName = async (city) => {
-  try {
-    const queryText = "SELECT id FROM cities WHERE name = $1";
-    const queryParams = [city];
-    const results = await query(queryText, queryParams);
-    if (results.rows.length === 0) {
-      return null;
-    }
-    return results.rows[0].id;
-  } catch (error) {
-    throw new Error(error);
-  }
-};
-exports.getCityNameById = async (cityId) => {
-  try {
-    const queryText = "SELECT name FROM cities WHERE id = $1";
-    const queryParams = [cityId];
-    const results = await query(queryText, queryParams);
-    return results.rows[0].name;
-  } catch (error) {
-    throw new Error(error);
-  }
-};
-exports.getAddress = async (streetNameId) => {
-  try {
-    const queryText = `SELECT addresses.street_name AS street, cities.name AS city, states.abbreviation AS state FROM addresses join
-     cities on addresses.city_id = cities.id join
-     states on states.id = cities.state_id WHERE addresses.id = $1`;
-    const queryParams = [streetNameId];
-    const results = await query(queryText, queryParams);
-    return {
-      streetName: results.rows[0].street,
-      city: results.rows[0].city,
-      state: results.rows[0].state,
-    };
-  } catch (error) {
-    throw new Error(error);
-  }
-};
-exports.getStateNameById = async (stateId) => {
-  try {
-    const queryText = "SELECT name FROM states WHERE id = $1";
-    const queryParams = [stateId];
-    const results = await query(queryText, queryParams);
-    return results.rows[0].name;
-  } catch (error) {
-    throw new Error(error);
-  }
-};
-
-exports.createStreetName = async (streetName, cityId) => {
-  try {
-    const queryText =
-      "INSERT INTO addresses VALUES (DEFAULT, $1, $2) RETURNING *";
-    const queryParams = [streetName, cityId];
-    const results = await query(queryText, queryParams);
-    if (results.rows.length === 0) {
-      throw new Error(`Unable to create street name: ${streetName}, ${cityId}`);
-    }
-    return results.rows[0].id;
-  } catch (error) {
-    throw new Error(error);
-  }
-};
-
-exports.getStreetNameId = async (streetName) => {
-  try {
-    streetName = streetName.toLowerCase();
-    const results = await query(
-      "SELECT * FROM addresses WHERE street_name = $1",
-      [streetName]
-    );
-    if (results.rows.length === 0) {
-      return null;
-    }
-    return results.rows[0].id;
-  } catch (error) {
-    throw new Error(error);
-  }
-};
-
-exports.getStreetNameById = async (streetNameId) => {
-  try {
-    const queryText = "SELECT street_name FROM addresses WHERE id = $1";
-    const queryParams = [streetNameId];
-    const results = await query(queryText, queryParams);
-    return results.rows[0].name;
-  } catch (error) {
-    throw new Error(error);
-  }
-};
-
-exports.getStateId = async (state) => {
-  try {
-    const queryText =
-      "SELECT id FROM states WHERE name = $1 OR abbreviation = $1";
-    const queryParams = [state];
-    const results = await query(queryText, queryParams);
-    if (results.rows.length === 0) {
-      throw new Error(`State not found: ${state}`);
-    }
-    return results.rows[0].id;
   } catch (error) {
     throw new Error(error);
   }
