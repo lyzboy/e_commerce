@@ -68,19 +68,21 @@ describe("Users Endpoints Integration Tests", () => {
         address: changedAddress,
       });
       expect(res.statusCode).toEqual(200);
-      const newUserInfo = await request(app).get(`/user`);
-      expect(newUserInfo.body.username).toEqual(changeUsername);
-      expect(newUserInfo.body.name).toEqual(changeName);
-      expect(newUserInfo.body.phone).toEqual(changedPhone);
-      expect(newUserInfo.body.address).toEqual(changedAddress);
+      expect(res.body.username).toEqual(changeUsername);
+      expect(res.body.name).toEqual(changeName);
+      expect(res.body.phone).toEqual(changedPhone);
+      expect(res.body.address.streetName).toEqual(changedAddress.streetName);
+      expect(res.body.address.city).toEqual(changedAddress.city);
+      expect(res.body.address.state).toEqual(changedAddress.state);
       const userPassword = await db.query(
         `SELECT password FROM accounts WHERE email = $1`,
         ["testUser99@email.com"],
         true
       );
-      expect(userPassword.rows[0].password).toEqual(
-        authentication.createHashedPassword(changedPassword)
+      const hashedPassword = await authentication.createHashedPassword(
+        changedPassword
       );
+      expect(userPassword.rows[0].password).toEqual(hashedPassword);
     });
   });
   describe("DELETE /user", () => {

@@ -150,7 +150,6 @@ exports.getUserByEmail = async (email) => {
 
 exports.updateUser = async (userObject) => {
   try {
-    // finish query, add parameters if they are found in user object
     let queryText = "UPDATE accounts SET ";
     const valuesArray = [userObject.email];
     const fieldsArray = [];
@@ -159,6 +158,7 @@ exports.updateUser = async (userObject) => {
       fieldsArray.push(`username = $${valuesArray.length}`);
     }
     if (userObject.password) {
+      console.log("Password: ", userObject.password);
       const newPassword = await authentication.createHashedPassword(
         userObject.password
       );
@@ -170,7 +170,7 @@ exports.updateUser = async (userObject) => {
       fieldsArray.push(`name = $${valuesArray.length}`);
     }
     if (userObject.phone) {
-      const phoneId = this.getPhoneNumber(userObject.phone);
+      const phoneId = await this.getPhoneNumber(userObject.phone);
       if (phoneId) {
         valuesArray.push(phoneId);
       } else {
@@ -188,8 +188,8 @@ exports.updateUser = async (userObject) => {
       ) {
         throw new Error("Missing address fields");
       }
-      const retrievedStreetNameId = await this.getStreetNameId(streetName);
-      const retrievedCityId = await this.getCityIdByName(city);
+      let retrievedStreetNameId = await this.getStreetNameId(streetName);
+      let retrievedCityId = await this.getCityIdByName(city);
       const retrievedStateId = await this.getStateId(state);
       if (!retrievedCityId) {
         retrievedCityId = await this.createCity(city, retrievedStateId);
@@ -206,7 +206,7 @@ exports.updateUser = async (userObject) => {
     }
     queryText += fieldsArray.join(", ");
     queryText += " WHERE email = $1 RETURNING *";
-    const results = await query(queryText, valuesArray);
+    const results = await query(queryText, valuesArray, true);
     if (results.rows.length === 0) {
       throw new Error("Unable to update user");
     }
@@ -215,10 +215,11 @@ exports.updateUser = async (userObject) => {
       username: results.rows[0].username,
       name: results.rows[0].name,
     };
-    finalResults.phone = await this.getPhoneNumber(results.rows[0].number);
-    finalResults.address = await this.getAddressById(
-      results.rows[0].address_id
+    finalResults.phone = await this.getPhoneNumberById(
+      results.rows[0].phone_id
     );
+    finalResults.address = await this.getAddress(results.rows[0].address_id);
+    console.log("Final Results: ", finalResults);
     return finalResults;
   } catch (error) {
     throw new Error(error);
@@ -244,19 +245,24 @@ exports.getUserByUsername = async (username) => {
   }
 };
 
+/**
+ *
+ * @param {string} city
+ * @param {int} state - the state's id
+ * @returns
+ */
 exports.createCity = async (city, state) => {
   try {
-    const stateId = await this.getStateId(state);
-    if (stateId === null) {
+    if (state === null) {
       throw new Error(`State not found for: ${state}`);
     }
     const queryText = "INSERT INTO cities VALUES (DEFAULT, $1, $2) RETURNING *";
-    const queryParams = [city, stateId];
+    const queryParams = [city, state];
     results = await query(queryText, queryParams);
     if (results.rows.length === 0) {
       throw new Error(`Unable to create city: ${city}, ${state}`);
     }
-    return results.rows[0];
+    return results.rows[0].id;
   } catch (error) {
     throw new Error(error);
   }
@@ -270,7 +276,7 @@ exports.getCityIdByName = async (city) => {
     if (results.rows.length === 0) {
       return null;
     }
-    return results.rows[0];
+    return results.rows[0].id;
   } catch (error) {
     throw new Error(error);
   }
@@ -287,7 +293,7 @@ exports.getCityNameById = async (cityId) => {
 };
 exports.getAddress = async (streetNameId) => {
   try {
-    const queryText = `SELECT addresses.name AS street, cities.name AS city, state.name AS state FROM addresses join
+    const queryText = `SELECT addresses.street_name AS street, cities.name AS city, states.name AS state FROM addresses join
      cities on addresses.city_id = cities.id join
      states on states.id = cities.state_id WHERE addresses.id = $1`;
     const queryParams = [streetNameId];
@@ -315,7 +321,7 @@ exports.getStateNameById = async (stateId) => {
 exports.createStreetName = async (streetName, cityId) => {
   try {
     const queryText =
-      "INSERT INTO street_names VALUES (DEFAULT, $1, $2) RETURNING *";
+      "INSERT INTO addresses VALUES (DEFAULT, $1, $2) RETURNING *";
     const queryParams = [streetName, cityId];
     const results = await query(queryText, queryParams);
     if (results.rows.length === 0) {
@@ -343,6 +349,17 @@ exports.getStreetNameId = async (streetName) => {
   }
 };
 
+exports.getStreetNameById = async (streetNameId) => {
+  try {
+    const queryText = "SELECT street_name FROM addresses WHERE id = $1";
+    const queryParams = [streetNameId];
+    const results = await query(queryText, queryParams);
+    return results.rows[0].name;
+  } catch (error) {
+    throw new Error(error);
+  }
+};
+
 exports.getStateId = async (state) => {
   try {
     const queryText =
@@ -352,7 +369,7 @@ exports.getStateId = async (state) => {
     if (results.rows.length === 0) {
       throw new Error(`State not found: ${state}`);
     }
-    return results.rows[0];
+    return results.rows[0].id;
   } catch (error) {
     throw new Error(error);
   }
@@ -366,7 +383,18 @@ exports.getPhoneNumber = async (phoneNumber) => {
     if (results.rows.length === 0) {
       return null;
     }
-    return results.rows[0];
+    return results.rows[0].id;
+  } catch (error) {
+    throw new Error(error);
+  }
+};
+
+exports.getPhoneNumberById = async (phoneId) => {
+  try {
+    const queryText = "SELECT number FROM phones WHERE id = $1";
+    const queryParams = [phoneId];
+    const results = await query(queryText, queryParams);
+    return results.rows[0].number;
   } catch (error) {
     throw new Error(error);
   }

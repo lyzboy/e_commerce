@@ -93,21 +93,7 @@ exports.updateUser = async (req, res) => {
     // send the user object, not just the email. This object needs to contain all
     // data that needs updated. don't leave null if not updated.
     let rawResults = await userModel.updateUser(userObject);
-    const returnedResults = {
-      email: rawResults.email,
-      username: rawResults.username,
-      name: rawResults.name,
-    };
-
-    //TODO: query for phone and address
-    // return the actual phone and address objects, not the ids
-    if (rawResults.phone_id == null) {
-      returnedResults.phone = null;
-    }
-    if (rawResults.address_id == null) {
-      returnedResults.address = null;
-    }
-    res.status(200).json(returnedResults);
+    res.status(200).json(rawResults);
   } catch (error) {
     console.log(error);
     res.status(500).json({ message: "Server Error: " + error.message });
