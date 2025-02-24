@@ -147,7 +147,10 @@ const dbSeed = {
         DELETE FROM categories;
         DELETE FROM carts;
         DELETE FROM admins;
-        DELETE FROM accounts; 
+        DELETE FROM accounts;
+        DELETE FROM addresses;
+        DELETE FROM cities;
+        DELETE FROM states;
       `);
       await db.testPool.end();
       console.log("Cleaned up discounts and closed database pool.");
