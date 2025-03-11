@@ -308,3 +308,14 @@ exports.getIsUserAdmin = async (account_email) => {
   }
   return true;
 };
+
+exports.deleteUserByEmail = async (userEmail) => {
+  const queryText = "DELETE FROM accounts WHERE email = $1";
+  const queryParams = [userEmail];
+  const results = await query(queryText, queryParams, true);
+  if (results.rowCount > 0) {
+    return { deleted: true };
+  } else {
+    return { deleted: false };
+  }
+};

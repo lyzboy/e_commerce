@@ -10,6 +10,11 @@ router.get("/", authentication.authenticateUser, userController.getUser);
 // update logged in user's info
 router.put("/", authentication.authenticateUser, userController.updateUser);
 
+/**
+ * Route that deletes a users account when the user is signed in
+ */
+router.delete("/", authentication.authenticateUser, userController.deleteUser);
+
 /***
  * Route that creates a recovery code for a user
  */

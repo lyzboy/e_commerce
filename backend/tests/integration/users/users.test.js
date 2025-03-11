@@ -86,6 +86,11 @@ describe("Users Endpoints Integration Tests", () => {
       expect(comparedPasswords).toEqual(true);
     });
   });
+  describe("POST /user", () => {
+    it("should create a new user object and return the created object", async () => {
+      expect(false).toEqual(true);
+    });
+  });
   describe("DELETE /user", () => {
     it("should delete a user's object if the user is the same user", async () => {
       const res = await request(app).delete(`/user`);

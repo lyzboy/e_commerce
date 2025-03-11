@@ -34,7 +34,7 @@ describe("Users Endpoints Integration Tests", () => {
     await dbSeed.cleanupDbSeed();
   });
 
-  describe("GET /users/:id", () => {
+  describe("admin GET /users/:id", () => {
     it("should get the user's object only if the user is an admin", async () => {
       const userIds = await db.query(`SELECT * FROM accounts`, []);
       const testId = userIds.rows[0].email;
@@ -49,10 +49,12 @@ describe("Users Endpoints Integration Tests", () => {
     });
   });
 
-  describe("DELETE /user/:id", () => {
-    it("should return 403 if the user is not logged in", async () => {
-      const res = await request(app).get(`/user`);
-      expect(res.statusCode).toEqual(403);
+  describe("admin DELETE /user/:id", () => {
+    it("should return 200 if the user is deleted", async () => {
+      testId = null;
+      const res = await request(app).delete(`/user/${testId}`);
+      expect(res.statusCode).toEqual(200);
+      expect(res.userId).toEqual(testId);
     });
   });
 });

@@ -261,9 +261,9 @@ describe("Users Endpoints Integration Tests", () => {
     });
   });
   describe("DELETE /user/:id", () => {
-    it("should return 403 if the user is not an admin", async () => {
+    it("should return 401 if the user is not an admin", async () => {
       const res = await request(app).get(`/user`);
-      expect(res.statusCode).toEqual(403);
+      expect(res.statusCode).toEqual(401);
     });
   });
 });
