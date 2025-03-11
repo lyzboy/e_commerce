@@ -3,6 +3,7 @@ const express = require("express");
 const userRoutes = require("../../../routes/user-routes");
 const db = require("../../../config/db");
 const dbSeed = require("../../db_seeding/dbSeed");
+const authentication = require("../../../middlewares/authentication");
 
 /**
  * Express application instance.
@@ -51,10 +52,25 @@ describe("Users Endpoints Integration Tests", () => {
 
   describe("admin DELETE /user/:id", () => {
     it("should return 200 if the user is deleted", async () => {
-      testId = null;
-      const res = await request(app).delete(`/user/${testId}`);
+      const testUserObject = {
+        email: "newTest@email.com",
+        username: "newTest",
+        password: "Password1$",
+      };
+
+      const { email, username } = testUserObject;
+      const password = await authentication.createHashedPassword(
+        testUserObject.password
+      );
+
+      await db.query(
+        `INSERT INTO accounts (email, username, name, password) 
+                       VALUES ($1, $2, $3, $4) 
+                       RETURNING *`,
+        [email, username, "testAccount", password]
+      );
+      const res = await request(app).delete(`/user/${testUserObject.email}`);
       expect(res.statusCode).toEqual(200);
-      expect(res.userId).toEqual(testId);
     });
   });
 });

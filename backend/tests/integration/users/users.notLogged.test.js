@@ -240,13 +240,27 @@ describe("Users Endpoints Integration Tests", () => {
     });
   });
   describe("POST /user/register", () => {
-    it("should return 200 if user is created", async () => {});
-    it("should return 400 if email is missing", async () => {});
-    it("should return 400 if email is invalid", async () => {});
-    it("should return 400 if username is missing", async () => {});
-    it("should return 400 if password is missing", async () => {});
-    it("should return 400 if password is invalid", async () => {});
-    it("should return 409 if email already exists", async () => {});
+    it("should return 200 if user is created", async () => {
+      expect(true).toEqual(false);
+    });
+    it("should return 400 if email is missing", async () => {
+      expect(true).toEqual(false);
+    });
+    it("should return 400 if email is invalid", async () => {
+      expect(true).toEqual(false);
+    });
+    it("should return 400 if username is missing", async () => {
+      expect(true).toEqual(false);
+    });
+    it("should return 400 if password is missing", async () => {
+      expect(true).toEqual(false);
+    });
+    it("should return 400 if password is invalid", async () => {
+      expect(true).toEqual(false);
+    });
+    it("should return 409 if email already exists", async () => {
+      expect(true).toEqual(false);
+    });
   });
   describe("GET /user/:id", () => {
     it("should return 401 if the user is not an admin", async () => {

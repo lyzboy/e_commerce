@@ -61,6 +61,7 @@ exports.getUser = async (req, res) => {
 
 exports.createUser = async (req, res) => {
   try {
+    res.status(500).json({ message: "Not Implemented" });
   } catch (error) {
     console.log(error);
     res.status(500).json({ message: "Server Error: " + error.message });
@@ -157,6 +158,24 @@ exports.deleteUser = async (req, res) => {
       return res.status(400).json({ message: "Unauthorized delete request" });
     }
     const results = await userModel.deleteUserByEmail(req.user.email);
+    if (results.deleted) {
+      return res.status(200).json({ message: "Account successfully deleted" });
+    } else {
+      throw new Error(
+        "Unable to delete. Account has already been deleted or doesn't exist."
+      );
+    }
+  } catch (error) {
+    res.status(500).json({ message: "Server Error" + error.message });
+  }
+};
+
+exports.adminDeleteUser = async (req, res) => {
+  try {
+    if (!req.params.id) {
+      return res.status(400).json({ message: "Unauthorized delete request" });
+    }
+    const results = await userModel.deleteUserByEmail(req.params.id);
     if (results.deleted) {
       return res.status(200).json({ message: "Account successfully deleted" });
     } else {
