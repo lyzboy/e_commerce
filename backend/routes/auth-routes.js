@@ -7,7 +7,7 @@ const authorization = require("../middlewares/authorization");
 
 router.post("/login", passport.authenticate("local"), authController.login);
 
-router.post("/register", authController.createUser);
+// router.post("/register", authController.createUser);
 
 router.post("/logout", authController.logout);
 

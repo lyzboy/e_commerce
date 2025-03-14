@@ -35,7 +35,7 @@ exports.verifyPasswordCode = async (req, res) => {
     res.status(500).json({ message: "Server Error: " + error.message });
   }
 };
-//TODO: ensure password is proper length and requirements
+
 exports.getUser = async (req, res) => {
   try {
     const email = req.user.email;
@@ -63,30 +63,44 @@ exports.getUser = async (req, res) => {
 
 exports.createUser = async (req, res) => {
   try {
-    const userObject = req.body;
-    if (!userObject.email || !userObject.username || !userObject.password) {
+    const user = req.body;
+    if (!user.email || !user.username || !user.password) {
       return res
         .status(400)
         .json({ message: "Bad Request: Missing User Data" });
     }
 
-    // Validate the email using the validator package
-    if (!validator.isEmail(userObject.email)) {
-      return res.status(400).json({ message: "Invalid email address" });
-    }
+    const userObject = this.validateUserData(user);
 
     const checkedEmail = await userModel.getUserByEmail(userObject.email);
     if (checkedEmail) {
       return res.status(409).json({ message: "Email already in use" });
     }
-    const results = await userModel.createUser(userObject);
-    res.status(200).json(results);
+    // check if username exists
+    const userCheck = await userModel.getUserByUsername(user.username);
+    if (userCheck) {
+      return res.status(409).json({ message: "Username already exists" });
+    }
+    const newUser = await userModel.createUser(userObject);
+    req.logIn(newUser, (err) => {
+      if (err) {
+        console.error("Error during login:", err);
+        return res.status(500).json({ message: "Login failed" });
+      }
+      res.status(200).json({ message: "logged in" });
+    });
   } catch (error) {
-    console.log(error);
-    res.status(500).json({ message: "Server Error: " + error.message });
+    if (error instanceof CustomError) {
+      console.error(error);
+      res.status(error.statusCode).json({ message: error.message });
+    } else {
+      console.error(error);
+      res.status(500).json({ message: `${error}` });
+    }
   }
 };
 
+//TODO utilize validation from create user in this function
 exports.updateUser = async (req, res) => {
   try {
     // get the rest of the body details. found in users.test.js
@@ -207,3 +221,107 @@ exports.adminDeleteUser = async (req, res) => {
     res.status(500).json({ message: "Server Error" + error.message });
   }
 };
+
+exports.validateUserData = ({
+  email,
+  username,
+  name,
+  password,
+  streetName,
+  streetNumber,
+  city,
+  state,
+  zipCode,
+  phoneNumber,
+}) => {
+  if (!email || !username || !password) {
+    throw new CustomError(
+      422,
+      "Unprocessable Entity: no email, username, or password"
+    );
+  }
+  if (!validator.isEmail(email)) {
+    throw new CustomError(422, "Unprocessable Entity: invalid email");
+  }
+  if (!validator.isAlphanumeric(username, "en-US")) {
+    throw new CustomError(422, "Unprocessable Entity: invalid username");
+  }
+  if (
+    !validator.isStrongPassword(password, {
+      minLength: 8,
+      minLowercase: 1,
+      minUppercase: 1,
+      minNumbers: 1,
+      minSymbols: 1,
+    })
+  ) {
+    throw new CustomError(422, "Unprocessable Entity: invalid password");
+  }
+  if (name) {
+    if (!validator.isAlphanumeric(name, "en-US", { ignore: " " })) {
+      throw new CustomError(422, "Unprocessable Entity: invalid name");
+    }
+  }
+  if (streetName) {
+    if (!validator.isAlphanumeric(streetName, "en-US", { ignore: " ." })) {
+      throw new CustomError(422, "Unprocessable Entity: invalid street name");
+    }
+  }
+  if (streetNumber) {
+    if (!validator.isNumeric(streetNumber)) {
+      throw new CustomError(422, "Unprocessable Entity: invalid street number");
+    }
+  }
+  if (city) {
+    if (!validator.isAlphanumeric(city, "en-US", { ignore: " " })) {
+      throw new CustomError(422, "Unprocessable Entity: invalid city");
+    }
+  }
+  if (state) {
+    if (
+      !validator.isAlpha(state) &&
+      !validator.isLength(state, { min: 2, max: 2 })
+    ) {
+      throw new CustomError(422, "Unprocessable Entity: invalid state");
+    }
+  }
+  if (zipCode) {
+    if (!validator.isPostalCode(zipCode, "US")) {
+      throw new CustomError(422, "Unprocessable Entity: invalid zip code");
+    }
+  }
+  if (phoneNumber) {
+    if (!validator.isMobilePhone(phoneNumber, "en-US")) {
+      throw new CustomError(422, "Unprocessable Entity: invalid phone number");
+    }
+  }
+
+  return {
+    email,
+    username,
+    name,
+    password,
+    streetName,
+    streetNumber,
+    city,
+    state,
+    zipCode,
+    phoneNumber,
+  };
+};
+
+class CustomError extends Error {
+  constructor(statusCode = 500, ...params) {
+    // Pass remaining arguments (including vendor specific ones) to parent constructor
+    super(...params);
+
+    // Maintains proper stack trace for where our error was thrown (only available on V8)
+    if (Error.captureStackTrace) {
+      Error.captureStackTrace(this, CustomError);
+    }
+
+    this.name = "CustomError";
+    // Custom debugging information
+    this.statusCode = statusCode;
+  }
+}
