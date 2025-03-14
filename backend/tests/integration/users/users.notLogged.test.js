@@ -241,7 +241,34 @@ describe("Users Endpoints Integration Tests", () => {
   });
   describe("POST /user/register", () => {
     it("should return 200 if user is created", async () => {
-      expect(true).toEqual(false);
+      const userObject = {
+        email: "newEmail@email.com",
+        username: "newUserName",
+        password: "newPassword",
+        address: {
+          streetName: "123 abc st.",
+          city: "city",
+          state: "CO",
+          zipCode: "12345",
+        },
+        phoneNumber: "1234567890",
+        name: "New Name",
+      };
+      const results = await request(app)
+        .post(`/user/register`)
+        .set("Content-Type", "application/json")
+        .send(userObject);
+      expect(results.status).toBe(200);
+      expect(results.body).toBeDefined();
+      expect(results.body).toHaveProperty("email");
+      expect(results.body).toHaveProperty("username");
+      expect(results.body).toHaveProperty("name");
+      expect(results.body).toHaveProperty("phone");
+      expect(results.body).toHaveProperty("address");
+      expect(results.body.address).toHaveProperty("streetName");
+      expect(results.body.address).toHaveProperty("city");
+      expect(results.body.address).toHaveProperty("state");
+      expect(results.body.address).toHaveProperty("zipcode");
     });
     it("should return 400 if email is missing", async () => {
       expect(true).toEqual(false);

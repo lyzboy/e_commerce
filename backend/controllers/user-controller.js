@@ -61,7 +61,14 @@ exports.getUser = async (req, res) => {
 
 exports.createUser = async (req, res) => {
   try {
-    res.status(500).json({ message: "Not Implemented" });
+    const userObject = req.body;
+    if (!userObject.email || !userObject.username || !userObject.password) {
+      return res
+        .status(400)
+        .json({ message: "Bad Request: Missing User Data" });
+    }
+    const results = await userModel.createUser(userObject);
+    res.status(200).json(results);
   } catch (error) {
     console.log(error);
     res.status(500).json({ message: "Server Error: " + error.message });

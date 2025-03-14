@@ -65,15 +65,21 @@ exports.getCityNameById = async (cityId) => {
  */
 exports.getAddress = async (streetNameId) => {
   try {
-    const queryText = `SELECT addresses.street_name AS street, cities.name AS city, states.abbreviation AS state FROM addresses join
+    if (streetNameId === null) {
+      throw new Error(`Street name not found for: ${streetNameId}`);
+    }
+    const queryText = `SELECT addresses.street_name AS street, zipcodes.zipcode AS zipcode, cities.name AS city, states.abbreviation AS state FROM addresses join
      cities on addresses.city_id = cities.id join
-     states on states.id = cities.state_id WHERE addresses.id = $1`;
+     states on states.id = cities.state_id join
+     zipcodes on zipcodes.id = addresses.zipcode_id
+     WHERE addresses.id = $1`;
     const queryParams = [streetNameId];
     const results = await query(queryText, queryParams);
     return {
       streetName: results.rows[0].street,
       city: results.rows[0].city,
       state: results.rows[0].state,
+      zipcode: results.rows[0].zipcode,
     };
   } catch (error) {
     throw new Error(error);
@@ -118,11 +124,11 @@ exports.getStateAbbreviationById = async (stateId) => {
  * @param {int} cityId
  * @returns
  */
-exports.createStreetName = async (streetName, cityId) => {
+exports.createStreetName = async (streetName, cityId, zipId) => {
   try {
     const queryText =
-      "INSERT INTO addresses VALUES (DEFAULT, $1, $2) RETURNING *";
-    const queryParams = [streetName, cityId];
+      "INSERT INTO addresses VALUES (DEFAULT, $1, $2, $3) RETURNING *";
+    const queryParams = [streetName, cityId, zipId];
     const results = await query(queryText, queryParams);
     if (results.rows.length === 0) {
       throw new Error(`Unable to create street name: ${streetName}, ${cityId}`);
@@ -183,6 +189,34 @@ exports.getStateId = async (state) => {
     const results = await query(queryText, queryParams);
     if (results.rows.length === 0) {
       throw new Error(`State not found: ${state}`);
+    }
+    return results.rows[0].id;
+  } catch (error) {
+    throw new Error(error);
+  }
+};
+
+exports.getZipcodeId = async (zipcode) => {
+  try {
+    const queryText = "SELECT id FROM zipcodes WHERE zipcode = $1";
+    const queryParams = [zipcode];
+    const results = await query(queryText, queryParams);
+    if (results.rows.length === 0) {
+      return null;
+    }
+    return results.rows[0].id;
+  } catch (error) {
+    throw new Error(error);
+  }
+};
+
+exports.createZipcode = async (zipcode) => {
+  try {
+    const queryText = "INSERT INTO zipcodes VALUES (DEFAULT, $1) RETURNING *";
+    const queryParams = [zipcode];
+    const results = await query(queryText, queryParams);
+    if (results.rows.length === 0) {
+      throw new Error(`Unable to create zipcode: ${zipcode}`);
     }
     return results.rows[0].id;
   } catch (error) {

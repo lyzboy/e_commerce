@@ -76,18 +76,8 @@ exports.verifyPasswordCode = async (code) => {
 exports.createUser = async (userObject) => {
   try {
     //TODO: finish implementing the rest of the user fields
-    const {
-      email,
-      username,
-      name,
-      password,
-      streetName,
-      streetNumber,
-      city,
-      state,
-      zipCode,
-      phoneNumber,
-    } = userObject;
+    const { email, username, name, password, address, phoneNumber } =
+      userObject;
 
     let phoneId = null;
     if (phoneNumber) {
@@ -118,8 +108,53 @@ exports.createUser = async (userObject) => {
       valuesIndexes.push(`$${valuesArray.length}`);
     }
     if (phoneId) {
-      valuesArray.push(phoneId);
-      fieldsArray.push("phone_id");
+      const phoneId = await this.getPhoneNumber(userObject.phone);
+      if (phoneId) {
+        valuesArray.push(phoneId);
+      } else {
+        const newPhoneId = await this.createPhoneNumber(userObject.phone);
+        valuesArray.push(newPhoneId);
+      }
+      fieldsArray.push(`phone_id`);
+      valuesIndexes.push(`$${valuesArray.length}`);
+    }
+    if (address) {
+      const { streetName, city, state, zipCode } = address;
+      if (
+        streetName === undefined ||
+        city === undefined ||
+        state === undefined ||
+        zipCode === undefined
+      ) {
+        throw new Error(
+          `Missing address fields for: ${JSON.stringify(address)}`
+        );
+      }
+      let retrievedZipcodeId = await userAddressDao.getZipcodeId(zipCode);
+      if (!retrievedZipcodeId) {
+        retrievedZipcodeId = await userAddressDao.createZipcode(zipCode);
+      }
+      let retrievedStreetNameId = await userAddressDao.getStreetNameId(
+        streetName
+      );
+      let retrievedCityId = await userAddressDao.getCityIdByName(city);
+      const retrievedStateId = await userAddressDao.getStateId(state);
+      if (!retrievedCityId) {
+        retrievedCityId = await userAddressDao.createCity(
+          city,
+          retrievedStateId
+        );
+      }
+      if (!retrievedStreetNameId) {
+        // create street name
+        retrievedStreetNameId = await userAddressDao.createStreetName(
+          streetName,
+          retrievedCityId,
+          retrievedZipcodeId
+        );
+      }
+      valuesArray.push(retrievedStreetNameId);
+      fieldsArray.push(`address_id`);
       valuesIndexes.push(`$${valuesArray.length}`);
     }
     queryText += fieldsArray.join(", ");
@@ -130,7 +165,18 @@ exports.createUser = async (userObject) => {
     if (results.rows.length === 0) {
       throw new Error("Unable to create user");
     }
-    return results.rows[0];
+    const finalResults = {
+      email: results.rows[0].email,
+      username: results.rows[0].username,
+      name: results.rows[0].name,
+    };
+    finalResults.phone = await this.getPhoneNumberById(
+      results.rows[0].phone_id
+    );
+    finalResults.address = await userAddressDao.getAddress(
+      results.rows[0].address_id
+    );
+    return finalResults;
   } catch (error) {
     throw new Error(error);
   }
@@ -181,11 +227,12 @@ exports.updateUser = async (userObject) => {
       fieldsArray.push(`phone_id = $${valuesArray.length}`);
     }
     if (userObject.address) {
-      const { streetName, city, state } = userObject.address;
+      const { streetName, city, state, zipCode } = userObject.address;
       if (
         streetName === undefined ||
         city === undefined ||
-        state === undefined
+        state === undefined ||
+        zipCode === undefined
       ) {
         throw new Error("Missing address fields");
       }
@@ -204,7 +251,8 @@ exports.updateUser = async (userObject) => {
         // create street name
         retrievedStreetNameId = await userAddressDao.createStreetName(
           streetName,
-          retrievedCityId
+          retrievedCityId,
+          zipCode
         );
       }
       valuesArray.push(retrievedStreetNameId);
@@ -268,6 +316,9 @@ exports.getPhoneNumber = async (phoneNumber) => {
 
 exports.getPhoneNumberById = async (phoneId) => {
   try {
+    if (!phoneId) {
+      throw new Error("Phone ID is required");
+    }
     const queryText = "SELECT number FROM phones WHERE id = $1";
     const queryParams = [phoneId];
     const results = await query(queryText, queryParams);
