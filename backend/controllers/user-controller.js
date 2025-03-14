@@ -1,5 +1,7 @@
 const { query } = require("../config/db");
 const userModel = require("../models/user-model");
+const validator = require("validator");
+const { createHashedPassword } = require("../middlewares/authentication");
 
 exports.setPasswordRecovery = async (req, res) => {
   try {
@@ -33,7 +35,7 @@ exports.verifyPasswordCode = async (req, res) => {
     res.status(500).json({ message: "Server Error: " + error.message });
   }
 };
-
+//TODO: ensure password is proper length and requirements
 exports.getUser = async (req, res) => {
   try {
     const email = req.user.email;
@@ -66,6 +68,16 @@ exports.createUser = async (req, res) => {
       return res
         .status(400)
         .json({ message: "Bad Request: Missing User Data" });
+    }
+
+    // Validate the email using the validator package
+    if (!validator.isEmail(userObject.email)) {
+      return res.status(400).json({ message: "Invalid email address" });
+    }
+
+    const checkedEmail = await userModel.getUserByEmail(userObject.email);
+    if (checkedEmail) {
+      return res.status(409).json({ message: "Email already in use" });
     }
     const results = await userModel.createUser(userObject);
     res.status(200).json(results);
@@ -123,6 +135,7 @@ exports.updatePasswordWithRecovery = async (req, res) => {
       return res
         .status(400)
         .json({ message: "Bad Request: Missing code or password" });
+    password = await createHashedPassword(password);
     const results = await userModel.updatePasswordWithRecovery(code, password);
     if (results.message === "unverified") {
       return res.status(400).json({ message: results.message });

@@ -71,7 +71,7 @@ exports.logout = async (req, res) => {
  * @param {object} param0 - the user object to validate
  * @returns {object} the validated user object
  */
-const validateUserData = ({
+exports.validateUserData = ({
   email,
   username,
   name,

@@ -75,9 +75,9 @@ exports.verifyPasswordCode = async (code) => {
 
 exports.createUser = async (userObject) => {
   try {
-    //TODO: finish implementing the rest of the user fields
-    const { email, username, name, password, address, phoneNumber } =
-      userObject;
+    let { email, username, name, password, address, phoneNumber } = userObject;
+
+    password = await authentication.createHashedPassword(password);
 
     let phoneId = null;
     if (phoneNumber) {

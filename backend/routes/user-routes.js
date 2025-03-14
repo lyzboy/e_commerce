@@ -9,9 +9,6 @@ router.get("/", authentication.authenticateUser, userController.getUser);
 
 // update logged in user's info
 router.put("/", authentication.authenticateUser, userController.updateUser);
-
-router.post("/register", userController.createUser);
-
 /**
  * Route that deletes a users account when the user is signed in
  */

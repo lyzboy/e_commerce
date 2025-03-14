@@ -271,22 +271,143 @@ describe("Users Endpoints Integration Tests", () => {
       expect(results.body.address).toHaveProperty("zipcode");
     });
     it("should return 400 if email is missing", async () => {
-      expect(true).toEqual(false);
+      const userObject = {
+        username: "newUserName",
+        password: "newPassword",
+        address: {
+          streetName: "123 abc st.",
+          city: "city",
+          state: "CO",
+          zipCode: "12345",
+        },
+        phoneNumber: "1234567890",
+        name: "New Name",
+      };
+      const results = await request(app)
+        .post(`/user/register`)
+        .set("Content-Type", "application/json")
+        .send(userObject);
+      expect(results.status).toBe(400);
+      expect(results.body).toBeDefined();
+      expect(results.body).toHaveProperty("message");
+      expect(results.body.message).toBe("Bad Request: Missing User Data");
     });
     it("should return 400 if email is invalid", async () => {
-      expect(true).toEqual(false);
+      const userObject = {
+        email: "not an eamil",
+        username: "newUserName",
+        password: "newPassword",
+        address: {
+          streetName: "123 abc st.",
+          city: "city",
+          state: "CO",
+          zipCode: "12345",
+        },
+        phoneNumber: "1234567890",
+        name: "New Name",
+      };
+      const results = await request(app)
+        .post(`/user/register`)
+        .set("Content-Type", "application/json")
+        .send(userObject);
+      expect(results.status).toBe(400);
+      expect(results.body).toBeDefined();
+      expect(results.body).toHaveProperty("message");
+      expect(results.body.message).toBe("Invalid email address");
     });
     it("should return 400 if username is missing", async () => {
-      expect(true).toEqual(false);
+      const userObject = {
+        email: "newEmail@email.com",
+        password: "newPassword",
+        address: {
+          streetName: "123 abc st.",
+          city: "city",
+          state: "CO",
+          zipCode: "12345",
+        },
+        phoneNumber: "1234567890",
+        name: "New Name",
+      };
+      const results = await request(app)
+        .post(`/user/register`)
+        .set("Content-Type", "application/json")
+        .send(userObject);
+      expect(results.status).toBe(400);
+      expect(results.body).toBeDefined();
+      expect(results.body).toHaveProperty("message");
+      expect(results.body.message).toBe("Bad Request: Missing User Data");
     });
     it("should return 400 if password is missing", async () => {
-      expect(true).toEqual(false);
+      const userObject = {
+        email: "newEmail@email.com",
+
+        address: {
+          streetName: "123 abc st.",
+          city: "city",
+          state: "CO",
+          zipCode: "12345",
+        },
+        phoneNumber: "1234567890",
+        name: "New Name",
+      };
+      const results = await request(app)
+        .post(`/user/register`)
+        .set("Content-Type", "application/json")
+        .send(userObject);
+      expect(results.status).toBe(400);
+      expect(results.body).toBeDefined();
+      expect(results.body).toHaveProperty("message");
+      expect(results.body.message).toBe("Bad Request: Missing User Data");
     });
     it("should return 400 if password is invalid", async () => {
-      expect(true).toEqual(false);
+      //TODO  Remove register user from user-controller
+      //TODO move validateUserData fro auth-controller to user-controller to helper file
+      //TODO move update user to auth controller.
+      //TODO ensure login after account creation
+      const userObject = {
+        email: "newEmail@email.com",
+        password: "short",
+        address: {
+          streetName: "123 abc st.",
+          city: "city",
+          state: "CO",
+          zipCode: "12345",
+        },
+        phoneNumber: "1234567890",
+        name: "New Name",
+      };
+      const results = await request(app)
+        .post(`/user/register`)
+        .set("Content-Type", "application/json")
+        .send(userObject);
+      console.log(`results status: ${results.status}`);
+      expect(results.status).toBe(400);
+      expect(results.body).toBeDefined();
+      expect(results.body).toHaveProperty("message");
+      expect(results.body.message).toBe("Bad Request: Invalid password");
     });
     it("should return 409 if email already exists", async () => {
-      expect(true).toEqual(false);
+      const userObject = {
+        email: "admin@email.com",
+        username: "newUserName",
+        password: "newPassword",
+        address: {
+          streetName: "123 abc st.",
+          city: "city",
+          state: "CO",
+          zipCode: "12345",
+        },
+        phoneNumber: "1234567890",
+        name: "New Name",
+      };
+      const results = await request(app)
+        .post(`/user/register`)
+        .set("Content-Type", "application/json")
+        .send(userObject);
+      expect(results.status).toBe(409);
+      expect(results.body).toBeDefined();
+      expect(results.body).toHaveProperty("message");
+      expect(results.body.message).toBe("Email already in use");
     });
   });
   describe("GET /user/:id", () => {
