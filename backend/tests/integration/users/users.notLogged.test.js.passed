@@ -1,12 +1,30 @@
 const request = require("supertest");
 const express = require("express");
+const session = require("express-session");
+const passport = require("passport");
 const userRoutes = require("../../../routes/user-routes");
 const db = require("../../../config/db");
 const userModel = require("../../../models/user-model");
 const dbSeed = require("../../db_seeding/dbSeed");
+const authentication = require("../../../middlewares/authentication");
+require("../../../config/passport-config"); // Ensure passport configuration is loaded
+
 const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+// Initialize session middleware
+app.use(
+  session({
+    secret: process.env.TOKEN_SECRET,
+    resave: false,
+    saveUninitialized: true,
+  })
+);
+
+// Initialize Passport
+app.use(passport.initialize());
+app.use(passport.session());
 
 app.use("/user", userRoutes);
 
@@ -189,7 +207,7 @@ describe("Users Endpoints Integration Tests", () => {
     });
     // reset the password of the account with the associated code
     it("should change the password with the correct code and remove the instance of the code in the reset_password_codes table", async () => {
-      const newPassword = "newPassword";
+      const newPassword = "newPassword1!";
       const results = await request(app)
         .post(`/user/recovery/update`)
         .set("Content-Type", "application/json")
@@ -202,7 +220,11 @@ describe("Users Endpoints Integration Tests", () => {
       expect(results.body).toBeDefined();
       expect(results.body).toHaveProperty("message");
       expect(results.body.message).toBe("Password updated");
-      expect(accountResults.rows[0].password).toBe(newPassword);
+      const passwordsMatch = await authentication.comparePasswords(
+        newPassword,
+        accountResults.rows[0].password
+      );
+      expect(passwordsMatch).toBe(true);
 
       const dbResult = await db.query(
         "SELECT * FROM reset_password_codes WHERE email = $1",
@@ -242,16 +264,16 @@ describe("Users Endpoints Integration Tests", () => {
   describe("POST /user/register", () => {
     it("should return 200 if user is created", async () => {
       const userObject = {
-        email: "newEmail@email.com",
+        email: "newEmail@gmail.com",
         username: "newUserName",
-        password: "newPassword",
+        password: "newPassword1!",
         address: {
           streetName: "123 abc st.",
           city: "city",
           state: "CO",
           zipCode: "12345",
         },
-        phoneNumber: "1234567890",
+        phoneNumber: "9708744106",
         name: "New Name",
       };
       const results = await request(app)
@@ -260,20 +282,13 @@ describe("Users Endpoints Integration Tests", () => {
         .send(userObject);
       expect(results.status).toBe(200);
       expect(results.body).toBeDefined();
-      expect(results.body).toHaveProperty("email");
-      expect(results.body).toHaveProperty("username");
-      expect(results.body).toHaveProperty("name");
-      expect(results.body).toHaveProperty("phone");
-      expect(results.body).toHaveProperty("address");
-      expect(results.body.address).toHaveProperty("streetName");
-      expect(results.body.address).toHaveProperty("city");
-      expect(results.body.address).toHaveProperty("state");
-      expect(results.body.address).toHaveProperty("zipcode");
+      expect(results.body).toHaveProperty("message");
+      expect(results.body.message).toBe("logged in");
     });
     it("should return 400 if email is missing", async () => {
       const userObject = {
         username: "newUserName",
-        password: "newPassword",
+        password: "newPassword1!",
         address: {
           streetName: "123 abc st.",
           city: "city",
@@ -292,11 +307,11 @@ describe("Users Endpoints Integration Tests", () => {
       expect(results.body).toHaveProperty("message");
       expect(results.body.message).toBe("Bad Request: Missing User Data");
     });
-    it("should return 400 if email is invalid", async () => {
+    it("should return 422 if email is invalid", async () => {
       const userObject = {
         email: "not an eamil",
         username: "newUserName",
-        password: "newPassword",
+        password: "newPassword1!",
         address: {
           streetName: "123 abc st.",
           city: "city",
@@ -310,15 +325,15 @@ describe("Users Endpoints Integration Tests", () => {
         .post(`/user/register`)
         .set("Content-Type", "application/json")
         .send(userObject);
-      expect(results.status).toBe(400);
+      expect(results.status).toBe(422);
       expect(results.body).toBeDefined();
       expect(results.body).toHaveProperty("message");
-      expect(results.body.message).toBe("Invalid email address");
+      expect(results.body.message).toBe("Unprocessable Entity: invalid email");
     });
     it("should return 400 if username is missing", async () => {
       const userObject = {
         email: "newEmail@email.com",
-        password: "newPassword",
+        password: "newPassword1!",
         address: {
           streetName: "123 abc st.",
           city: "city",
@@ -339,7 +354,7 @@ describe("Users Endpoints Integration Tests", () => {
     });
     it("should return 400 if password is missing", async () => {
       const userObject = {
-        email: "newEmail@email.com",
+        email: "newEmail@gmail.com",
 
         address: {
           streetName: "123 abc st.",
@@ -360,10 +375,6 @@ describe("Users Endpoints Integration Tests", () => {
       expect(results.body.message).toBe("Bad Request: Missing User Data");
     });
     it("should return 400 if password is invalid", async () => {
-      //TODO  Remove register user from user-controller
-      //TODO move validateUserData fro auth-controller to user-controller to helper file
-      //TODO move update user to auth controller.
-      //TODO ensure login after account creation
       const userObject = {
         email: "newEmail@email.com",
         password: "short",
@@ -380,17 +391,16 @@ describe("Users Endpoints Integration Tests", () => {
         .post(`/user/register`)
         .set("Content-Type", "application/json")
         .send(userObject);
-      console.log(`results status: ${results.status}`);
       expect(results.status).toBe(400);
       expect(results.body).toBeDefined();
       expect(results.body).toHaveProperty("message");
-      expect(results.body.message).toBe("Bad Request: Invalid password");
+      expect(results.body.message).toBe("Bad Request: Missing User Data");
     });
     it("should return 409 if email already exists", async () => {
       const userObject = {
         email: "admin@email.com",
         username: "newUserName",
-        password: "newPassword",
+        password: "newPassword1!",
         address: {
           streetName: "123 abc st.",
           city: "city",

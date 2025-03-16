@@ -1,7 +1,7 @@
 const { query } = require("../config/db");
 const userModel = require("../models/user-model");
 const validator = require("validator");
-const { createHashedPassword } = require("../middlewares/authentication");
+const authentication = require("../middlewares/authentication");
 
 exports.setPasswordRecovery = async (req, res) => {
   try {
@@ -144,12 +144,12 @@ exports.updateUser = async (req, res) => {
 
 exports.updatePasswordWithRecovery = async (req, res) => {
   try {
-    const { code, password } = req.body;
+    let { code, password } = req.body;
     if (!code || !password)
       return res
         .status(400)
         .json({ message: "Bad Request: Missing code or password" });
-    password = await createHashedPassword(password);
+    password = await authentication.createHashedPassword(password);
     const results = await userModel.updatePasswordWithRecovery(code, password);
     if (results.message === "unverified") {
       return res.status(400).json({ message: results.message });
@@ -173,7 +173,6 @@ exports.getUserByEmail = async (req, res) => {
       name: results.name,
     };
 
-    //TODO: query for phone and address
     if (results.phone_id == null) {
       returnedResults.phone = null;
     }
@@ -291,7 +290,10 @@ exports.validateUserData = ({
     }
   }
   if (phoneNumber) {
-    if (!validator.isMobilePhone(phoneNumber, "en-US")) {
+    if (
+      !validator.isLength(phoneNumber, { min: 10, max: 10 }) &&
+      !validator.isNumeric(phoneNumber)
+    ) {
       throw new CustomError(422, "Unprocessable Entity: invalid phone number");
     }
   }

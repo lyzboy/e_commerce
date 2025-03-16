@@ -66,7 +66,7 @@ exports.getCityNameById = async (cityId) => {
 exports.getAddress = async (streetNameId) => {
   try {
     if (streetNameId === null) {
-      throw new Error(`Street name not found for: ${streetNameId}`);
+      return null;
     }
     const queryText = `SELECT addresses.street_name AS street, zipcodes.zipcode AS zipcode, cities.name AS city, states.abbreviation AS state FROM addresses join
      cities on addresses.city_id = cities.id join

@@ -3,12 +3,16 @@ const router = express.Router();
 const userController = require("../controllers/user-controller");
 const authentication = require("../middlewares/authentication");
 const authorization = require("../middlewares/authorization");
+const passport = require("passport");
 
 // get logged in user's info
 router.get("/", authentication.authenticateUser, userController.getUser);
 
 // update logged in user's info
 router.put("/", authentication.authenticateUser, userController.updateUser);
+
+router.post("/register", userController.createUser);
+
 /**
  * Route that deletes a users account when the user is signed in
  */
