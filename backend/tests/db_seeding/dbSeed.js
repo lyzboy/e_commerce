@@ -1,10 +1,14 @@
 const db = require("../../config/db");
+const authentication = require("../../middlewares/authentication");
 
 const seedDiscounts = require("./seedDiscounts");
 const seedCategories = require("./seedCategories");
 const seedProducts = require("./seedProducts");
 const seedProductDiscounts = require("./seedProductDiscounts");
 const seedProductsCategories = require("./seedProductsCategories");
+const seedUserAccounts = require("./seedUserAccounts");
+const seedAdmins = require("./seedAdmins");
+const seedStates = require("./seedStates");
 
 const dbSeed = {
   testDiscountId: 1,
@@ -22,6 +26,30 @@ const dbSeed = {
   },
 
   seedAll: async function () {
+    const testUserPassword = "Password1!";
+
+    await seedUserAccounts([
+      {
+        email: "testUser99@email.com",
+        username: "testUser",
+        name: "Test User",
+        password: authentication.createHashedPassword(testUserPassword),
+      },
+      {
+        email: "admin@email.com",
+        username: "adminTest",
+        password: authentication.createHashedPassword(testUserPassword),
+      },
+    ]);
+
+    await seedAdmins([
+      {
+        email: "admin@email.com",
+      },
+    ]);
+
+    await seedStates();
+
     await seedDiscounts([
       {
         code: "DISCOUNT10",
@@ -109,14 +137,32 @@ const dbSeed = {
 
   cleanupDbSeed: async function () {
     try {
+      //BUG: check recovery password table name
       await db.query(`
         DELETE FROM products_discounts;
         DELETE FROM products_categories;
         DELETE FROM discounts;
         DELETE FROM products;
+        DELETE FROM reset_password_codes;
+        DELETE FROM categories;
+        DELETE FROM carts;
+        DELETE FROM admins;
+        DELETE FROM accounts;
+        DELETE FROM addresses;
+        DELETE FROM cities;
+        DELETE FROM states;
       `);
       await db.testPool.end();
       console.log("Cleaned up discounts and closed database pool.");
+    } catch (error) {
+      throw new Error(error);
+    }
+  },
+  cleanupDbPasswordReset: async function () {
+    try {
+      await db.query(`
+        DELETE FROM reset_password_codes;
+      `);
     } catch (error) {
       throw new Error(error);
     }

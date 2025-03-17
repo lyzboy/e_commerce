@@ -202,17 +202,17 @@ See the [Design](Design/design_info.md/#needed-functions) document for a list of
 ## Roadmap
 
 - Upcoming Features and Plans 
-  - [X] Add user authentication
-   - [ ] Implement product management
-   - [ ] Create shopping cart functionality
-   - [ ] Implement order processing
-   - [ ] Add API for developers
-   - [ ] Admin panel
-   - [ ] Dynamic hero creation within admin panel
-   - [ ] Frontend
-  - [ ] Initial release
-  - [ ] Add payment gateway
-  - [ ] Create admin dashboard
+  - Add user authentication
+   - Implement product management
+   - Create shopping cart functionality
+   - Implement order processing
+   - Add API for developers
+   - Admin panel
+   - Dynamic hero creation within admin panel
+   - Frontend
+  - Initial release
+  - Add payment gateway
+  - Create admin dashboard
 
 ---
 

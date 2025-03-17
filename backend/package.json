@@ -4,12 +4,12 @@
   "description": "A e-commerce website that can be used as a framework for any e-commerce website.",
   "main": "index.js",
   "scripts": {
-    "test": "jest --verbose=true --silent=false --watch --runInBand --onlyFailures ",
+    "test": "jest --verbose=true --silent=false --watchAll --runInBand",
     "start": "node app.js",
     "dev": "nodemon app.js"
   },
   "keywords": [],
-  "author": "",
+  "author": "Joshua Sanford, Lyz Studios",
   "license": "ISC",
   "dependencies": {
     "bcrypt": "^5.1.1",
