@@ -168,27 +168,160 @@ describe("Heros Endpoints Integration Tests", () => {
   });
   describe("PUT /heros/:id", () => {
     it("should update a hero", async () => {
-      expect(true).toBe(false);
+      // create a new hero to update
+      const origHero = {
+        layout: 1, // integer of the type of layout
+        heading: "Orig Heading",
+        subTitle1: "Test Subtitle 1",
+        subTitle2: "Test Subtitle 2",
+        backgroundColor: "#000000",
+        textColor: "#ffffff",
+      };
+      await request(app)
+        .post("/heros")
+        .set("Content-Type", "application/json")
+        .send(origHero);
+      // update the hero
+      const newHero = {
+        layout: 1, // integer of the type of layout
+        heading: "Test Heading",
+        subTitle1: "Test Subtitle 1",
+        subTitle2: "Test Subtitle 2",
+        backgroundColor: "#000000",
+        textColor: "#ffffff",
+      };
+      const response = await request(app)
+        .put("/heros/1")
+        .set("Content-Type", "application/json")
+        .send(newHero);
+      expect(response.status).toBe(200);
+      expect(response.body).toEqual(newHero);
     });
     it("should return 404 status code if hero is not found", async () => {
-      expect(true).toBe(false);
+      const newHero = {
+        layout: 1, // integer of the type of layout
+        heading: "Test Heading",
+        subTitle1: "Test Subtitle 1",
+        subTitle2: "Test Subtitle 2",
+        backgroundColor: "#000000",
+        textColor: "#ffffff",
+      };
+      const response = await request(app)
+        .put("/heros/999")
+        .set("Content-Type", "application/json")
+        .send(newHero);
+      expect(response.status).toBe(404);
+      expect(response.body.message).toBe("Hero not found.");
     });
     it("should return 400 status code if there is a validation error", async () => {
-      expect(true).toBe(false);
+      const newHero = {
+        layout: 1, // integer of the type of layout
+        heading: "Test Heading",
+        subTitle1: "Test Subtitle 1",
+        subTitle2: "Test Subtitle 2",
+        backgroundColor: "#000000",
+        textColor: "#ffffff",
+      };
+
+      // Temporarily override the mock middleware for this specific test
+      const appWithMockUser = express();
+      appWithMockUser.use(express.json());
+      appWithMockUser.use(express.urlencoded({ extended: true }));
+
+      // Mock a non-admin user
+      appWithMockUser.use((req, res, next) => {
+        req.user = {
+          email: "notAnAdmin@email.com",
+          username: "notAnAdmin",
+        };
+        next();
+      });
+      appWithMockUser
+        .use("/heros", herosRoutes)
+        .set("Content-Type", "application/json")
+        .send(newHero);
+      const response = await request(appWithMockUser).put("/heros/1");
+      expect(response.status).toBe(400);
+      expect(response.body.message).toBe("Unauthorized: Access Denied");
     });
     it("should return 500 status code if there is an error", async () => {
-      expect(true).toBe(false);
+      const newHero = {
+        layout: 1, // integer of the type of layout
+        heading: "Test Heading",
+        subTitle1: "Test Subtitle 1",
+        subTitle2: "Test Subtitle 2",
+        backgroundColor: "#000000",
+        textColor: "#ffffff",
+      };
+
+      const originalUpdateHero = herosModel.updateHero;
+      herosModel.updateHero = jest.fn(() => {
+        throw new Error("Server Error");
+      });
+
+      const results = await request(app)
+        .put("/heros/1")
+        .set("Content-Type", "application/json")
+        .send(newHero);
+
+      expect(results.status).toBe(500);
+      expect(results.body.message).toBe("Server Error: Server Error");
+      herosModel.updateHero = originalUpdateHero;
     });
   });
   describe("DELETE /heros/:id", () => {
     it("should delete a hero", async () => {
-      expect(true).toBe(false);
+      const newHero = {
+        layout: 1, // integer of the type of layout
+        heading: "Test Heading",
+        subTitle1: "Test Subtitle 1",
+        subTitle2: "Test Subtitle 2",
+        backgroundColor: "#000000",
+        textColor: "#ffffff",
+      };
+      await request(app)
+        .post("/heros")
+        .set("Content-Type", "application/json")
+        .send(newHero);
+      const response = await request(app).delete("/heros/1");
+      expect(response.status).toBe(200);
+      expect(response.body.message).toBe("Hero deleted successfully.");
     });
     it("should return 404 status code if hero is not found", async () => {
-      expect(true).toBe(false);
+      const response = await request(app).delete("/heros/999");
+      expect(response.status).toBe(404);
+      expect(response.body.message).toBe("Hero not found.");
+    });
+    it("should return 400 status code if there is a validation error", async () => {
+      // Temporarily override the mock middleware for this specific test
+      const appWithMockUser = express();
+      appWithMockUser.use(express.json());
+      appWithMockUser.use(express.urlencoded({ extended: true }));
+
+      // Mock a non-admin user
+      appWithMockUser.use((req, res, next) => {
+        req.user = {
+          email: "notAnAdmin@email.com",
+          username: "notAnAdmin",
+        };
+        next();
+      });
+      appWithMockUser.use("/heros", herosRoutes);
+      const response = await request(appWithMockUser).delete("/heros/1");
+      expect(response.status).toBe(400);
+      expect(response.body.message).toBe("Unauthorized: Access Denied");
     });
     it("should return 500 status code if there is an error", async () => {
-      expect(true).toBe(false);
+      const originalDeleteHero = herosModel.deleteHero;
+      herosModel.deleteHero = jest.fn(() => {
+        throw new Error("Server Error");
+      });
+
+      const results = await request(app).delete("/heros/1");
+
+      expect(results.status).toBe(500);
+      expect(results.body.message).toBe("Server Error: Server Error");
+      herosModel.deleteHero = originalDeleteHero;
     });
   });
 });
