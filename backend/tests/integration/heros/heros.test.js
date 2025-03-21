@@ -68,13 +68,102 @@ describe("Heros Endpoints Integration Tests", () => {
   });
   describe("POST /heros", () => {
     it("should create a new hero", async () => {
-      expect(true).toBe(false);
+      const newHero = {
+        layout: 1, // integer of the type of layout
+        heading: "Test Heading",
+        subTitle1: "Test Subtitle 1",
+        subTitle2: "Test Subtitle 2",
+        backgroundColor: "#000000",
+        textColor: "#ffffff",
+      };
+      const response = await request(app)
+        .post("/heros")
+        .set("Content-Type", "application/json")
+        .send(newHero);
+      expect(response.status).toBe(201);
+      expect(response.body).toEqual(newHero);
     });
     it("should return 400 status code if there is a validation error", async () => {
-      expect(true).toBe(false);
+      const newHero = {
+        layout: 1, // integer of the type of layout
+        heading: "Test Heading",
+        subTitle1: "Test Subtitle 1",
+        subTitle2: "Test Subtitle 2",
+        backgroundColor: "#000000",
+        textColor: "#ffffff",
+      };
+
+      // Temporarily override the mock middleware for this specific test
+      const appWithMockUser = express();
+      appWithMockUser.use(express.json());
+      appWithMockUser.use(express.urlencoded({ extended: true }));
+
+      // Mock a non-admin user
+      appWithMockUser.use((req, res, next) => {
+        req.user = {
+          email: "notAdmin@email.com",
+          username: "notAdmin",
+        };
+        next();
+      });
+
+      appWithMockUser.use("/heros", herosRoutes);
+
+      const response = await request(appWithMockUser)
+        .post("/heros")
+        .set("Content-Type", "application/json")
+        .send(newHero);
+
+      expect(response.status).toBe(400);
+      expect(response.body.message).toBe("Unauthorized: Access Denied");
     });
     it("should return 500 status code if there is an error", async () => {
-      expect(true).toBe(false);
+      const newHero = {
+        layout: 1, // integer of the type of layout
+        heading: "Test Heading",
+        subTitle1: "Test Subtitle 1",
+        subTitle2: "Test Subtitle 2",
+        backgroundColor: "#000000",
+        textColor: "#ffffff",
+      };
+
+      const originalCreateHero = herosModel.createHero;
+      herosModel.createHero = jest.fn(() => {
+        throw new Error("Server Error");
+      });
+
+      const results = await request(app)
+        .post("/heros")
+        .set("Content-Type", "application/json")
+        .send(newHero);
+
+      expect(results.status).toBe(500);
+      expect(results.body.message).toBe("Server Error: Server Error");
+      herosModel.createHero = originalCreateHero;
+    });
+    it("should return 400 status code if the object is empty", async () => {
+      const newHero = {};
+      const response = await request(app)
+        .post("/heros")
+        .set("Content-Type", "application/json")
+        .send(newHero);
+      expect(response.status).toBe(400);
+      expect(response.body.message).toBe("Bad Request: Invalid data.");
+    });
+    it("should return 400 status code if the object is missing required fields", async () => {
+      const newHero = {
+        layout: 1, // integer of the type of layout
+        heading: "Test Heading",
+        subTitle1: "Test Subtitle 1",
+        subTitle2: "Test Subtitle 2",
+        backgroundColor: "#000000",
+      };
+      const response = await request(app)
+        .post("/heros")
+        .set("Content-Type", "application/json")
+        .send(newHero);
+      expect(response.status).toBe(400);
+      expect(response.body.message).toBe("Bad Request: Invalid data.");
     });
   });
   describe("PUT /heros/:id", () => {
