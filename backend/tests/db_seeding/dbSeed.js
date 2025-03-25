@@ -133,6 +133,28 @@ const dbSeed = {
       { product_id: productIds[0], category_id: this.testCategoryId },
       { product_id: productIds[1], category_id: this.testCategoryId },
     ]);
+    await seedHeros([
+      {
+        categoryId: this.testCategoryId,
+        productId: productIds[0],
+        layout: "layout1",
+        heading: "Test Heading",
+        subTitle1: "Sub Title 1",
+        subTitle2: "Sub Title 2",
+        bgColor: "#000000",
+        textColor: "#FFFFFF",
+      },
+      {
+        categoryId: this.testCategoryId,
+        productId: productIds[1],
+        layout: "layout2",
+        heading: "Test Heading 2",
+        subTitle1: "Sub Title 1",
+        subTitle2: "Sub Title 2",
+        bgColor: "#FFFFFF",
+        textColor: "#000000",
+      },
+    ]);
   },
 
   cleanupDbSeed: async function () {
