@@ -9,6 +9,7 @@ const seedProductsCategories = require("./seedProductsCategories");
 const seedUserAccounts = require("./seedUserAccounts");
 const seedAdmins = require("./seedAdmins");
 const seedStates = require("./seedStates");
+const seedHeros = require("./seedHeros");
 
 const dbSeed = {
   testDiscountId: 1,

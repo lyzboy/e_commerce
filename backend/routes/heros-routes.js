@@ -6,23 +6,25 @@ const authorization = require("../middlewares/authorization");
 
 router.get("/", herosController.getHeros);
 
-router.post(
-  "/",
-  authentication.authenticateUser,
-  authorization.authorizeRole("admin"),
-  herosController.createHero
-);
+// router.post(
+//   "/",
+//   authentication.authenticateUser,
+//   authorization.authorizeRole("admin"),
+//   herosController.createHero
+// );
 
-router.put(
-  "/:id",
-  authentication.authenticateUser,
-  authorization.authorizeRole("admin"),
-  herosController.updateHero
-);
+// router.put(
+//   "/:id",
+//   authentication.authenticateUser,
+//   authorization.authorizeRole("admin"),
+//   herosController.updateHero
+// );
 
-router.delete(
-  "/:id",
-  authentication.authenticateUser,
-  authorization.authorizeRole("admin"),
-  herosController.deleteHero
-);
+// router.delete(
+//   "/:id",
+//   authentication.authenticateUser,
+//   authorization.authorizeRole("admin"),
+//   herosController.deleteHero
+// );
+
+module.exports = router;
