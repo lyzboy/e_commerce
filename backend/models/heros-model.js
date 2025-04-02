@@ -26,3 +26,26 @@ exports.getAllHeros = async () => {
     throw new Error(HERO_ERROR + error);
   }
 };
+
+exports.createHero = async (hero) => {
+  const {
+    categoryId,
+    productId,
+    layout,
+    heading,
+    subTitle1,
+    subTitle2,
+    backgroundColor,
+    textColor,
+    imageurl,
+  } = hero;
+  let queryText = `INSERT INTO heros(category_id, product_id, 
+  layout, heading, sub_title_1, sub_title_2, background_color, 
+  text_color, imageurl) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9)`;
+  const queryParams = [];
+  categoryId ? queryParams.push(categoryId) : queryParams.push("NULL");
+  productId ? queryParams.push(productId) : queryParams.push("NULL");
+  if (!layout) {
+    throw new Error(HERO_ERROR + "Missing layout.");
+  }
+};

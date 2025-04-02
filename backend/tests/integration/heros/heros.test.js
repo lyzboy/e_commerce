@@ -11,11 +11,7 @@ app.use(express.urlencoded({ extended: true }));
 
 //mock authentication middleware
 app.use((req, res, next) => {
-  req.user = {
-    email: "adminTest@email.com",
-    username: "adminTest",
-    role: "admin",
-  };
+  req.user = { email: "admin@email.com", username: "adminTest", role: "admin" };
   next();
 });
 
@@ -24,10 +20,6 @@ app.use("/heros", herosRoutes);
 describe("Heros Endpoints Integration Tests", () => {
   beforeAll(async () => {
     await dbSeed.seedAll();
-  });
-
-  afterEach(async () => {
-    await dbSeed.cleanupDbPasswordReset();
   });
 
   afterAll(async () => {
@@ -67,7 +59,7 @@ describe("Heros Endpoints Integration Tests", () => {
     });
   });
   describe("POST /heros", () => {
-    it("should create a new hero", async () => {
+    it("should create a new hero with no specific product", async () => {
       const newHero = {
         layout: 1, // integer of the type of layout
         heading: "Test Heading",
@@ -75,6 +67,26 @@ describe("Heros Endpoints Integration Tests", () => {
         subTitle2: "Test Subtitle 2",
         backgroundColor: "#000000",
         textColor: "#ffffff",
+        imageurl: "www.test.com/image1.jpeg",
+      };
+      const response = await request(app)
+        .post("/heros")
+        .set("Content-Type", "application/json")
+        .send(newHero);
+      expect(response.status).toBe(201);
+      expect(response.body).toEqual(newHero);
+    });
+    it("should create a new hero with a product", async () => {
+      const newHero = {
+        productId: 1,
+        categoryId: 1,
+        layout: 1, // integer of the type of layout
+        heading: "Test Heading",
+        subTitle1: "Test Subtitle 1",
+        subTitle2: "Test Subtitle 2",
+        backgroundColor: "#000000",
+        textColor: "#ffffff",
+        imageurl: "www.test.com/image1.jpeg",
       };
       const response = await request(app)
         .post("/heros")

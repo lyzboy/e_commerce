@@ -6,12 +6,12 @@ const authorization = require("../middlewares/authorization");
 
 router.get("/", herosController.getHeros);
 
-// router.post(
-//   "/",
-//   authentication.authenticateUser,
-//   authorization.authorizeRole("admin"),
-//   herosController.createHero
-// );
+router.post(
+  "/",
+  authentication.authenticateUser,
+  authorization.authorizeRole("admin"),
+  herosController.createHero
+);
 
 // router.put(
 //   "/:id",

@@ -11,3 +11,13 @@ exports.getHeros = async (req, res) => {
     res.status(500).json({ message: "Server Error: " + error.message });
   }
 };
+
+exports.createHero = async (req, res) => {
+  try {
+    const hero = req.body;
+    const newHero = await herosModel.createHero(hero);
+    res.status(201).json(newHero);
+  } catch (error) {
+    res.status(500).json({ message: "Server Error: " + error.message });
+  }
+};
