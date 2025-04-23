@@ -11,6 +11,7 @@ const formatHero = (result) => {
     subTitle2: result.sub_title_2,
     backgroundColor: result.background_color,
     textColor: result.text_color,
+    imageurl: result.imageurl,
   };
 };
 
@@ -39,13 +40,49 @@ exports.createHero = async (hero) => {
     textColor,
     imageurl,
   } = hero;
-  let queryText = `INSERT INTO heros(category_id, product_id, 
-  layout, heading, sub_title_1, sub_title_2, background_color, 
-  text_color, imageurl) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9)`;
+
+  // Base query and parameters
+  let queryText = `INSERT INTO heros (`;
+  let queryValues = `VALUES (`;
   const queryParams = [];
-  categoryId ? queryParams.push(categoryId) : queryParams.push("NULL");
-  productId ? queryParams.push(productId) : queryParams.push("NULL");
-  if (!layout) {
-    throw new Error(HERO_ERROR + "Missing layout.");
+  let paramIndex = 1;
+
+  // Dynamically add fields and values
+  if (categoryId) {
+    queryText += `category_id, `;
+    queryValues += `$${paramIndex}, `;
+    queryParams.push(categoryId);
+    paramIndex++;
   }
+  if (productId) {
+    queryText += `product_id, `;
+    queryValues += `$${paramIndex}, `;
+    queryParams.push(productId);
+    paramIndex++;
+  }
+
+  // Add required fields
+  queryText += `layout, heading, sub_title_1, sub_title_2, background_color, text_color, imageurl)`;
+  queryValues += `$${paramIndex}, $${paramIndex + 1}, $${paramIndex + 2}, $${
+    paramIndex + 3
+  }, $${paramIndex + 4}, $${paramIndex + 5}, $${paramIndex + 6})`;
+  queryParams.push(
+    layout,
+    heading,
+    subTitle1,
+    subTitle2,
+    backgroundColor,
+    textColor,
+    imageurl
+  );
+
+  // Combine query text
+  queryText += queryValues;
+
+  // add returning clause
+  queryText += ` RETURNING *;`;
+
+  // Execute query
+  const results = await query(queryText, queryParams, true);
+  return formatHero(results.rows[0]);
 };

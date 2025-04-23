@@ -59,27 +59,14 @@ describe("Heros Endpoints Integration Tests", () => {
     });
   });
   describe("POST /heros", () => {
-    it("should create a new hero with no specific product", async () => {
-      const newHero = {
-        layout: 1, // integer of the type of layout
-        heading: "Test Heading",
-        subTitle1: "Test Subtitle 1",
-        subTitle2: "Test Subtitle 2",
-        backgroundColor: "#000000",
-        textColor: "#ffffff",
-        imageurl: "www.test.com/image1.jpeg",
-      };
-      const response = await request(app)
-        .post("/heros")
-        .set("Content-Type", "application/json")
-        .send(newHero);
-      expect(response.status).toBe(201);
-      expect(response.body).toEqual(newHero);
-    });
     it("should create a new hero with a product", async () => {
+      let results = await db.query("SELECT * FROM products");
+      const retrievedProductId = results.rows[0].id;
+      results = await db.query("SELECT * FROM categories");
+      const retrievedCategoryId = results.rows[0].id;
       const newHero = {
-        productId: 1,
-        categoryId: 1,
+        productId: retrievedProductId,
+        categoryId: retrievedCategoryId,
         layout: 1, // integer of the type of layout
         heading: "Test Heading",
         subTitle1: "Test Subtitle 1",
@@ -93,9 +80,9 @@ describe("Heros Endpoints Integration Tests", () => {
         .set("Content-Type", "application/json")
         .send(newHero);
       expect(response.status).toBe(201);
-      expect(response.body).toEqual(newHero);
+      expect(response.body).toEqual({ ...newHero, id: expect.any(Number) });
     });
-    it("should return 400 status code if there is a validation error", async () => {
+    it("should return 403 status code if there is a validation error", async () => {
       const newHero = {
         layout: 1, // integer of the type of layout
         heading: "Test Heading",
@@ -126,11 +113,13 @@ describe("Heros Endpoints Integration Tests", () => {
         .set("Content-Type", "application/json")
         .send(newHero);
 
-      expect(response.status).toBe(400);
-      expect(response.body.message).toBe("Unauthorized: Access Denied");
+      expect(response.status).toBe(403);
+      expect(response.body.message).toBe("Access denied");
     });
     it("should return 500 status code if there is an error", async () => {
       const newHero = {
+        productId: 1,
+        categoryId: 1,
         layout: 1, // integer of the type of layout
         heading: "Test Heading",
         subTitle1: "Test Subtitle 1",

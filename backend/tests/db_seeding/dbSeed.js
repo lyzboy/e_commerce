@@ -162,6 +162,7 @@ const dbSeed = {
     try {
       //BUG: check recovery password table name
       await db.query(`
+        DELETE FROM heros;
         DELETE FROM products_discounts;
         DELETE FROM products_categories;
         DELETE FROM discounts;

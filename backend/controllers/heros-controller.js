@@ -15,6 +15,12 @@ exports.getHeros = async (req, res) => {
 exports.createHero = async (req, res) => {
   try {
     const hero = req.body;
+    if (Object.keys(hero).length === 0) {
+      return res.status(400).json({ message: "Bad Request: Invalid data." });
+    }
+    if (!hero.categoryId || !hero.productId) {
+      return res.status(400).json({ message: "Bad Request: Invalid data." });
+    }
     const newHero = await herosModel.createHero(hero);
     res.status(201).json(newHero);
   } catch (error) {
