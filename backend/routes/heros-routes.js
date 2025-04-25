@@ -13,12 +13,12 @@ router.post(
   herosController.createHero
 );
 
-// router.put(
-//   "/:id",
-//   authentication.authenticateUser,
-//   authorization.authorizeRole("admin"),
-//   herosController.updateHero
-// );
+router.put(
+  "/:id",
+  authentication.authenticateUser,
+  authorization.authorizeRole("admin"),
+  herosController.updateHero
+);
 
 // router.delete(
 //   "/:id",

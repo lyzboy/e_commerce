@@ -86,3 +86,79 @@ exports.createHero = async (hero) => {
   const results = await query(queryText, queryParams, true);
   return formatHero(results.rows[0]);
 };
+
+exports.updateHero = async (id, hero) => {
+  const {
+    categoryId,
+    productId,
+    layout,
+    heading,
+    subTitle1,
+    subTitle2,
+    backgroundColor,
+    textColor,
+    imageurl,
+  } = hero;
+
+  // Base query and parameters
+  let queryText = `UPDATE heros SET `;
+  const queryParams = [];
+  let paramIndex = 1;
+
+  // Dynamically add fields
+  if (categoryId) {
+    queryText += `category_id = $${paramIndex}, `;
+    queryParams.push(categoryId);
+    paramIndex++;
+  }
+  if (productId) {
+    queryText += `product_id = $${paramIndex}, `;
+    queryParams.push(productId);
+    paramIndex++;
+  }
+  if (layout) {
+    queryText += `layout = $${paramIndex}, `;
+    queryParams.push(layout);
+    paramIndex++;
+  }
+  if (heading) {
+    queryText += `heading = $${paramIndex}, `;
+    queryParams.push(heading);
+    paramIndex++;
+  }
+  if (subTitle1) {
+    queryText += `sub_title_1 = $${paramIndex}, `;
+    queryParams.push(subTitle1);
+    paramIndex++;
+  }
+  if (subTitle2) {
+    queryText += `sub_title_2 = $${paramIndex}, `;
+    queryParams.push(subTitle2);
+    paramIndex++;
+  }
+  if (backgroundColor) {
+    queryText += `background_color = $${paramIndex}, `;
+    queryParams.push(backgroundColor);
+    paramIndex++;
+  }
+  if (textColor) {
+    queryText += `text_color = $${paramIndex}, `;
+    queryParams.push(textColor);
+    paramIndex++;
+  }
+  if (imageurl) {
+    queryText += `imageurl = $${paramIndex}, `;
+    queryParams.push(imageurl);
+    paramIndex++;
+  }
+  // Remove trailing comma and space
+  queryText = queryText.slice(0, -2);
+  queryText += ` WHERE id = $${paramIndex} RETURNING *;`;
+  queryParams.push(id);
+  // Execute query
+  const results = await query(queryText, queryParams, true);
+  if (results.rowCount === 0) {
+    throw new Error(HERO_ERROR + "Hero not found");
+  }
+  return formatHero(results.rows[0]);
+};

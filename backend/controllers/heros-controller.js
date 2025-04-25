@@ -1,5 +1,9 @@
 const herosModel = require("../models/heros-model");
 
+const HeroServerError = (message) => {
+  return { message: "Server Error: " + message };
+};
+
 exports.getHeros = async (req, res) => {
   try {
     const heros = await herosModel.getAllHeros();
@@ -8,7 +12,7 @@ exports.getHeros = async (req, res) => {
     }
     res.status(200).json(heros);
   } catch (error) {
-    res.status(500).json({ message: "Server Error: " + error.message });
+    res.status(500).json(HeroServerError(error.message));
   }
 };
 
@@ -24,6 +28,15 @@ exports.createHero = async (req, res) => {
     const newHero = await herosModel.createHero(hero);
     res.status(201).json(newHero);
   } catch (error) {
-    res.status(500).json({ message: "Server Error: " + error.message });
+    res.status(500).json(HeroServerError(error.message));
+  }
+};
+
+exports.updateHero = async (req, res) => {
+  try {
+    const updatedHero = await herosModel.updateHero(req.params.id, req.body);
+    res.status(200).json(updatedHero);
+  } catch (error) {
+    res.status(500).json(HeroServerError(error.message));
   }
 };

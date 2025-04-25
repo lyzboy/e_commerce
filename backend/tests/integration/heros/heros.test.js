@@ -169,16 +169,23 @@ describe("Heros Endpoints Integration Tests", () => {
   });
   describe("PUT /heros/:id", () => {
     it("should update a hero", async () => {
+      let results = await db.query("SELECT * FROM products");
+      const retrievedProductId = results.rows[0].id;
+      results = await db.query("SELECT * FROM categories");
+      const retrievedCategoryId = results.rows[0].id;
       // create a new hero to update
       const origHero = {
+        productId: retrievedProductId,
+        categoryId: retrievedCategoryId,
         layout: 1, // integer of the type of layout
         heading: "Orig Heading",
         subTitle1: "Test Subtitle 1",
         subTitle2: "Test Subtitle 2",
         backgroundColor: "#000000",
         textColor: "#ffffff",
+        imageurl: "www.test.com/image1.jpeg",
       };
-      await request(app)
+      const tempHeroObject = await request(app)
         .post("/heros")
         .set("Content-Type", "application/json")
         .send(origHero);
@@ -192,11 +199,15 @@ describe("Heros Endpoints Integration Tests", () => {
         textColor: "#ffffff",
       };
       const response = await request(app)
-        .put("/heros/1")
+        .put(`/heros/${tempHeroObject.body.id}`)
         .set("Content-Type", "application/json")
         .send(newHero);
       expect(response.status).toBe(200);
-      expect(response.body).toEqual(newHero);
+      expect(response.body).toEqual({
+        ...origHero,
+        ...newHero,
+        id: tempHeroObject.body.id,
+      });
     });
     it("should return 404 status code if hero is not found", async () => {
       const newHero = {
