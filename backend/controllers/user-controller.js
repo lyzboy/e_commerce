@@ -240,7 +240,7 @@ exports.validateUserData = ({
     );
   }
   if (!validator.isEmail(email)) {
-    throw new CustomError(422, "Unprocessable Entity: invalid email");
+    throw new CustomError(422, `Unprocessable Entity: invalid email`);
   }
   if (!validator.isAlphanumeric(username, "en-US")) {
     throw new CustomError(422, "Unprocessable Entity: invalid username");

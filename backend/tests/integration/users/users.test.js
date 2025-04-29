@@ -58,6 +58,7 @@ describe("Users Endpoints Integration Tests", () => {
         streetName: "changedTestAddress",
         city: "newCity",
         state: "CO",
+        zipCode: 12345,
       };
       const res = await request(app).put(`/user`).send({
         email: "testUser99@email.com",

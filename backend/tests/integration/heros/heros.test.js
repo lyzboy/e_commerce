@@ -4,7 +4,6 @@ const db = require("../../../config/db");
 const herosRoutes = require("../../../routes/heros-routes");
 const herosModel = require("../../../models/heros-model");
 const dbSeed = require("../../db_seeding/dbSeed");
-const authentication = require("../../../middlewares/authentication");
 const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));

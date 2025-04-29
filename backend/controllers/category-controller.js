@@ -46,7 +46,7 @@ exports.createCategory = async (req, res) => {
       return res.status(400).json({ message: "Invalid request object." });
     }
     const results = await categoryModel.createCategory(name, description);
-    res.status(200).json(results);
+    res.status(201).json(results);
   } catch (error) {
     res.status(500).json({ message: "Server Error: " + error.message });
   }
@@ -115,7 +115,7 @@ exports.deleteCategory = async (req, res) => {
     if (results === 0) {
       return res.status(404).json({ message: `Item with id ${id} not found` });
     }
-    res.status(200).json({ message: `Item with id ${id} was deleted.` });
+    res.status(204).json({ message: `Item with id ${id} was deleted.` });
   } catch (error) {
     res.status(500).json({ message: "Server Error: " + error.message });
   }
