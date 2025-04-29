@@ -20,11 +20,11 @@ router.put(
   herosController.updateHero
 );
 
-// router.delete(
-//   "/:id",
-//   authentication.authenticateUser,
-//   authorization.authorizeRole("admin"),
-//   herosController.deleteHero
-// );
+router.delete(
+  "/:id",
+  authentication.authenticateUser,
+  authorization.authorizeRole("admin"),
+  herosController.deleteHero
+);
 
 module.exports = router;

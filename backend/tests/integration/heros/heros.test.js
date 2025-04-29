@@ -218,6 +218,7 @@ describe("Heros Endpoints Integration Tests", () => {
         backgroundColor: "#000000",
         textColor: "#ffffff",
       };
+
       const response = await request(app)
         .put("/heros/999")
         .set("Content-Type", "application/json")
@@ -225,16 +226,7 @@ describe("Heros Endpoints Integration Tests", () => {
       expect(response.status).toBe(404);
       expect(response.body.message).toBe("Hero not found.");
     });
-    it("should return 400 status code if there is a validation error", async () => {
-      const newHero = {
-        layout: 1, // integer of the type of layout
-        heading: "Test Heading",
-        subTitle1: "Test Subtitle 1",
-        subTitle2: "Test Subtitle 2",
-        backgroundColor: "#000000",
-        textColor: "#ffffff",
-      };
-
+    it("should return 403 status code if there is a validation error", async () => {
       // Temporarily override the mock middleware for this specific test
       const appWithMockUser = express();
       appWithMockUser.use(express.json());
@@ -248,15 +240,35 @@ describe("Heros Endpoints Integration Tests", () => {
         };
         next();
       });
-      appWithMockUser
-        .use("/heros", herosRoutes)
-        .set("Content-Type", "application/json")
-        .send(newHero);
+
+      appWithMockUser.use("/heros", herosRoutes);
       const response = await request(appWithMockUser).put("/heros/1");
-      expect(response.status).toBe(400);
-      expect(response.body.message).toBe("Unauthorized: Access Denied");
+      expect(response.status).toBe(403);
+      expect(response.body.message).toBe("Access denied");
     });
     it("should return 500 status code if there is an error", async () => {
+      let results = await db.query("SELECT * FROM products");
+      const retrievedProductId = results.rows[0].id;
+      results = await db.query("SELECT * FROM categories");
+      const retrievedCategoryId = results.rows[0].id;
+
+      // Ensure a hero exists with ID 1
+      const existingHero = {
+        productId: retrievedProductId,
+        categoryId: retrievedCategoryId,
+        layout: 1,
+        heading: "Existing Hero",
+        subTitle1: "Subtitle 1",
+        subTitle2: "Subtitle 2",
+        backgroundColor: "#000000",
+        textColor: "#ffffff",
+        imageurl: "www.test.com/image1.jpeg",
+      };
+      const createdHero = await request(app)
+        .post("/heros")
+        .set("Content-Type", "application/json")
+        .send(existingHero);
+
       const newHero = {
         layout: 1, // integer of the type of layout
         heading: "Test Heading",
@@ -271,8 +283,8 @@ describe("Heros Endpoints Integration Tests", () => {
         throw new Error("Server Error");
       });
 
-      const results = await request(app)
-        .put("/heros/1")
+      results = await request(app)
+        .put(`/heros/${createdHero.body.id}`)
         .set("Content-Type", "application/json")
         .send(newHero);
 
@@ -283,7 +295,13 @@ describe("Heros Endpoints Integration Tests", () => {
   });
   describe("DELETE /heros/:id", () => {
     it("should delete a hero", async () => {
+      let results = await db.query("SELECT * FROM products");
+      const retrievedProductId = results.rows[0].id;
+      results = await db.query("SELECT * FROM categories");
+      const retrievedCategoryId = results.rows[0].id;
       const newHero = {
+        productId: retrievedProductId,
+        categoryId: retrievedCategoryId,
         layout: 1, // integer of the type of layout
         heading: "Test Heading",
         subTitle1: "Test Subtitle 1",
@@ -291,11 +309,13 @@ describe("Heros Endpoints Integration Tests", () => {
         backgroundColor: "#000000",
         textColor: "#ffffff",
       };
-      await request(app)
+      const newHeroResults = await request(app)
         .post("/heros")
         .set("Content-Type", "application/json")
         .send(newHero);
-      const response = await request(app).delete("/heros/1");
+      const response = await request(app).delete(
+        `/heros/${newHeroResults.body.id}`
+      );
       expect(response.status).toBe(200);
       expect(response.body.message).toBe("Hero deleted successfully.");
     });
@@ -304,7 +324,7 @@ describe("Heros Endpoints Integration Tests", () => {
       expect(response.status).toBe(404);
       expect(response.body.message).toBe("Hero not found.");
     });
-    it("should return 400 status code if there is a validation error", async () => {
+    it("should return 403 status code if there is a validation error", async () => {
       // Temporarily override the mock middleware for this specific test
       const appWithMockUser = express();
       appWithMockUser.use(express.json());
@@ -320,8 +340,8 @@ describe("Heros Endpoints Integration Tests", () => {
       });
       appWithMockUser.use("/heros", herosRoutes);
       const response = await request(appWithMockUser).delete("/heros/1");
-      expect(response.status).toBe(400);
-      expect(response.body.message).toBe("Unauthorized: Access Denied");
+      expect(response.status).toBe(403);
+      expect(response.body.message).toBe("Access denied");
     });
     it("should return 500 status code if there is an error", async () => {
       const originalDeleteHero = herosModel.deleteHero;

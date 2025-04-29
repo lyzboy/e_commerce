@@ -28,6 +28,16 @@ exports.getAllHeros = async () => {
   }
 };
 
+exports.getHeroById = async (id) => {
+  const queryText = `SELECT * FROM heros WHERE id = $1;`;
+  const queryParams = [id];
+  const results = await query(queryText, queryParams, true);
+  if (results.rowCount === 0) {
+    return null;
+  }
+  return formatHero(results.rows[0]);
+};
+
 exports.createHero = async (hero) => {
   const {
     categoryId,
@@ -161,4 +171,18 @@ exports.updateHero = async (id, hero) => {
     throw new Error(HERO_ERROR + "Hero not found");
   }
   return formatHero(results.rows[0]);
+};
+
+exports.deleteHero = async (heroId) => {
+  // check for hero
+  const isHeroResults = await query(
+    "SELECT * FROM heros WHERE id = $1",
+    [heroId],
+    true
+  );
+  if (isHeroResults.rows.length < 1) {
+    return 0;
+  }
+  const results = await query("DELETE FROM heros WHERE id = $1", [heroId]);
+  return 1;
 };
