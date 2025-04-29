@@ -10,7 +10,7 @@ paths:
             Endpoints related to retrieving and managing all categories
             withing the store's database.
         get:
-            summary: Search and filter categories.
+            summary: Search and filter categories
             description: Retrieves categories from the store's database based on search criteria
             operationId: search_categories
             parameters:
@@ -25,16 +25,14 @@ paths:
                     in: query
                     name: limit
                     schema:
-                        type: number
-                        format: integer
+                        type: integer
                     description: The number of items to return.
                     example: 25
                 -
                     in: query
                     name: offset
                     schema:
-                        type: number
-                        format: integer
+                        type: integer
                     description: The number to offset for return items. Creates pagination.
 
                 
@@ -129,6 +127,10 @@ paths:
                         application/json:
                             schema:
                                 $ref: "#/components/schemas/Category"
+                "404":
+                    description: No category found
+                "500":
+                    description: Server error
             parameters:
                 - name: id
                   in: path
@@ -139,11 +141,13 @@ paths:
             tags:
                 - Category
         put:
-            summary: Update a Category.
-            description: This operation updates an object with the matching id.
+            summary: Update a category
+            description: Updates a category with the matching ID
+            operationId: update_category
             security:
                 - bearerAuth: []
             requestBody:
+                required: true
                 content:
                     application/json:
                         schema:
@@ -154,30 +158,33 @@ paths:
                     content:
                         application/json:
                             schema:
-                                $ref: "#/components/schemas/Product"
+                                $ref: "#/components/schemas/Category"
                 "404":
                     description: No category found
+                "500":
+                    description: Server error
             tags:
                 - Category
         delete:
-            summary: Delete a category.
-            description: This operation deletes an object with the matching id.
-            operationId: delete_category_id
+            summary: Delete a category
+            description: Deletes a category with the matching ID
+            operationId: delete_category
             security:
                 - bearerAuth: []
-            responses:
-                "200":
-                    description: The category was deleted successfully
-                "403":
-                    description: User does not have elevated role to complete this operation.
-                "500":
-                    description: Server error
             parameters:
                 - name: id
                   in: path
                   schema:
                       type: string
                   required: true
+                  description: The id of the category.
+            responses:
+                "200":
+                    description: The category was deleted successfully
+                "404":
+                    description: No category found
+                "500":
+                    description: Server error
             tags:
                 - Category
     /api/v1/products:
@@ -191,23 +198,23 @@ paths:
             operationId: search_products
             parameters:
                 - in: query
-                  name: category
+                  name: categoryId
                   schema:
                       type: string
-                  description: Filter products by category
+                  description: Filter products by category ID
                 - in: query
                   name: name
                   schema:
                       type: string
                   description: Search products by name
                 - in: query
-                  name: min_price
+                  name: minPrice
                   schema:
                       type: number
                       format: float
                   description: Filter products by minimum price
                 - in: query
-                  name: max_price
+                  name: maxPrice
                   schema:
                       type: number
                       format: float
@@ -215,14 +222,12 @@ paths:
                 - in: query
                   name: offset
                   schema:
-                      type: number
-                      format: integer
-                  description: The offset of the number of items to retrieve. Creates pagination.
+                      type: integer
+                  description: The offset for pagination
                 - in: query
                   name: limit
                   schema:
-                      type: number
-                      format: float
+                      type: integer
                   description: The number of products per page
             responses:
                 "200":
@@ -244,14 +249,20 @@ paths:
             security:
                 - bearerAuth: []
             requestBody:
-                description: A new product object
+                required: true
                 content:
                     application/json:
                         schema:
                             $ref: "#/components/schemas/Product"
             responses:
-                default:
-                    description: Default error sample response
+                "200":
+                    description: Product created
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/Product"
+                "500":
+                    description: Server error
             tags:
                 - Products
     /api/v1/products/{id}:
@@ -268,6 +279,10 @@ paths:
                         application/json:
                             schema:
                                 $ref: "#/components/schemas/Product"
+                "404":
+                    description: No product found
+                "500":
+                    description: Server error
             parameters:
                 - name: id
                   in: path
@@ -278,72 +293,128 @@ paths:
             tags:
                 - Products
         put:
-            summary: Update a product.
-            description: This operation updates an object with the matching id
-            operationId: update_product_id
+            summary: Update a product
+            description: Updates a product with the matching ID
+            operationId: update_product
+            security:
+                - bearerAuth: []
             requestBody:
+                required: true
                 content:
                     application/json:
                         schema:
                             $ref: "#/components/schemas/Product"
             responses:
                 "200":
-                    description: The product was successfully retrieved.
+                    description: The product was successfully updated.
                     content:
                         application/json:
                             schema:
                                 $ref: "#/components/schemas/Product"
-            parameters:
-                - name: id
-                  in: path
-                  description: The id of the product.
-                  required: true
-                  schema:
-                      type: string
+                "404":
+                    description: No product found
+                "500":
+                    description: Server error
             tags:
                 - Products
         delete:
-            summary: Delete a product.
-            description: This product deletes an object with the matching id.
-            operationId: delete_product_id
+            summary: Delete a product
+            description: Deletes a product with the matching ID
+            operationId: delete_product
             security:
                 - bearerAuth: []
-            responses:
-                "200":
-                    description: The product was deleted successfully
-                "403":
-                    description: User does not have elevated role to complete this operation.
-                "500":
-                    description: Server error
             parameters:
                 - name: id
                   in: path
                   schema:
                       type: string
                   required: true
+                  description: The id of the product.
+            responses:
+                "200":
+                    description: The product was deleted successfully
+                "404":
+                    description: No product found
+                "500":
+                    description: Server error
             tags:
                 - Products
     /api/v1/products/{productId}/variants:
         post:
-            summary: create a variant for a product
-            responses: 
+            summary: Create a variant for a product
+            description: Adds a new variant to a product
+            operationId: create_variant
+            security:
+                - bearerAuth: []
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            properties:
+                                name:
+                                    type: string
+                                price:
+                                    type: number
+                                stock_quantity:
+                                    type: integer
+            responses:
                 "200":
                     description: Variant created
+                "500":
+                    description: Server error
             tags:
                 - Products
     /api/v1/products/{productId}/variants/{variantId}:
         put:
-            summary: update a variant.
+            summary: Update a variant
+            description: Updates a variant of a product
+            operationId: update_variant
+            security:
+                - bearerAuth: []
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            properties:
+                                name:
+                                    type: string
+                                price:
+                                    type: number
+                                stock_quantity:
+                                    type: integer
             responses:
                 "200":
-                    description: Variant updated.
+                    description: Variant updated
+                "404":
+                    description: Variant not found
+                "500":
+                    description: Server error
             tags:
                 - Products
         delete:
-            summary: delete a variant.
+            summary: Delete a variant
+            description: Deletes a variant of a product
+            operationId: delete_variant
+            security:
+                - bearerAuth: []
+            parameters:
+                - name: variantId
+                  in: path
+                  schema:
+                      type: string
+                  required: true
+                  description: The id of the variant.
             responses:
                 "200":
                     description: Variant deleted
+                "404":
+                    description: Variant not found
+                "500":
+                    description: Server error
             tags:
                 - Products
     /api/v1/user:
@@ -415,56 +486,244 @@ paths:
                                 $ref: "#/components/schemas/User"
             tags:
                 - User
-    /api/v1/orders:
-        description: Endpoints for retrieving orders.
-        get:
-            summary: Get all orders
-            description: This operation retrieves all orders with the matching id
-            operationId: get_orders
-            parameters:
-                - 
-                    in: query
-                    name: limit
-                    schema:
-                        type: integer
-                        minimum: 1
-                        maximum: 100
-                        default: 25
-                    description: The number of orders to return
-                    example: 25
-            security:
-                - bearerAuth: []
-            responses:
-                "200":
-                    description: The user was successfully retrieved.
-                    content:
-                        application/json:
-                            schema:
-                                $ref: "#/components/schemas/Order"
-            tags:
-                - Orders
-        post:
-            tags:
-                - Orders
-    /api/v1/orders/{id}:
-        put:
-            tags:
-                - Orders
-    /api/v1/heros:
-        description: Endpoints relating to site heros (banners)
-        get:
-            tags:
-                - Heros
-        post:
-            tags:
-                - Heros
-    /api/v1/heros/{id}:
-        put:
-            tags:
-                - Heros
-        delete:
-            tags:
-                - Heros
+
+
+  /api/v1/heros:
+    get:
+      summary: Get all heros
+      description: Retrieves all heros (banners) from the database.
+      operationId: get_all_heros
+      responses:
+        "200":
+          description: A list of heros was successfully retrieved.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Hero"
+        "404":
+          description: No heros found.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "No heros found."
+        "500":
+          description: Server error.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Server Error: <error message>"
+      tags:
+        - Heros
+    post:
+      summary: Create a new hero
+      description: Adds a new hero (banner) to the database.
+      operationId: create_hero
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - categoryId
+                - productId
+                - layout
+                - heading
+              properties:
+                categoryId:
+                  type: integer
+                  description: The ID of the category associated with the hero.
+                productId:
+                  type: integer
+                  description: The ID of the product associated with the hero.
+                layout:
+                  type: integer
+                  description: The layout type of the hero.
+                heading:
+                  type: string
+                  description: The main heading of the hero.
+                subTitle1:
+                  type: string
+                  description: The first subtitle of the hero.
+                subTitle2:
+                  type: string
+                  description: The second subtitle of the hero.
+                backgroundColor:
+                  type: string
+                  description: The background color of the hero.
+                textColor:
+                  type: string
+                  description: The text color of the hero.
+                imageurl:
+                  type: string
+                  description: The URL of the hero's image.
+      responses:
+        "201":
+          description: Hero created successfully.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Hero"
+        "400":
+          description: Invalid request data.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Bad Request: Invalid data."
+        "500":
+          description: Server error.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Server Error: <error message>"
+      tags:
+        - Heros
+  /api/v1/heros/{id}:
+    put:
+      summary: Update a hero
+      description: Updates an existing hero (banner) in the database.
+      operationId: update_hero
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: The ID of the hero to update.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                categoryId:
+                  type: integer
+                  description: The ID of the category associated with the hero.
+                productId:
+                  type: integer
+                  description: The ID of the product associated with the hero.
+                layout:
+                  type: integer
+                  description: The layout type of the hero.
+                heading:
+                  type: string
+                  description: The main heading of the hero.
+                subTitle1:
+                  type: string
+                  description: The first subtitle of the hero.
+                subTitle2:
+                  type: string
+                  description: The second subtitle of the hero.
+                backgroundColor:
+                  type: string
+                  description: The background color of the hero.
+                textColor:
+                  type: string
+                  description: The text color of the hero.
+                imageurl:
+                  type: string
+                  description: The URL of the hero's image.
+      responses:
+        "200":
+          description: Hero updated successfully.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Hero"
+        "404":
+          description: Hero not found.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Hero not found."
+        "500":
+          description: Server error.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Server Error: <error message>"
+      tags:
+        - Heros
+    delete:
+      summary: Delete a hero
+      description: Deletes an existing hero (banner) from the database.
+      operationId: delete_hero
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: The ID of the hero to delete.
+      responses:
+        "200":
+          description: Hero deleted successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Hero deleted successfully."
+        "404":
+          description: Hero not found.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Hero not found."
+        "500":
+          description: Server error.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Server Error: <error message>"
+      tags:
+        - Heros
+
+
+
+
+
+
+
+
+
     /api/v1/discounts:
         summary: Discount Management
         description: >-
@@ -744,21 +1003,7 @@ paths:
             - bearerAuth: []
             tags:
             - Discounts
-    /api/v1/carts:
-        description: Endpoints relating to user carts.
-        post:
-            tags:
-                - Carts
-    /api/v1/carts{id}:
-        put:
-            tags:
-                - Carts
-        get:
-            tags:
-                - Carts
-        delete:
-            tags:
-                - Carts
+
     /api/v1/auth/login:
         post:
             responses:
@@ -929,12 +1174,61 @@ paths:
             tags:
                 - Auth
 
-
+        /api/v1/carts:
+        description: Endpoints relating to user carts.
+        post:
+            tags:
+                - Carts
+    /api/v1/carts{id}:
+        put:
+            tags:
+                - Carts
+        get:
+            tags:
+                - Carts
+        delete:
+            tags:
+                - Carts
+        /api/v1/orders:
+        description: Endpoints for retrieving orders.
+        get:
+            summary: Get all orders
+            description: This operation retrieves all orders with the matching id
+            operationId: get_orders
+            parameters:
+                - 
+                    in: query
+                    name: limit
+                    schema:
+                        type: integer
+                        minimum: 1
+                        maximum: 100
+                        default: 25
+                    description: The number of orders to return
+                    example: 25
+            security:
+                - bearerAuth: []
+            responses:
+                "200":
+                    description: The user was successfully retrieved.
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/Order"
+            tags:
+                - Orders
+        post:
+            tags:
+                - Orders
+    /api/v1/orders/{id}:
+        put:
+            tags:
+                - Orders
 components:
     securitySchemes:
         bearerAuth:
             type: http
-            scheme: basic
+            scheme: bearer
 
     schemas:
         Category:
@@ -1002,6 +1296,40 @@ components:
                 quantity:
                     type: integer
                     description: The quantity of the discount available.
+
+        Hero:
+            type: object
+            properties:
+                id:
+                    type: integer
+                    description: The ID of the hero.
+                categoryId:
+                    type: integer
+                    description: The ID of the category associated with the hero.
+                productId:
+                    type: integer
+                    description: The ID of the product associated with the hero.
+                layout:
+                    type: integer
+                    description: The layout type of the hero.
+                heading:
+                    type: string
+                    description: The main heading of the hero.
+                subTitle1:
+                    type: string
+                    description: The first subtitle of the hero.
+                subTitle2:
+                    type: string
+                    description: The second subtitle of the hero.
+                backgroundColor:
+                    type: string
+                    description: The background color of the hero.
+                textColor:
+                    type: string
+                    description: The text color of the hero.
+                imageurl:
+                    type: string
+                    description: The URL of the hero's image.
         Order:
             type: object
             properties:

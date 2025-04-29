@@ -236,6 +236,10 @@ exports.updateUser = async (userObject) => {
       ) {
         throw new Error("Missing address fields");
       }
+      let retrievedZipcodeId = await userAddressDao.getZipcodeId(zipCode);
+      if (!retrievedZipcodeId) {
+        retrievedZipcodeId = await userAddressDao.createZipcode(zipCode);
+      }
       let retrievedStreetNameId = await userAddressDao.getStreetNameId(
         streetName
       );
@@ -252,7 +256,7 @@ exports.updateUser = async (userObject) => {
         retrievedStreetNameId = await userAddressDao.createStreetName(
           streetName,
           retrievedCityId,
-          zipCode
+          retrievedZipcodeId
         );
       }
       valuesArray.push(retrievedStreetNameId);
