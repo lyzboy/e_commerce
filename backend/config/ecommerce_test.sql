@@ -2,8 +2,8 @@
 -- PostgreSQL database dump
 --
 
--- Dumped from database version 16.3
--- Dumped by pg_dump version 16.3
+-- Dumped from database version 15.12 (Debian 15.12-0+deb12u2)
+-- Dumped by pg_dump version 15.12 (Debian 15.12-0+deb12u2)
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -55,8 +55,9 @@ ALTER TABLE public.accounts_orders OWNER TO postgres;
 
 CREATE TABLE public.addresses (
     id integer NOT NULL,
-    street_name character varying(75),
-    city_id integer
+    street_name character varying(50),
+    city_id integer,
+    zipcode_id integer
 );
 
 
@@ -75,7 +76,7 @@ CREATE SEQUENCE public.addresses_id_seq
     CACHE 1;
 
 
-ALTER SEQUENCE public.addresses_id_seq OWNER TO postgres;
+ALTER TABLE public.addresses_id_seq OWNER TO postgres;
 
 --
 -- Name: addresses_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
@@ -109,7 +110,7 @@ CREATE SEQUENCE public.admins_id_seq
     CACHE 1;
 
 
-ALTER SEQUENCE public.admins_id_seq OWNER TO postgres;
+ALTER TABLE public.admins_id_seq OWNER TO postgres;
 
 --
 -- Name: admins_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
@@ -144,7 +145,7 @@ CREATE SEQUENCE public.attribute_values_id_seq
     CACHE 1;
 
 
-ALTER SEQUENCE public.attribute_values_id_seq OWNER TO postgres;
+ALTER TABLE public.attribute_values_id_seq OWNER TO postgres;
 
 --
 -- Name: attribute_values_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
@@ -178,7 +179,7 @@ CREATE SEQUENCE public.attributes_id_seq
     CACHE 1;
 
 
-ALTER SEQUENCE public.attributes_id_seq OWNER TO postgres;
+ALTER TABLE public.attributes_id_seq OWNER TO postgres;
 
 --
 -- Name: attributes_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
@@ -193,7 +194,7 @@ ALTER SEQUENCE public.attributes_id_seq OWNED BY public.attributes.id;
 
 CREATE TABLE public.carts (
     id integer NOT NULL,
-    account_email character varying
+    account_email character varying NOT NULL
 );
 
 
@@ -212,7 +213,7 @@ CREATE SEQUENCE public.carts_id_seq
     CACHE 1;
 
 
-ALTER SEQUENCE public.carts_id_seq OWNER TO postgres;
+ALTER TABLE public.carts_id_seq OWNER TO postgres;
 
 --
 -- Name: carts_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
@@ -226,9 +227,11 @@ ALTER SEQUENCE public.carts_id_seq OWNED BY public.carts.id;
 --
 
 CREATE TABLE public.carts_products (
-    product_id integer,
-    cart_id integer,
-    quantity integer
+    product_id integer NOT NULL,
+    cart_id integer NOT NULL,
+    quantity integer NOT NULL,
+    variant_attribute_value_id integer,
+    id integer NOT NULL
 );
 
 
@@ -246,7 +249,7 @@ CREATE SEQUENCE public.carts_products_id_seq
     CACHE 1;
 
 
-ALTER SEQUENCE public.carts_products_id_seq OWNER TO postgres;
+ALTER TABLE public.carts_products_id_seq OWNER TO postgres;
 
 --
 -- Name: carts_products_id_seq1; Type: SEQUENCE; Schema: public; Owner: postgres
@@ -261,7 +264,14 @@ CREATE SEQUENCE public.carts_products_id_seq1
     CACHE 1;
 
 
-ALTER SEQUENCE public.carts_products_id_seq1 OWNER TO postgres;
+ALTER TABLE public.carts_products_id_seq1 OWNER TO postgres;
+
+--
+-- Name: carts_products_id_seq1; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.carts_products_id_seq1 OWNED BY public.carts_products.id;
+
 
 --
 -- Name: categories; Type: TABLE; Schema: public; Owner: postgres
@@ -289,7 +299,7 @@ CREATE SEQUENCE public.categories_id_seq
     CACHE 1;
 
 
-ALTER SEQUENCE public.categories_id_seq OWNER TO postgres;
+ALTER TABLE public.categories_id_seq OWNER TO postgres;
 
 --
 -- Name: categories_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
@@ -324,7 +334,7 @@ CREATE SEQUENCE public.cities_id_seq
     CACHE 1;
 
 
-ALTER SEQUENCE public.cities_id_seq OWNER TO postgres;
+ALTER TABLE public.cities_id_seq OWNER TO postgres;
 
 --
 -- Name: cities_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
@@ -343,7 +353,7 @@ CREATE TABLE public.discounts (
     percent_off numeric NOT NULL,
     expire_date date,
     quantity integer,
-    amount_off numeric(10,2)
+    amount_off money
 );
 
 
@@ -362,13 +372,48 @@ CREATE SEQUENCE public.discounts_id_seq
     CACHE 1;
 
 
-ALTER SEQUENCE public.discounts_id_seq OWNER TO postgres;
+ALTER TABLE public.discounts_id_seq OWNER TO postgres;
 
 --
 -- Name: discounts_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
 
 ALTER SEQUENCE public.discounts_id_seq OWNED BY public.discounts.id;
+
+
+--
+-- Name: hero_image_urls; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.hero_image_urls (
+    id integer NOT NULL,
+    image_url character varying NOT NULL,
+    hero_id integer NOT NULL
+);
+
+
+ALTER TABLE public.hero_image_urls OWNER TO postgres;
+
+--
+-- Name: hero_image_urls_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.hero_image_urls_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.hero_image_urls_id_seq OWNER TO postgres;
+
+--
+-- Name: hero_image_urls_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.hero_image_urls_id_seq OWNED BY public.hero_image_urls.id;
 
 
 --
@@ -384,7 +429,8 @@ CREATE TABLE public.heros (
     sub_title_1 character varying,
     sub_title_2 character varying,
     background_color character varying,
-    text_color character varying
+    text_color character varying,
+    imageurl character varying
 );
 
 
@@ -403,7 +449,7 @@ CREATE SEQUENCE public.heros_id_seq
     CACHE 1;
 
 
-ALTER SEQUENCE public.heros_id_seq OWNER TO postgres;
+ALTER TABLE public.heros_id_seq OWNER TO postgres;
 
 --
 -- Name: heros_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
@@ -439,7 +485,7 @@ CREATE SEQUENCE public.orders_id_seq
     CACHE 1;
 
 
-ALTER SEQUENCE public.orders_id_seq OWNER TO postgres;
+ALTER TABLE public.orders_id_seq OWNER TO postgres;
 
 --
 -- Name: orders_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
@@ -488,7 +534,7 @@ CREATE SEQUENCE public.payment_token_id_seq
     CACHE 1;
 
 
-ALTER SEQUENCE public.payment_token_id_seq OWNER TO postgres;
+ALTER TABLE public.payment_token_id_seq OWNER TO postgres;
 
 --
 -- Name: payment_token_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
@@ -522,7 +568,7 @@ CREATE SEQUENCE public.phones_id_seq
     CACHE 1;
 
 
-ALTER SEQUENCE public.phones_id_seq OWNER TO postgres;
+ALTER TABLE public.phones_id_seq OWNER TO postgres;
 
 --
 -- Name: phones_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
@@ -532,13 +578,48 @@ ALTER SEQUENCE public.phones_id_seq OWNED BY public.phones.id;
 
 
 --
+-- Name: product_image_urls; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.product_image_urls (
+    id integer NOT NULL,
+    image_url character varying NOT NULL,
+    product_id integer NOT NULL
+);
+
+
+ALTER TABLE public.product_image_urls OWNER TO postgres;
+
+--
+-- Name: product_image_urls_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.product_image_urls_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.product_image_urls_id_seq OWNER TO postgres;
+
+--
+-- Name: product_image_urls_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.product_image_urls_id_seq OWNED BY public.product_image_urls.id;
+
+
+--
 -- Name: product_variants; Type: TABLE; Schema: public; Owner: postgres
 --
 
 CREATE TABLE public.product_variants (
     id integer NOT NULL,
     product_id integer,
-    price numeric(10,2) NOT NULL,
+    price money NOT NULL,
     stock_quantity integer NOT NULL
 );
 
@@ -558,7 +639,7 @@ CREATE SEQUENCE public.product_variants_id_seq
     CACHE 1;
 
 
-ALTER SEQUENCE public.product_variants_id_seq OWNER TO postgres;
+ALTER TABLE public.product_variants_id_seq OWNER TO postgres;
 
 --
 -- Name: product_variants_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
@@ -576,8 +657,12 @@ CREATE TABLE public.products (
     barcode character varying(20),
     name character varying(100),
     description character varying(254),
-    price numeric(10,2),
-    stock_quantity integer
+    price money,
+    stock_quantity integer,
+    brand character varying(100),
+    weight numeric,
+    weight_units character varying(5),
+    main_image_id integer
 );
 
 
@@ -622,7 +707,7 @@ CREATE SEQUENCE public.products_discounts_id_seq
     CACHE 1;
 
 
-ALTER SEQUENCE public.products_discounts_id_seq OWNER TO postgres;
+ALTER TABLE public.products_discounts_id_seq OWNER TO postgres;
 
 --
 -- Name: products_discounts_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
@@ -644,7 +729,7 @@ CREATE SEQUENCE public.products_id_seq
     CACHE 1;
 
 
-ALTER SEQUENCE public.products_id_seq OWNER TO postgres;
+ALTER TABLE public.products_id_seq OWNER TO postgres;
 
 --
 -- Name: products_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
@@ -659,9 +744,9 @@ ALTER SEQUENCE public.products_id_seq OWNED BY public.products.id;
 
 CREATE TABLE public.reset_password_codes (
     id integer NOT NULL,
-    reset_code character varying(6),
-    expire_time timestamp without time zone,
-    email character varying
+    reset_code character varying(6) NOT NULL,
+    expire_time timestamp without time zone NOT NULL,
+    email character varying NOT NULL
 );
 
 
@@ -680,7 +765,7 @@ CREATE SEQUENCE public.reset_password_codes_id_seq
     CACHE 1;
 
 
-ALTER SEQUENCE public.reset_password_codes_id_seq OWNER TO postgres;
+ALTER TABLE public.reset_password_codes_id_seq OWNER TO postgres;
 
 --
 -- Name: reset_password_codes_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
@@ -695,7 +780,7 @@ ALTER SEQUENCE public.reset_password_codes_id_seq OWNED BY public.reset_password
 
 CREATE TABLE public.states (
     id integer NOT NULL,
-    name character varying(150),
+    name character varying(15),
     abbreviation character varying(2)
 );
 
@@ -715,7 +800,7 @@ CREATE SEQUENCE public.states_id_seq
     CACHE 1;
 
 
-ALTER SEQUENCE public.states_id_seq OWNER TO postgres;
+ALTER TABLE public.states_id_seq OWNER TO postgres;
 
 --
 -- Name: states_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
@@ -730,8 +815,12 @@ ALTER SEQUENCE public.states_id_seq OWNED BY public.states.id;
 
 CREATE TABLE public.variant_attribute_values (
     id integer NOT NULL,
-    product_variant_id integer,
-    attribute_value_id integer
+    product_variant_id integer NOT NULL,
+    attribute_value_1_id integer NOT NULL,
+    attribute_value_2_id integer,
+    attribute_value_3_id integer,
+    attribute_value_4_id integer,
+    attribute_value_5_id integer
 );
 
 
@@ -750,13 +839,47 @@ CREATE SEQUENCE public.variant_attribute_values_id_seq
     CACHE 1;
 
 
-ALTER SEQUENCE public.variant_attribute_values_id_seq OWNER TO postgres;
+ALTER TABLE public.variant_attribute_values_id_seq OWNER TO postgres;
 
 --
 -- Name: variant_attribute_values_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
 
 ALTER SEQUENCE public.variant_attribute_values_id_seq OWNED BY public.variant_attribute_values.id;
+
+
+--
+-- Name: zipcodes; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.zipcodes (
+    id integer NOT NULL,
+    zipcode character varying(5)
+);
+
+
+ALTER TABLE public.zipcodes OWNER TO postgres;
+
+--
+-- Name: zipcodes_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.zipcodes_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.zipcodes_id_seq OWNER TO postgres;
+
+--
+-- Name: zipcodes_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.zipcodes_id_seq OWNED BY public.zipcodes.id;
 
 
 --
@@ -795,6 +918,13 @@ ALTER TABLE ONLY public.carts ALTER COLUMN id SET DEFAULT nextval('public.carts_
 
 
 --
+-- Name: carts_products id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.carts_products ALTER COLUMN id SET DEFAULT nextval('public.carts_products_id_seq1'::regclass);
+
+
+--
 -- Name: categories id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -813,6 +943,13 @@ ALTER TABLE ONLY public.cities ALTER COLUMN id SET DEFAULT nextval('public.citie
 --
 
 ALTER TABLE ONLY public.discounts ALTER COLUMN id SET DEFAULT nextval('public.discounts_id_seq'::regclass);
+
+
+--
+-- Name: hero_image_urls id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.hero_image_urls ALTER COLUMN id SET DEFAULT nextval('public.hero_image_urls_id_seq'::regclass);
 
 
 --
@@ -841,6 +978,13 @@ ALTER TABLE ONLY public.payment_token ALTER COLUMN id SET DEFAULT nextval('publi
 --
 
 ALTER TABLE ONLY public.phones ALTER COLUMN id SET DEFAULT nextval('public.phones_id_seq'::regclass);
+
+
+--
+-- Name: product_image_urls id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.product_image_urls ALTER COLUMN id SET DEFAULT nextval('public.product_image_urls_id_seq'::regclass);
 
 
 --
@@ -886,6 +1030,13 @@ ALTER TABLE ONLY public.variant_attribute_values ALTER COLUMN id SET DEFAULT nex
 
 
 --
+-- Name: zipcodes id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.zipcodes ALTER COLUMN id SET DEFAULT nextval('public.zipcodes_id_seq'::regclass);
+
+
+--
 -- Data for Name: accounts; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
@@ -905,7 +1056,7 @@ COPY public.accounts_orders (account_email, order_id) FROM stdin;
 -- Data for Name: addresses; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-COPY public.addresses (id, street_name, city_id) FROM stdin;
+COPY public.addresses (id, street_name, city_id, zipcode_id) FROM stdin;
 \.
 
 
@@ -922,6 +1073,12 @@ COPY public.admins (id, account_email) FROM stdin;
 --
 
 COPY public.attribute_values (id, attribute_id, value) FROM stdin;
+1	1	S
+2	1	M
+3	1	L
+4	2	Red
+5	2	White
+6	2	Blue
 \.
 
 
@@ -947,7 +1104,7 @@ COPY public.carts (id, account_email) FROM stdin;
 -- Data for Name: carts_products; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-COPY public.carts_products (product_id, cart_id, quantity) FROM stdin;
+COPY public.carts_products (product_id, cart_id, quantity, variant_attribute_value_id, id) FROM stdin;
 \.
 
 
@@ -976,10 +1133,18 @@ COPY public.discounts (id, code, percent_off, expire_date, quantity, amount_off)
 
 
 --
+-- Data for Name: hero_image_urls; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.hero_image_urls (id, image_url, hero_id) FROM stdin;
+\.
+
+
+--
 -- Data for Name: heros; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-COPY public.heros (id, category_id, product_id, layout, heading, sub_title_1, sub_title_2, background_color, text_color) FROM stdin;
+COPY public.heros (id, category_id, product_id, layout, heading, sub_title_1, sub_title_2, background_color, text_color, imageurl) FROM stdin;
 \.
 
 
@@ -1013,6 +1178,152 @@ COPY public.payment_token (id, email, token) FROM stdin;
 
 COPY public.phones (id, number) FROM stdin;
 1	9705555555
+2	1234567890
+3	\N
+4	1234567890
+5	\N
+6	1234567890
+7	\N
+8	1234567890
+9	\N
+10	1234567890
+11	\N
+12	1234567890
+13	\N
+14	1234567890
+15	\N
+16	1234567890
+17	\N
+18	1234567890
+19	\N
+20	1234567890
+21	\N
+22	1234567890
+23	\N
+24	1234567890
+25	\N
+26	1234567890
+27	\N
+28	1234567890
+29	\N
+30	1234567890
+31	\N
+32	1234567890
+33	\N
+34	1234567890
+35	\N
+36	1234567890
+37	\N
+38	1234567890
+39	\N
+40	1234567890
+41	\N
+42	1234567890
+43	\N
+44	1234567890
+45	\N
+46	1234567890
+47	\N
+48	1234567890
+49	\N
+50	1234567890
+51	\N
+52	1234567890
+53	\N
+54	1234567890
+55	\N
+56	1234567890
+57	\N
+58	1234567890
+59	\N
+60	1234567890
+61	\N
+62	1234567890
+63	\N
+64	1234567890
+65	\N
+66	1234567890
+67	\N
+68	1234567890
+69	\N
+70	1234567890
+71	\N
+72	1234567890
+73	\N
+74	1234567890
+75	\N
+76	1234567890
+77	\N
+78	1234567890
+79	\N
+80	1234567890
+81	\N
+82	1234567890
+83	\N
+84	1234567890
+85	\N
+86	1234567890
+87	\N
+88	1234567890
+89	\N
+90	1234567890
+91	\N
+92	9708744106
+93	\N
+94	9708744106
+95	\N
+96	9708744106
+97	\N
+98	9708744106
+99	\N
+100	9708744106
+101	\N
+102	9708744106
+103	\N
+104	9708744106
+105	\N
+106	9708744106
+107	\N
+108	9708744106
+109	\N
+110	9708744106
+111	\N
+112	9708744106
+113	\N
+114	9708744106
+115	\N
+116	9708744106
+117	\N
+118	9708744106
+119	\N
+120	9708744106
+121	\N
+122	9708744106
+123	\N
+124	9708744106
+125	\N
+126	9708744106
+127	\N
+128	9708744106
+129	\N
+130	9708744106
+131	\N
+132	9708744106
+133	\N
+134	9708744106
+135	\N
+136	9708744106
+137	\N
+138	9708744106
+139	\N
+\.
+
+
+--
+-- Data for Name: product_image_urls; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.product_image_urls (id, image_url, product_id) FROM stdin;
 \.
 
 
@@ -1028,7 +1339,7 @@ COPY public.product_variants (id, product_id, price, stock_quantity) FROM stdin;
 -- Data for Name: products; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-COPY public.products (id, barcode, name, description, price, stock_quantity) FROM stdin;
+COPY public.products (id, barcode, name, description, price, stock_quantity, brand, weight, weight_units, main_image_id) FROM stdin;
 \.
 
 
@@ -1068,7 +1379,16 @@ COPY public.states (id, name, abbreviation) FROM stdin;
 -- Data for Name: variant_attribute_values; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-COPY public.variant_attribute_values (id, product_variant_id, attribute_value_id) FROM stdin;
+COPY public.variant_attribute_values (id, product_variant_id, attribute_value_1_id, attribute_value_2_id, attribute_value_3_id, attribute_value_4_id, attribute_value_5_id) FROM stdin;
+\.
+
+
+--
+-- Data for Name: zipcodes; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.zipcodes (id, zipcode) FROM stdin;
+1	12345
 \.
 
 
@@ -1076,14 +1396,14 @@ COPY public.variant_attribute_values (id, product_variant_id, attribute_value_id
 -- Name: addresses_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.addresses_id_seq', 7, true);
+SELECT pg_catalog.setval('public.addresses_id_seq', 68, true);
 
 
 --
 -- Name: admins_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.admins_id_seq', 775, true);
+SELECT pg_catalog.setval('public.admins_id_seq', 1463, true);
 
 
 --
@@ -1125,28 +1445,35 @@ SELECT pg_catalog.setval('public.carts_products_id_seq1', 3, true);
 -- Name: categories_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.categories_id_seq', 887, true);
+SELECT pg_catalog.setval('public.categories_id_seq', 1322, true);
 
 
 --
 -- Name: cities_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.cities_id_seq', 7, true);
+SELECT pg_catalog.setval('public.cities_id_seq', 39, true);
 
 
 --
 -- Name: discounts_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.discounts_id_seq', 1976, true);
+SELECT pg_catalog.setval('public.discounts_id_seq', 2762, true);
+
+
+--
+-- Name: hero_image_urls_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.hero_image_urls_id_seq', 1, false);
 
 
 --
 -- Name: heros_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.heros_id_seq', 1, false);
+SELECT pg_catalog.setval('public.heros_id_seq', 883, true);
 
 
 --
@@ -1167,7 +1494,14 @@ SELECT pg_catalog.setval('public.payment_token_id_seq', 1, false);
 -- Name: phones_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.phones_id_seq', 1, true);
+SELECT pg_catalog.setval('public.phones_id_seq', 139, true);
+
+
+--
+-- Name: product_image_urls_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.product_image_urls_id_seq', 1, false);
 
 
 --
@@ -1181,28 +1515,28 @@ SELECT pg_catalog.setval('public.product_variants_id_seq', 8, true);
 -- Name: products_discounts_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.products_discounts_id_seq', 1895, true);
+SELECT pg_catalog.setval('public.products_discounts_id_seq', 2684, true);
 
 
 --
 -- Name: products_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.products_id_seq', 2621, true);
+SELECT pg_catalog.setval('public.products_id_seq', 3833, true);
 
 
 --
 -- Name: reset_password_codes_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.reset_password_codes_id_seq', 613, true);
+SELECT pg_catalog.setval('public.reset_password_codes_id_seq', 1102, true);
 
 
 --
 -- Name: states_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.states_id_seq', 2276, true);
+SELECT pg_catalog.setval('public.states_id_seq', 47100, true);
 
 
 --
@@ -1213,11 +1547,10 @@ SELECT pg_catalog.setval('public.variant_attribute_values_id_seq', 23, true);
 
 
 --
--- Name: states abbreviation_uq; Type: CONSTRAINT; Schema: public; Owner: postgres
+-- Name: zipcodes_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-ALTER TABLE ONLY public.states
-    ADD CONSTRAINT abbreviation_uq UNIQUE (abbreviation);
+SELECT pg_catalog.setval('public.zipcodes_id_seq', 1, true);
 
 
 --
@@ -1277,6 +1610,14 @@ ALTER TABLE ONLY public.carts
 
 
 --
+-- Name: carts_products carts_products_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.carts_products
+    ADD CONSTRAINT carts_products_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: categories categories_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -1301,11 +1642,35 @@ ALTER TABLE ONLY public.discounts
 
 
 --
+-- Name: hero_image_urls hero_image_url_uq; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.hero_image_urls
+    ADD CONSTRAINT hero_image_url_uq UNIQUE (image_url);
+
+
+--
+-- Name: hero_image_urls hero_image_urls_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.hero_image_urls
+    ADD CONSTRAINT hero_image_urls_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: heros heros_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY public.heros
     ADD CONSTRAINT heros_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: product_image_urls image_url_uq; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.product_image_urls
+    ADD CONSTRAINT image_url_uq UNIQUE (image_url);
 
 
 --
@@ -1330,6 +1695,14 @@ ALTER TABLE ONLY public.payment_token
 
 ALTER TABLE ONLY public.phones
     ADD CONSTRAINT phones_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: product_image_urls product_image_urls_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.product_image_urls
+    ADD CONSTRAINT product_image_urls_pkey PRIMARY KEY (id);
 
 
 --
@@ -1381,17 +1754,18 @@ ALTER TABLE ONLY public.variant_attribute_values
 
 
 --
+-- Name: zipcodes zipcodes_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.zipcodes
+    ADD CONSTRAINT zipcodes_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: idx_accounts_orders; Type: INDEX; Schema: public; Owner: postgres
 --
 
 CREATE INDEX idx_accounts_orders ON public.accounts_orders USING btree (account_email, order_id);
-
-
---
--- Name: idx_carts_products; Type: INDEX; Schema: public; Owner: postgres
---
-
-CREATE INDEX idx_carts_products ON public.carts_products USING btree (product_id, cart_id);
 
 
 --
@@ -1449,6 +1823,14 @@ ALTER TABLE ONLY public.addresses
 
 
 --
+-- Name: addresses addresses_zipcode_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.addresses
+    ADD CONSTRAINT addresses_zipcode_id_fkey FOREIGN KEY (zipcode_id) REFERENCES public.zipcodes(id);
+
+
+--
 -- Name: admins admins_account_email_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -1489,11 +1871,27 @@ ALTER TABLE ONLY public.carts_products
 
 
 --
+-- Name: carts_products carts_products_variant_attribute_value_id_fk; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.carts_products
+    ADD CONSTRAINT carts_products_variant_attribute_value_id_fk FOREIGN KEY (variant_attribute_value_id) REFERENCES public.variant_attribute_values(id);
+
+
+--
 -- Name: cities cities_state_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY public.cities
     ADD CONSTRAINT cities_state_id_fkey FOREIGN KEY (state_id) REFERENCES public.states(id);
+
+
+--
+-- Name: hero_image_urls hero_image_urls_hero_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.hero_image_urls
+    ADD CONSTRAINT hero_image_urls_hero_id_fkey FOREIGN KEY (hero_id) REFERENCES public.heros(id);
 
 
 --
@@ -1542,6 +1940,14 @@ ALTER TABLE ONLY public.orders_products
 
 ALTER TABLE ONLY public.payment_token
     ADD CONSTRAINT payment_token_email_fkey FOREIGN KEY (email) REFERENCES public.accounts(email);
+
+
+--
+-- Name: product_image_urls product_image_urls_product_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.product_image_urls
+    ADD CONSTRAINT product_image_urls_product_id_fkey FOREIGN KEY (product_id) REFERENCES public.products(id);
 
 
 --
@@ -1601,11 +2007,43 @@ ALTER TABLE ONLY public.reset_password_codes
 
 
 --
--- Name: variant_attribute_values variant_attribute_values_attribute_value_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+-- Name: variant_attribute_values variant_attribute_values_attribute_value_1_id_fk; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY public.variant_attribute_values
-    ADD CONSTRAINT variant_attribute_values_attribute_value_id_fkey FOREIGN KEY (attribute_value_id) REFERENCES public.attribute_values(id);
+    ADD CONSTRAINT variant_attribute_values_attribute_value_1_id_fk FOREIGN KEY (attribute_value_1_id) REFERENCES public.attribute_values(id);
+
+
+--
+-- Name: variant_attribute_values variant_attribute_values_attribute_value_2_id_fk; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.variant_attribute_values
+    ADD CONSTRAINT variant_attribute_values_attribute_value_2_id_fk FOREIGN KEY (attribute_value_2_id) REFERENCES public.attribute_values(id);
+
+
+--
+-- Name: variant_attribute_values variant_attribute_values_attribute_value_3_id_fk; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.variant_attribute_values
+    ADD CONSTRAINT variant_attribute_values_attribute_value_3_id_fk FOREIGN KEY (attribute_value_3_id) REFERENCES public.attribute_values(id);
+
+
+--
+-- Name: variant_attribute_values variant_attribute_values_attribute_value_4_id_fk; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.variant_attribute_values
+    ADD CONSTRAINT variant_attribute_values_attribute_value_4_id_fk FOREIGN KEY (attribute_value_4_id) REFERENCES public.attribute_values(id);
+
+
+--
+-- Name: variant_attribute_values variant_attribute_values_attribute_value_5_id_fk; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.variant_attribute_values
+    ADD CONSTRAINT variant_attribute_values_attribute_value_5_id_fk FOREIGN KEY (attribute_value_5_id) REFERENCES public.attribute_values(id);
 
 
 --
