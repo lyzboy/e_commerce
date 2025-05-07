@@ -109,3 +109,4 @@ This table lists the backend integration test cases derived from the Jest/Supert
 | USER-PUT-SELF-01    | Pass   | should update a user's object if the user is same user       | PUT `/user`, Body: `{ email, username, name, password, ... }` (User Auth) | Status 200, Returns updated user object                | Status 200, Returns updated user object                |
 | USER-DELETE-SELF-01 | Pass   | should delete a user's object if the user is same user       | DELETE `/user` (User Auth)                                                 | Status 200                                             | Status 200                                             |
 | **Products** ||||||
+| PROD-GET-ID-01      | | should get a product by id | GET `/products/:id` (No Auth) | Status 200, Body: `{ id, name, description, price, stockQuantity, brand, weight, mainImageUrl, images, category}` | | 
