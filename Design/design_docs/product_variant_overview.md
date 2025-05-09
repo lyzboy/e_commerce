@@ -1,3 +1,5 @@
+[ &#127968; Return To Design Info](../design_info.md)
+
 # Product Variants Storage System: Explanation
 
 This document explains the updated **variant storage** system, outlining the role of each table and how they work together to represent products with various attributes (like size, color, etc.) and their specific details like price and stock.

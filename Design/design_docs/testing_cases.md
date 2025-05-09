@@ -108,5 +108,7 @@ This table lists the backend integration test cases derived from the Jest/Supert
 | USER-GET-SELF-01    | Pass   | should get the user's object only if the user is same user   | GET `/user` (User Auth)                                                    | Status 200, Returns own user object                    | Status 200, Returns own user object                    |
 | USER-PUT-SELF-01    | Pass   | should update a user's object if the user is same user       | PUT `/user`, Body: `{ email, username, name, password, ... }` (User Auth) | Status 200, Returns updated user object                | Status 200, Returns updated user object                |
 | USER-DELETE-SELF-01 | Pass   | should delete a user's object if the user is same user       | DELETE `/user` (User Auth)                                                 | Status 200                                             | Status 200                                             |
-| **Products** |-|-|-|-|-|
-| PROD-GET-ID-01      | | should get a product by id | GET `/products/:id` (No Auth) | Status 200, Body: `{ id, name, description, price, stockQuantity, brand, weight, mainImageUrl, images, category}` | | 
+| **Images** |-|-|-|-|-|
+| IMG-GET-PRODUCT-ID-01      | | should get a product by id with image url data| GET `/products/:id` (No Auth) | Status 200, Body: `{ id, name, description, price, stockQuantity, brand, weight, mainImageUrl, images, category}` | | 
+| IMG-PUT-PRODUCT-ID-01 | | should update a product with image and return product with image url | PUT `/products/:id` (Admin Auth) | Status 200, Body: `{ id, name, description, price, stockQuantity, brand, weight, mainImageUrl, images, category}` | |
+| IMG-GET-HERO-ID-01 | | should get hero by id with image url data| GET `/heros/:id` (No Auth) | Status 200, Body: `{ id, productId, categoryId, layout, heading, description, imageUrl}` | |
