@@ -31,17 +31,26 @@ const uploadImage = async (imagePath) => {
 const getAssetInfo = async (publicId) => {
   // Return colors in the response
   const options = {
-    colors: true,
+    eager: true,
   };
 
   try {
     // Get details about the asset
     const result = await cloudinary.api.resource(publicId, options);
     console.log(result);
-    return result.colors;
+    return result.eager.url;
   } catch (error) {
     console.error(error);
   }
 };
 
-module.exports = { uploadImage, getAssetInfo };
+const deleteImage = async (publicId) => {
+  try {
+    const result = await cloudinary.api.uploader.destroy(publicId);
+    return result;
+  } catch (error) {
+    console.error(error);
+  }
+};
+
+module.exports = { uploadImage, getAssetInfo, deleteImage };
