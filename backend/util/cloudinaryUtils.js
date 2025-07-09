@@ -1,5 +1,5 @@
 // Require the cloudinary library
-import { v2 as cloudinary } from "cloudinary";
+const cloudinary = require("cloudinary").v2;
 
 // Return "https" URLs by setting secure: true
 cloudinary.config({
@@ -7,14 +7,14 @@ cloudinary.config({
 });
 
 // Log the configuration
-console.log(cloudinary.config());
+//console.log(cloudinary.config());
 
 const uploadImage = async (imagePath) => {
   // Use the uploaded file's name as the asset's public ID and
   // allow overwriting the asset with new versions
   const options = {
-    use_filename: true,
-    unique_filename: false,
+    use_filename: false,
+    unique_filename: true,
     overwrite: true,
   };
 
@@ -24,7 +24,8 @@ const uploadImage = async (imagePath) => {
     console.log(result);
     return result.public_id;
   } catch (error) {
-    console.error(error);
+    //console.error("Error in AMS: " + error);
+    throw error;
   }
 };
 
