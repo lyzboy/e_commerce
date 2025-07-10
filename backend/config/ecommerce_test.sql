@@ -388,6 +388,7 @@ ALTER SEQUENCE public.discounts_id_seq OWNED BY public.discounts.id;
 CREATE TABLE public.hero_image_urls (
     id integer NOT NULL,
     image_url character varying NOT NULL,
+    image_public_id character varying NOT NULL,
     hero_id integer NOT NULL
 );
 
@@ -584,6 +585,7 @@ ALTER SEQUENCE public.phones_id_seq OWNED BY public.phones.id;
 CREATE TABLE public.product_image_urls (
     id integer NOT NULL,
     image_url character varying NOT NULL,
+    image_public_id character varying NOT NULL,
     product_id integer NOT NULL
 );
 

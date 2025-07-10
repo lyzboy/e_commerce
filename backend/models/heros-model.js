@@ -1,4 +1,5 @@
 const { query } = require("../config/db");
+const { uploadImage, deleteImage } = require("../util/cloudinaryUtils");
 
 const formatHero = (result) => {
   return {
@@ -48,8 +49,21 @@ exports.createHero = async (hero) => {
     subTitle2,
     backgroundColor,
     textColor,
-    imageurl,
+    imagePath,
   } = hero;
+
+  // the image url from cloudinary
+  let imageUrl;
+  let imagePublicId;
+
+  if (imagePath) {
+    // upload image and get the image url
+    const imageResult = await uploadImage(imagePath);
+    imageUrl = imageResult.eager.url;
+
+    // collect public_id and save to DB to be able to destroy it later.
+    imagePublicId = imageResult.public_id;
+  }
 
   // Base query and parameters
   let queryText = `INSERT INTO heros (`;
@@ -83,7 +97,7 @@ exports.createHero = async (hero) => {
     subTitle2,
     backgroundColor,
     textColor,
-    imageurl
+    imagePath
   );
 
   // Combine query text
@@ -94,6 +108,9 @@ exports.createHero = async (hero) => {
 
   // Execute query
   const results = await query(queryText, queryParams, true);
+
+  // TODO: add public id to `hero_image_urls` in the `image_public_id` section
+
   return formatHero(results.rows[0]);
 };
 
@@ -107,7 +124,7 @@ exports.updateHero = async (id, hero) => {
     subTitle2,
     backgroundColor,
     textColor,
-    imageurl,
+    imagePath,
   } = hero;
 
   // Base query and parameters
@@ -156,10 +173,17 @@ exports.updateHero = async (id, hero) => {
     queryParams.push(textColor);
     paramIndex++;
   }
-  if (imageurl) {
-    queryText += `imageurl = $${paramIndex}, `;
-    queryParams.push(imageurl);
-    paramIndex++;
+  if (imagePath) {
+    const imageResults = await uploadImage(imagePath);
+    let imageUrl = imageResults.eager.url;
+
+    if (imageUrl) {
+      // delete image before assigning new image
+      deleteImage(heroImagePublicID);
+      queryText += `imageurl = $${paramIndex}, `;
+      queryParams.push(imageUrl);
+      paramIndex++;
+    }
   }
   // Remove trailing comma and space
   queryText = queryText.slice(0, -2);
@@ -183,6 +207,9 @@ exports.deleteHero = async (heroId) => {
   if (isHeroResults.rows.length < 1) {
     return 0;
   }
+  // remove hero image
+  deleteImage(heroImagePublicID);
+
   const results = await query("DELETE FROM heros WHERE id = $1", [heroId]);
   return 1;
 };
