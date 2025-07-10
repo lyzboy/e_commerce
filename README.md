@@ -113,7 +113,30 @@ The web app includes an admin dashboard where store owners can manage products, 
    ```
    you can use the default values for the name user and password, typically `postgres` for the user and password, `localhost` for the host, and `5432` for the port.
 
-6. **Run the project**:
+6. **Install Cloudinary Node.js**
+   If you want to use Cloudinary for image uploads, which is the default this projects framework uses, you will need to install the Cloudinary Node.js package. 
+
+   *Note: A quickstart guide for Cloudinary can be found [here](https://cloudinary.com/documentation/node_quickstart).*
+   
+   You can do this by running the following command in the backend directory:
+
+   ```bash
+   npm install cloudinary
+   ```
+   You will also need to create a Cloudinary account and set up you api key and secret. This can by running this command in the backend directory with your api key and secret:
+
+   *Linux/MacOS:*
+   ```bash
+   export CLOUDINARY_URL=cloudinary://API_KEY:API_SECRET@CLOUD_NAME
+   ```
+
+   *Windows:*
+   ```bash
+   set CLOUDINARY_URL=cloudinary://API_KEY:API_SECRET@CLOUD_NAME
+   ```
+   Replace `API_KEY`, `API_SECRET`, and `CLOUD_NAME` with your Cloudinary account details. You can find these in your Cloudinary dashboard.
+
+7. **Run the project**:
 
    You will need to run the backend and frontend separately.
 
