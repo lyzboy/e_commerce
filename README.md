@@ -123,7 +123,13 @@ The web app includes an admin dashboard where store owners can manage products, 
    ```bash
    npm install cloudinary
    ```
-   You will also need to create a Cloudinary account and set up you api key and secret. This can by running this command in the backend directory with your api key and secret:
+   You will also need to create a Cloudinary account and set up you api key and secret. This can be done by creating the var in the .env file for:
+
+   ```bash
+   CLOUDINARY_URL=cloudinary://API_KEY:API_SECRET@CLOUD_NAME
+   ```
+
+   or by running this command in the backend directory with your api key and secret:
 
    *Linux/MacOS:*
    ```bash
