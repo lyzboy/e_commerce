@@ -1,3 +1,5 @@
+const path = require("path");
+require("dotenv").config({ path: path.resolve(__dirname, "../.env") });
 // Require the cloudinary library
 const cloudinary = require("cloudinary").v2;
 
@@ -9,13 +11,14 @@ cloudinary.config({
 // Log the configuration
 //console.log(cloudinary.config());
 
-const uploadImage = async (imagePath) => {
+const uploadImage = async (imagePath, imageName) => {
   // Use the uploaded file's name as the asset's public ID and
   // allow overwriting the asset with new versions
   const options = {
     use_filename: false,
     unique_filename: true,
     overwrite: true,
+    display_name: imageName,
   };
 
   try {
@@ -24,7 +27,7 @@ const uploadImage = async (imagePath) => {
     console.log(result);
     return result.public_id;
   } catch (error) {
-    //console.error("Error in AMS: " + error);
+    console.error("Error in AMS: " + error);
     throw error;
   }
 };
@@ -39,18 +42,21 @@ const getAssetInfo = async (publicId) => {
     // Get details about the asset
     const result = await cloudinary.api.resource(publicId, options);
     console.log(result);
-    return result.eager.url;
+    return result.url;
   } catch (error) {
     console.error(error);
+    throw error;
   }
 };
 
 const deleteImage = async (publicId) => {
+  const options = {};
   try {
-    const result = await cloudinary.api.uploader.destroy(publicId);
+    const result = await cloudinary.uploader.destroy(publicId, options);
     return result;
   } catch (error) {
     console.error(error);
+    throw error;
   }
 };
 
