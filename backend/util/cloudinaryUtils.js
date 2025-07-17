@@ -1,5 +1,5 @@
 const path = require("path");
-require("dotenv").config({ path: path.resolve(__dirname, "../.env") });
+require("dotenv").config({ path: path.resolve(__dirname, "../../.env") });
 // Require the cloudinary library
 const cloudinary = require("cloudinary").v2;
 
@@ -12,6 +12,7 @@ cloudinary.config({
 //console.log(cloudinary.config());
 
 const uploadImage = async (imagePath, imageName) => {
+  console.log("Env path: " + path.resolve(__dirname, "../.env"));
   // Use the uploaded file's name as the asset's public ID and
   // allow overwriting the asset with new versions
   const options = {
@@ -53,7 +54,7 @@ const deleteImage = async (publicId) => {
   const options = {};
   try {
     const result = await cloudinary.uploader.destroy(publicId, options);
-    return result;
+    return result.result;
   } catch (error) {
     console.error(error);
     throw error;
