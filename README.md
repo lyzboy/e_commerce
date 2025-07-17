@@ -248,7 +248,7 @@ See the [Design](Design/design_info.md/#needed-functions) document for a list of
 ## Contributing
 
 Contributions are always welcome!  
-Please read our [Contributing Guidelines](CONTRIBUTING.md) for details on the process of submitting pull requests.
+Please read our [Contributing Guidelines](Design/design_docs/CONTRIBUTING.md) for details on the process of submitting pull requests.
 
 ### How to Contribute
 
